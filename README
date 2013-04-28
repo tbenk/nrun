@@ -1,10 +1,11 @@
 nrun
 ====
 
-nrun will run a single command or script on a multiple of target servers synchronously. 
+nrun will run a single command or script on a multiple of target servers
+synchronously. 
 
-the underlying remote access mechanism is exchangeable. as of now, ssh, nsh, rsh and local
-execution modes are implemented.
+the underlying remote access mechanism is exchangeable. as of now, ssh, nsh, rsh
+and local execution modes are implemented.
 
 the return code and all command output will be logged.
 
@@ -16,7 +17,8 @@ usage: nrun -h <HOSTS> -c <CMD> [-a <ARGS>] [-l <DIR>] [-p <MAX>] [-t <SEC>] ...
 --command,-c <CMD>         command to be executed.
 --arguments,-a <ARGS>      the arguments that should be passed to command.
 --parallel,-p <MAX>        number of parallel connections (defaults to 5).
---dump-results,-d          instead of dumping the command output, dump the exit status.
+--dump-results,-d          instead of dumping the command output, dump the exit
+                           status.
 --log-directory,-l <DIR>   base directory for the log files.
 --timeout,-t <SEC>         timeout for each command execution (defaults to 60).
 --copy                     copy command to target host before execution.
@@ -26,7 +28,8 @@ usage: nrun -h <HOSTS> -c <CMD> [-a <ARGS>] [-l <DIR>] [-p <MAX>] [-t <SEC>] ...
                            nsh - nsh based remote execution
                            rsh - rsh based remote execution
                            ssh - ssh based remote execution
-                           local - execute the script locally, set TARGET_HOST on each execution
+                           local - execute the script locally, set TARGET_HOST
+                           on each execution
 
 examples
 ========
@@ -51,10 +54,10 @@ copy the script bin/script.sh to each target hosts and execute it.
 configuration
 =============
 
-special configuration options for the different modes and additional all commandline options can 
-be given in a configuration file. the following three places will be searched for configuration 
-files (values in the last configuration file will overwrite values in the first configuration 
-file):
+special configuration options for the different modes and additional all
+commandline options can be given in a configuration file. the following three
+places will be searched for configuration files (values in the last
+configuration file will overwrite values in the first configuration file):
 
 - $FindBin::Bin/../conf/nrun.config
 - /etc/nrun.config
@@ -66,8 +69,8 @@ file):
 $Main::options->{module_basedir}    = "$FindBin::Bin/../lib/NRun/Workers/";
 $Main::options->{ssh_binary}        = "/usr/bin/ssh";
 $Main::options->{scp_binary}        = "/usr/bin/scp";
-$Main::options->{ssh_args}          = "-o PreferredAuthentications=hostbased,publickey -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q";
-$Main::options->{scp_args}          = "-o PreferredAuthentications=hostbased,publickey -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q";
+$Main::options->{ssh_args}          = "-o PreferredAuthentications=publickey";
+$Main::options->{scp_args}          = "-o PreferredAuthentications=publickey";
 $Main::options->{arg_mode}          = "ssh";
 $Main::options->{arg_parallel}      = 5;
 $Main::options->{arg_timeout}       = 60;
@@ -78,12 +81,13 @@ $Main::options->{arg_timeout}       = 60;
 logging
 =======
 
-on each execution run, the command output and exit code will be saved inside the logging
-directory. the default logging directory is $HOME/.nrun.
+on each execution run, the command output and exit code will be saved inside the
+logging directory. the default logging directory is $HOME/.nrun.
 
 - $LOGDIR/results.log - will contain the exit codes
 - $LOGDIR/output.log - will contain the complete command output for all hosts
-- $LOGDIR/hosts/<HOSTNAME>.log - will contain the command output for a single host
+- $LOGDIR/hosts/<HOSTNAME>.log - will contain the command output for a single
+  host
 
 mode ssh
 ========
@@ -105,7 +109,8 @@ for passwordless login ssh-agent can be used:
 # eval `ssh-agent` 
 # ssh-add
 
-to prevent any ssh interaction the following ssh command paramters are suggested:
+to prevent any ssh interaction the following ssh command paramters are
+suggested:
 
 -o PreferredAuthentications=hostbased,publickey
 -o StrictHostKeyChecking=no
@@ -115,8 +120,8 @@ to prevent any ssh interaction the following ssh command paramters are suggested
 mode local
 ==========
 
-execute the script locally for each host and set the environment variable TARGET_HOST on
-each execution.
+execute the script locally for each host and set the environment variable
+TARGET_HOST on each execution.
 
 mode nsh
 ========
@@ -125,12 +130,12 @@ use nsh as the underlying remote access mechanism.
 
 the following configuration options must be set in the configuration file:
 
-'agentinfo_args'  - arguments supplied to the agentinfo binary
-'nexec_args'      - arguments supplied to the nexec binary
-'ncp_args'        - arguments supplied to the ncp binary
-'ageninfo_binary' - agentinfo binary to be executed
-'nexec_binary'    - nexec binary to be executed
-'ncp_binary'      - ncp binary to be executed
+'agentinfo_args'   - arguments supplied to the agentinfo binary
+'nexec_args'       - arguments supplied to the nexec binary
+'ncp_args'         - arguments supplied to the ncp binary
+'agentinfo_binary' - agentinfo binary to be executed
+'nexec_binary'     - nexec binary to be executed
+'ncp_binary'       - ncp binary to be executed
 
 mode rsh
 ========
