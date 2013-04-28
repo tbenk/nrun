@@ -207,6 +207,16 @@ sub callback_action {
     
     my $_host = shift;
 
+    if (not (defined($options->{skip_ns_check}) or gethostbyname($_host))) {
+
+      return (-254, "dns entry is missing");
+    }
+
+    if (not (defined($options->{skip_ping_check}) or Net::Ping->new()->ping($_host))) {
+
+      return (-253, "not pinging");
+    }
+
     return $options->{workers}->{$options->{mode}}->execute($_host, $options);
 }
 

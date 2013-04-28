@@ -14,7 +14,6 @@ use warnings;
 
 use File::Basename;
 use NRun::Worker;
-use Net::Ping;
 
 our @ISA = qw(NRun::Worker);
 
@@ -67,16 +66,6 @@ sub execute {
     my $_opts = shift;
 
     my ($ret, $out);
-
-    if (not (defined($_opts->{skip_ns_check}) or gethostbyname($_host))) {
-
-      return (-254, "dns entry is missing");
-    }
-
-    if (not (defined($_opts->{skip_ping_check}) or Net::Ping->new()->ping($_host))) {
-
-      return (-253, "not pinging");
-    }
 
     if (not defined($_opts->{copy})) {
 
