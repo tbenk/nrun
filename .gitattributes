@@ -1,0 +1,6 @@
+# .gitattributes
+# Map file extensions to git filters
+
+nrun filter=keywords
+*.pm filter=keywords
+*.pl filter=keywords

@@ -1,0 +1,167 @@
+nrun
+====
+
+nrun will run a single command or script on a multiple of target servers synchronously. 
+
+the underlying remote access mechanism is exchangeable. as of now, ssh, nsh, rsh and local
+execution modes are implemented.
+
+the return code and all command output will be logged.
+
+usage
+=====
+
+usage: nrun -h <HOSTS> -c <CMD> [-a <ARGS>] [-l <DIR>] [-p <MAX>] [-t <SEC>] ...
+--hosts-file,-h <HOSTS>    file containing the target hosts (one host per line).
+--command,-c <CMD>         command to be executed.
+--arguments,-a <ARGS>      the arguments that should be passed to command.
+--parallel,-p <MAX>        number of parallel connections (defaults to 5).
+--dump-results,-d          instead of dumping the command output, dump the exit status.
+--log-directory,-l <DIR>   base directory for the log files.
+--timeout,-t <SEC>         timeout for each command execution (defaults to 60).
+--copy                     copy command to target host before execution.
+--no-hostname              omit hostname prefix.
+--no-logfile               do not generate any log files.
+--mode <MODE>              remote execution mode:
+                           nsh - nsh based remote execution
+                           rsh - rsh based remote execution
+                           ssh - ssh based remote execution
+                           local - execute the script locally, set TARGET_HOST on each execution
+
+examples
+========
+
+1. nrun --hosts-file <HOSTS.LST> --command ls
+
+run the command "ls" on all hosts in the file <HOSTS.LST>.
+
+2. nrun --hosts-file <HOSTS.LST> --command ls --arguments "-al" 
+
+run the command "ls -al" on all hosts in the file <HOSTS.LST>.
+
+3. nrun --hosts-file <HOSTS.LST> --command ls --mode ssh
+
+run the command "ls" on all hosts in the file <HOSTS.LST> using the mode "ssh".
+
+4. nrun --hosts-file <HOSTS.LST> --command bin/script.sh --copy
+
+copy the script bin/script.sh to each target hosts and execute it.
+
+
+configuration
+=============
+
+special configuration options for the different modes and additional all commandline options can 
+be given in a configuration file. the following three places will be searched for configuration 
+files (values in the last configuration file will overwrite values in the first configuration 
+file):
+
+- $FindBin::Bin/../conf/nrun.config
+- /etc/nrun.config
+- $HOME/.nrun.config
+
+--<snip>--
+###
+# global options
+$Main::options->{module_basedir}    = "$FindBin::Bin/../lib/NRun/Workers/";
+$Main::options->{ssh_binary}        = "/usr/bin/ssh";
+$Main::options->{scp_binary}        = "/usr/bin/scp";
+$Main::options->{ssh_args}          = "-o PreferredAuthentications=hostbased,publickey -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q";
+$Main::options->{scp_args}          = "-o PreferredAuthentications=hostbased,publickey -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q";
+$Main::options->{arg_mode}          = "ssh";
+$Main::options->{arg_parallel}      = 5;
+$Main::options->{arg_timeout}       = 60;
+
+1;
+--<snap>--
+
+logging
+=======
+
+on each execution run, the command output and exit code will be saved inside the logging
+directory. the default logging directory is $HOME/.nrun.
+
+- $LOGDIR/results.log - will contain the exit codes
+- $LOGDIR/output.log - will contain the complete command output for all hosts
+- $LOGDIR/hosts/<HOSTNAME>.log - will contain the command output for a single host
+
+mode ssh
+========
+
+use ssh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'ssh_args'   - arguments supplied to the ssh binary
+'scp_args'   - arguments supplied to the scp binary
+'ssh_binary' - ssh binary to be executed
+'scp_binary' - scp binary to be executed
+
+for passwordless login ssh-agent can be used:
+
+# ssh-keygen
+# scp .ssh/id_rsa.pub $USER@$HOST:.ssh/authorized_keys
+
+# eval `ssh-agent` 
+# ssh-add
+
+to prevent any ssh interaction the following ssh command paramters are suggested:
+
+-o PreferredAuthentications=hostbased,publickey
+-o StrictHostKeyChecking=no
+-o UserKnownHostsFile=/dev/null
+-q
+
+mode local
+==========
+
+execute the script locally for each host and set the environment variable TARGET_HOST on
+each execution.
+
+mode nsh
+========
+
+use nsh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'agentinfo_args'  - arguments supplied to the agentinfo binary
+'nexec_args'      - arguments supplied to the nexec binary
+'ncp_args'        - arguments supplied to the ncp binary
+'ageninfo_binary' - agentinfo binary to be executed
+'nexec_binary'    - nexec binary to be executed
+'ncp_binary'      - ncp binary to be executed
+
+mode rsh
+========
+
+use rsh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'rsh_args'   - arguments supplied to the rsh binary
+'rcp_args'   - arguments supplied to the rcp binary
+'rsh_binary' - rsh binary to be executed
+'rcp_binary' - rcp binary to be executed
+
+a note on the git repository
+============================
+
+$ git clone https://github.com/tbenk/nrun
+$ ln -s ../../.git_hooks/commit-msg .git/hooks
+
+to enable keyword substitution:
+$ git config --local filter.keywords.clean ".git_filters/keywords -m clean -f %f"
+$ git config --local filter.keywords.smudge ".git_filters/keywords -m smudge -f %f"
+
+to disable keyword substitution:
+$ git config --local filter.keywords.smudge "cat"
+
+after git keywors substitution is enabled, the following command will replace
+all keywords in the source files:
+
+$ git checkout HEAD .
+
+for keyword substitution to work at least git version v1.7.3.4-599-ga2b665d is
+necessary.
+

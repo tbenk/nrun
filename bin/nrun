@@ -1,0 +1,278 @@
+#!/usr/bin/perl
+
+# Program: <FILE>
+# Author:  <AUTHORNAME> <<AUTHOREMAIL>>
+# Date:    <COMMITTERDATE>
+# Ident:   <COMMITHASH>
+# Branch:  <REFNAMES>
+#
+# <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
+#
+
+package Main;
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use File::Path;
+use File::Basename;
+use Date::Format;
+use Getopt::Long;
+use File::HomeDir qw(home);
+
+use NRun::Dumper;
+use NRun::Logger;
+use NRun::Dispatcher;
+
+our $options = {};
+
+###
+# dump a short usage info to stdout.
+sub usage {
+
+    print "usage: " . basename($0) . " -h <HOSTS> -c <CMD> [-a <ARGS>] [-l <DIR>] [-p <MAX>] [-t <SEC>] ...\n";
+    print "--hosts-file,-h <HOSTS>    file containing the target hosts (one host per line).\n";
+    print "--command,-c <CMD>         command to be executed.\n";
+    print "--arguments,-a <ARGS>      the arguments that should be passed to command.\n";
+    print "--parallel,-p <MAX>        number of parallel connections (defaults to 5).\n";
+    print "--dump-results,-d          instead of dumping the command output, dump the exit status.\n";
+    print "--log-directory,-l <DIR>   base directory for the log files.\n";
+    print "--timeout,-t <SEC>         timeout for each command execution (defaults to 60).\n";
+    print "--copy                     copy command to target host before execution.\n";
+    print "--no-hostname              omit hostname prefix.\n";
+    print "--no-logfile               do not generate any log files.\n";
+    print "--mode <MODE>              remote execution mode:\n";
+
+    foreach my $object (values(%{$options->{workers}})) { 
+
+        print "                           " . $object->mode() . " - " . $object->desc() ."\n";
+    }
+
+    exit;
+}
+
+###
+# parse the commandline.
+sub parse_commandline {
+
+    my $arg_hosts_file    = $options->{arg_hosts_file};
+    my $arg_parallel      = $options->{arg_parallel};
+    my $arg_command       = $options->{arg_command};
+    my $arg_arguments     = $options->{arg_arguments};
+    my $arg_dump_results  = $options->{arg_dump_results};
+    my $arg_no_hostname   = $options->{arg_no_hostname};
+    my $arg_no_logfile    = $options->{arg_no_logfile};
+    my $arg_log_directory = $options->{arg_log_directory};
+    my $arg_mode          = $options->{arg_mode};
+    my $arg_copy          = $options->{arg_copy};
+    my $arg_timeout       = $options->{arg_timeout};
+
+    my $ret = GetOptions (
+        "hosts-file|h=s"    => \$arg_hosts_file,
+        "parallel|p=i"      => \$arg_parallel,
+        "command|c=s"       => \$arg_command,
+        "arguments|a=s"     => \$arg_arguments,
+        "no-hostname"       => \$arg_no_hostname,
+        "dump-results|d"    => \$arg_dump_results,
+        "log-directory|l=s" => \$arg_log_directory,
+        "timeout|t=i"       => \$arg_timeout,
+        "no-logfile"        => \$arg_no_logfile,
+        "mode|m=s"          => \$arg_mode,
+        "copy"              => \$arg_copy,
+    );
+
+    usage() if (not $ret);
+
+    if (not defined($arg_hosts_file)) {
+
+        print "error: parameter --hosts-file is mandatory.\n";
+        usage();
+    }
+
+    if (not defined($arg_command)) {
+
+        print "error: parameter --command is mandatory.\n";
+        usage();
+    }
+
+    if (not defined($arg_mode)) {
+
+        print "error: parameter --mode is mandatory.\n";
+        usage();
+    }
+
+    my $date = time2str("%Y%m%d_%H_%M_%S", time);
+
+    $options->{hosts_file}  = $arg_hosts_file;
+    $options->{parallel}    = $arg_parallel;
+    $options->{command}     = $arg_command;
+    $options->{arguments}   = $arg_arguments ? $arg_arguments : "";
+    $options->{timeout}     = $arg_timeout;
+    $options->{no_logfile}  = $arg_no_logfile;
+    $options->{copy}        = $arg_copy;
+    $options->{mode}        = lc($arg_mode);
+
+    $options->{dump} = "output";
+    if (defined($arg_dump_results)) {
+    
+        $options->{dump} = "result";
+    } elsif (defined($arg_no_hostname)) {
+
+        $options->{dump} = "output_no_hostname";
+    }
+
+    $options->{log_directory} = basename($options->{command}) . "/" . $date;
+    if (defined($arg_log_directory)) {
+
+        $options->{log_directory} = "$arg_log_directory/$options->{log_directory}";
+    } else {
+
+        $options->{log_directory} = home() . "/.nrun/$options->{log_directory}";
+    }
+
+    if ($options->{parallel} < 1) {
+
+        print "error: parameter --parallel must be bigger than 1.\n";
+        usage();
+    }
+}
+
+###
+# read the hosts file.
+#
+# $_file - the file containing the hostnames, one per line
+# <- an array reference to the array containing all hostnames
+sub read_hosts {
+
+    my $_file = shift;
+
+    my $hosts = ();
+
+    open(HOSTS, "<$_file") or die("Cannot open $_file: $!");
+    foreach my $host (<HOSTS>) {
+
+        chomp($host);
+        $host =~ s/^\s+//;
+        $host =~ s/\s+$//;
+
+        if (not $host =~ /^ *$/) {
+
+            # filter out duplicate entries
+            $hosts->{$host} = 1;
+        }
+    }
+
+    my @hosts = keys(%$hosts);
+
+    return \@hosts;
+}
+
+###
+# dynamically load all available login module
+sub load_modules {
+
+    opendir(DIR, $options->{module_basedir}) or die("$options->{module_basedir}: $!");
+    while (my $module = readdir(DIR)) {
+
+        if ($module =~ /\.pm$/i) {
+
+            require "$options->{module_basedir}/$module";
+            
+            $options->{workers} = {} if (not defined($options->{workers}));
+
+            $module =~ s/\.pm$//i;
+
+            my $object = $module->new();
+            $options->{workers}->{$object->mode()} = $object;
+        }
+    }
+    close DIR;
+}
+
+###
+# callback function used by the dispatcher
+sub callback_action {
+    
+    my $_host = shift;
+
+    return $options->{workers}->{$options->{mode}}->execute($_host, $options);
+}
+
+###
+# callback function used by the dispatcher
+sub callback_result {
+
+    my $_host   = shift;
+    my $_return = shift;
+    my $_output = shift;
+
+    my $dumper = NRun::Dumper->new (
+        {
+            dump => $options->{dump},
+        }
+    );
+
+    $dumper->dump($_host, $_return, $_output);
+
+    my $logger = NRun::Logger->new (
+        {
+            basedir => $options->{log_directory},
+        }
+    );
+
+    $logger->log($_host, $_return, $_output) if (not defined($options->{no_logfile}));
+}
+
+##
+# read configuration files
+#
+# $_files - the files to be read (values in last file will overwrite values in first file)
+sub read_config_files {
+
+    my $_files = shift;
+
+    foreach my $file (@$_files) {
+  
+        if (-e $file) {
+  
+            require $file;
+        }
+    }
+}
+
+###
+# main
+sub main {
+
+    read_config_files (
+        [
+            "$FindBin::Bin/../conf/nrun.config",
+            "/etc/nrun.config",
+            home() . "/.nrun.config" 
+        ]
+    );
+
+    load_modules();
+
+    parse_commandline();
+
+    my $hosts = read_hosts($options->{hosts_file});
+
+    my $dispatcher = NRun::Dispatcher->new (
+        {
+            nmax    => $options->{parallel},
+            timeout => $options->{timeout},
+            objects => $hosts,
+    
+            callback_action => \&callback_action,
+            callback_result => \&callback_result,
+        }
+    );
+
+    $dispatcher->run();
+}
+
+main();
