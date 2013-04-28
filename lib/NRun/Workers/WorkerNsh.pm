@@ -2,7 +2,7 @@
 # Author:  <AUTHORNAME> <<AUTHOREMAIL>>
 # Date:    <COMMITTERDATE>
 # Ident:   <COMMITHASH>
-# Branch:  <REFNAMES>
+# Branch:  HEAD, origin/master, master
 #
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
@@ -68,12 +68,12 @@ sub execute {
     my $_host = shift;
     my $_opts = shift;
 
-    if (not gethostbyname($_host)) {
+    if (not (defined($_opts->{skip_ns_check}) or gethostbyname($_host))) {
 
       return (-254, "dns entry is missing");
     }
 
-    if (not Net::Ping->new()->ping($_host)) {
+    if (not (defined($_opts->{skip_ping_check}) or Net::Ping->new()->ping($_host))) {
 
       return (-253, "not pinging");
     }

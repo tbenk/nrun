@@ -4,7 +4,7 @@
 # Author:  <AUTHORNAME> <<AUTHOREMAIL>>
 # Date:    <COMMITTERDATE>
 # Ident:   <COMMITHASH>
-# Branch:  <REFNAMES>
+# Branch:  HEAD, origin/master, master
 #
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
@@ -44,6 +44,8 @@ sub usage {
     print "--copy                     copy command to target host before execution.\n";
     print "--no-hostname              omit hostname prefix.\n";
     print "--no-logfile               do not generate any log files.\n";
+    print "--skip-ping-check          skip checking if the host answers on ping.\n";
+    print "--skip-ns-check            skip checking if the hostname is resolvable.\n";
     print "--mode <MODE>              remote execution mode:\n";
 
     foreach my $object (values(%{$options->{workers}})) { 
@@ -58,17 +60,19 @@ sub usage {
 # parse the commandline.
 sub parse_commandline {
 
-    my $arg_hosts_file    = $options->{arg_hosts_file};
-    my $arg_parallel      = $options->{arg_parallel};
-    my $arg_command       = $options->{arg_command};
-    my $arg_arguments     = $options->{arg_arguments};
-    my $arg_dump_results  = $options->{arg_dump_results};
-    my $arg_no_hostname   = $options->{arg_no_hostname};
-    my $arg_no_logfile    = $options->{arg_no_logfile};
-    my $arg_log_directory = $options->{arg_log_directory};
-    my $arg_mode          = $options->{arg_mode};
-    my $arg_copy          = $options->{arg_copy};
-    my $arg_timeout       = $options->{arg_timeout};
+    my $arg_hosts_file      = $options->{arg_hosts_file};
+    my $arg_parallel        = $options->{arg_parallel};
+    my $arg_command         = $options->{arg_command};
+    my $arg_arguments       = $options->{arg_arguments};
+    my $arg_dump_results    = $options->{arg_dump_results};
+    my $arg_no_hostname     = $options->{arg_no_hostname};
+    my $arg_no_logfile      = $options->{arg_no_logfile};
+    my $arg_log_directory   = $options->{arg_log_directory};
+    my $arg_mode            = $options->{arg_mode};
+    my $arg_copy            = $options->{arg_copy};
+    my $arg_skip_ping_check = $options->{arg_skip_ping_check};
+    my $arg_skip_ns_check   = $options->{arg_skip_ns_check};
+    my $arg_timeout         = $options->{arg_timeout};
 
     my $ret = GetOptions (
         "hosts-file|h=s"    => \$arg_hosts_file,
@@ -81,6 +85,9 @@ sub parse_commandline {
         "timeout|t=i"       => \$arg_timeout,
         "no-logfile"        => \$arg_no_logfile,
         "mode|m=s"          => \$arg_mode,
+        "copy"              => \$arg_copy,
+        "skip-ping-check"   => \$arg_skip_ping_check,
+        "skip-ns-check"     => \$arg_skip_ns_check,
         "copy"              => \$arg_copy,
     );
 
@@ -106,14 +113,16 @@ sub parse_commandline {
 
     my $date = time2str("%Y%m%d_%H_%M_%S", time);
 
-    $options->{hosts_file}  = $arg_hosts_file;
-    $options->{parallel}    = $arg_parallel;
-    $options->{command}     = $arg_command;
-    $options->{arguments}   = $arg_arguments ? $arg_arguments : "";
-    $options->{timeout}     = $arg_timeout;
-    $options->{no_logfile}  = $arg_no_logfile;
-    $options->{copy}        = $arg_copy;
-    $options->{mode}        = lc($arg_mode);
+    $options->{hosts_file}      = $arg_hosts_file;
+    $options->{parallel}        = $arg_parallel;
+    $options->{command}         = $arg_command;
+    $options->{arguments}       = $arg_arguments ? $arg_arguments : "";
+    $options->{timeout}         = $arg_timeout;
+    $options->{no_logfile}      = $arg_no_logfile;
+    $options->{copy}            = $arg_copy;
+    $options->{skip_ns_check}   = $arg_skip_ns_check;
+    $options->{skip_ping_check} = $arg_skip_ping_check;
+    $options->{mode}            = lc($arg_mode);
 
     $options->{dump} = "output";
     if (defined($arg_dump_results)) {

@@ -24,6 +24,8 @@ usage: nrun -h <HOSTS> -c <CMD> [-a <ARGS>] [-l <DIR>] [-p <MAX>] [-t <SEC>] ...
 --copy                     copy command to target host before execution.
 --no-hostname              omit hostname prefix.
 --no-logfile               do not generate any log files.
+--skip-ping-check          skip checking if the host answers on ping.
+--skip-ns-check            skip checking if the hostname is resolvable.
 --mode <MODE>              remote execution mode:
                            nsh - nsh based remote execution
                            rsh - rsh based remote execution
