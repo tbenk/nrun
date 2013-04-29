@@ -22,6 +22,7 @@ use File::Basename;
 use Date::Format;
 use Getopt::Long;
 use File::HomeDir qw(home);
+use Net::Ping;
 
 use NRun::Dumper;
 use NRun::Logger;
