@@ -21,8 +21,8 @@ use File::Path;
 use File::Basename;
 use Date::Format;
 use Getopt::Long;
-use File::HomeDir qw(home);
 use Net::Ping;
+use POSIX qw(getuid);
 
 use NRun::Worker;
 use NRun::Dumper;
@@ -150,6 +150,15 @@ sub parse_commandline {
         print "error: parameter --parallel must be bigger than 1.\n";
         usage();
     }
+}
+
+###
+# return users home directory
+#
+# <- the current users home directory
+sub home {
+
+    my $home = (getpwuid(getuid()))[7];
 }
 
 ###
