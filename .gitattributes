@@ -2,5 +2,6 @@
 # Map file extensions to git filters
 
 nrun filter=keywords
+ncopy filter=keywords
 *.pm filter=keywords
 *.pl filter=keywords
