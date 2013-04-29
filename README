@@ -2,7 +2,7 @@ nrun
 ====
 
 nrun will run a single command or script on a multiple of target servers
-synchronously. 
+synchronously.  ncopy will copy a file or directory to multiple target servers.
 
 the underlying remote access mechanism is exchangeable. as of now, ssh, nsh, rsh
 and local execution modes are implemented.
@@ -17,7 +17,7 @@ usage: nrun -h <HOSTS> -c <CMD> [-a <ARGS>] [-l <DIR>] [-p <MAX>] [-t <SEC>] ...
 --command,-c <CMD>         command to be executed.
 --arguments,-a <ARGS>      the arguments that should be passed to command.
 --parallel,-p <MAX>        number of parallel connections (defaults to 5).
---dump-results,-d          instead of dumping the command output, dump the exit
+--dump-results             instead of dumping the command output, dump the exit
                            status.
 --log-directory,-l <DIR>   base directory for the log files.
 --timeout,-t <SEC>         timeout for each command execution (defaults to 60).
@@ -33,25 +33,48 @@ usage: nrun -h <HOSTS> -c <CMD> [-a <ARGS>] [-l <DIR>] [-p <MAX>] [-t <SEC>] ...
                            local - execute the script locally, set TARGET_HOST
                            on each execution
 
+usage: ncopy -h <HOSTS> -s <SRC> -d <DST>  [-l <DIR>] [-p <MAX>] [-t <SEC>] ...
+--hosts-file,-h <HOSTS>    file containing the target hosts (one host per line).
+--source,-s <SRC>          the file to be copied.
+--destination,-d <DST>     destination the file should be copied to.
+--parallel,-p <MAX>        number of parallel connections (defaults to 5).
+--dump-results             instead of dumping the command output, dump the exit
+                           status.
+--log-directory,-l <DIR>   base directory for the log files.
+--timeout,-t <SEC>         timeout for each command execution (defaults to 60).
+--no-hostname              omit hostname prefix.
+--no-logfile               do not generate any log files.
+--skip-ping-check          skip checking if the host answers on ping.
+--skip-ns-check            skip checking if the hostname is resolvable.
+--mode <MODE>              remote execution mode:
+                           ssh - ssh based remote execution
+                           nsh - nsh based remote execution
+                           rsh - rsh based remote execution
+                           local - execute the script locally, set TARGET_HOST
+                           on each execution
+
 examples
 ========
 
-1. nrun --hosts-file <HOSTS.LST> --command ls
+1. run the command "ls" on all hosts in the file <HOSTS.LST>.
 
-run the command "ls" on all hosts in the file <HOSTS.LST>.
+$ nrun --hosts-file <HOSTS.LST> --command ls
 
-2. nrun --hosts-file <HOSTS.LST> --command ls --arguments "-al" 
+2. run the command "ls -al" on all hosts in the file <HOSTS.LST>.
 
-run the command "ls -al" on all hosts in the file <HOSTS.LST>.
+$ nrun --hosts-file <HOSTS.LST> --command ls --arguments "-al" 
 
-3. nrun --hosts-file <HOSTS.LST> --command ls --mode ssh
+3. run the command "ls" on all hosts in the file <HOSTS.LST> - mode "ssh".
 
-run the command "ls" on all hosts in the file <HOSTS.LST> using the mode "ssh".
+$ nrun --hosts-file <HOSTS.LST> --command ls --mode ssh
 
-4. nrun --hosts-file <HOSTS.LST> --command bin/script.sh --copy
+4. copy the script bin/script.sh to each target hosts and execute it.
 
-copy the script bin/script.sh to each target hosts and execute it.
+$ nrun --hosts-file <HOSTS.LST> --command bin/script.sh --copy
 
+5. copy file test.tar to all hosts in the file <HOSTS.LST>
+
+$ ncopy --hosts-file <HOSTS.LST> --source test.tar --destination /tmp
 
 configuration
 =============
@@ -68,14 +91,15 @@ configuration file will overwrite values in the first configuration file):
 --<snip>--
 ###
 # global options
-$Main::options->{module_basedir}    = "$FindBin::Bin/../lib/NRun/Workers/";
-$Main::options->{ssh_binary}        = "/usr/bin/ssh";
-$Main::options->{scp_binary}        = "/usr/bin/scp";
-$Main::options->{ssh_args}          = "-o PreferredAuthentications=publickey";
-$Main::options->{scp_args}          = "-o PreferredAuthentications=publickey";
-$Main::options->{arg_mode}          = "ssh";
-$Main::options->{arg_parallel}      = 5;
-$Main::options->{arg_timeout}       = 60;
+$Main::options->{ssh_binary}     = "/usr/bin/ssh";
+$Main::options->{scp_binary}     = "/usr/bin/scp";
+$Main::options->{ssh_args}       = "-o PreferredAuthentications=publickey";
+$Main::options->{ssh_user}       = "root";
+$Main::options->{scp_args}       = "-o PreferredAuthentications=publickey";
+$Main::options->{scp_user}       = "root";
+$Main::options->{arg_mode}       = "ssh";
+$Main::options->{arg_parallel}   = 5;
+$Main::options->{arg_timeout}    = 60;
 
 1;
 --<snap>--
@@ -102,6 +126,8 @@ the following configuration options must be set in the configuration file:
 'scp_args'   - arguments supplied to the scp binary
 'ssh_binary' - ssh binary to be executed
 'scp_binary' - scp binary to be executed
+'ssh_user'   - ssh login user
+'scp_user'   - scp login user
 
 for passwordless login ssh-agent can be used:
 
@@ -150,6 +176,8 @@ the following configuration options must be set in the configuration file:
 'rcp_args'   - arguments supplied to the rcp binary
 'rsh_binary' - rsh binary to be executed
 'rcp_binary' - rcp binary to be executed
+'rsh_user'   - rsh login user
+'rcp_user'   - rcp login user
 
 a note on the git repository
 ============================
@@ -164,7 +192,7 @@ $ git config --local filter.keywords.smudge ".git_filters/keywords -m smudge -f 
 to disable keyword substitution:
 $ git config --local filter.keywords.smudge "cat"
 
-after git keywors substitution is enabled, the following command will replace
+after git keyword substitution is enabled, the following command will replace
 all keywords in the source files:
 
 $ git checkout HEAD .

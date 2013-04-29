@@ -42,28 +42,64 @@ sub new {
 }
 
 ###
+# copy a file to $_host.
+#
+# $_host   - the host the command should be exeuted on
+# $_source - source file to be copied
+# $_target - destination $_source should be copied to
+# <- (
+#      $ret - the return code
+#      $out - command output
+#    )
+sub copy {
+
+    my $_self   = shift;
+    my $_host   = shift;
+    my $_source = shift;
+    my $_target = shift;
+
+    return (1, "not implemented");
+}
+
+###
 # execute the command locally and set environment variable TARGET_HOST
 # to $_host.
 #
-# $_host - the host that should be used in TARGET_HOST
-# $_opts - parameter hash where
-# {
-#   'command'   - the command to be exeuted
-#   'arguments' - the arguments supplied to command
-# }
+# $_host    - the host the command should be exeuted on
+# $_command - the command that should be executed
+# $_args    - arguments that should be supplied to $_command
 # <- (
 #      $ret - the return code
 #      $out - command output
 #    )
 sub execute {
 
-    my $_self = shift;
-    my $_host = shift;
-    my $_opts = shift;
+    my $_self    = shift;
+    my $_host    = shift;
+    my $_command = shift;
+    my $_args    = shift;
 
     $ENV{"TARGET_HOST"} = $_host;
 
-    return _("$_opts->{command} $_opts->{arguments}");
+    return _("$_command $_args");
+}
+
+###
+# delete a file on $_host.
+#
+# $_host - the host the command should be exeuted on
+# $_file - the command that should be executed
+# <- (
+#      $ret - the return code
+#      $out - command output
+#    )
+sub delete {
+
+    my $_self = shift;
+    my $_host = shift;
+    my $_file = shift;
+
+    return (1, "not implemented");
 }
 
 1;

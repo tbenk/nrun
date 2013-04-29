@@ -2,7 +2,7 @@
 # Author:  <AUTHORNAME> <<AUTHOREMAIL>>
 # Date:    <COMMITTERDATE>
 # Ident:   <COMMITHASH>
-# Branch:  HEAD, origin/master, master
+# Branch:  <REFNAMES>
 #
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
@@ -28,72 +28,112 @@ our $MODINFO = {
 ###
 # create a new object.
 #
+# $_cfg - parameter hash where
+# {
+#   'agentinfo_args'   - arguments supplied to the agentinfo binary
+#   'agentinfo_binary' - agentinfo binary to be executed
+#   'ncp_args'         - arguments supplied to the ncp binary
+#   'ncp_binary'       - ncp binary to be executed
+#   'nexec_args'       - arguments supplied to the nexec binary
+#   'nexec_binary'     - nexec binary to be executed
+# }
 # <- the new object
 sub new {
 
     my $_pkg = shift;
-    my $_obj = shift;
+    my $_cfg = shift;
 
     my $self = {};
     bless $self, $_pkg;
+
+    $self->{agentinfo_args}   = $_cfg->{agentinfo_args};
+    $self->{agentinfo_binary} = $_cfg->{agentinfo_binary};
+    $self->{nexec_args}       = $_cfg->{nexec_args};
+    $self->{nexec_binary}     = $_cfg->{nexec_binary};
+    $self->{ncp_args}         = $_cfg->{ncp_args};
+    $self->{ncp_binary}       = $_cfg->{ncp_binary};
 
     $self->{MODINFO} = $MODINFO;
     return $self;
 }
 
 ###
+# copy a file using nsh to $_host.
+#
+# $_host   - the host the command should be exeuted on
+# $_source - source file to be copied
+# $_target - destination $_source should be copied to
+# <- (
+#      $ret - the return code (-128 indicates too many parallel connections)
+#      $out - command output
+#    )
+sub copy {
+
+    my $_self   = shift;
+    my $_host   = shift;
+    my $_source = shift;
+    my $_target = shift;
+
+    # nexec "steals" STDIN otherwise - no CTRL+C possible
+    close(STDIN);
+    open(STDIN, "/dev/null");
+
+    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));
+    return ($ret, $out) if (not $ret == 0);
+
+    return $_self->error_handler(_("$_self->{ncp_binary} $_self->{ncp_args} $_source - //$_host/$_target"));
+}
+
+###
 # execute the command using nsh on $_host.
 #
-# $_host - the host the command should be exeuted on
-# $_opts - parameter hash where
-# {
-#   'command'          - the command to be exeuted
-#   'arguments'        - arguments supplied to the command
-#   'copy'             - copy command to target host before execution
-#   'agentinfo_args'   - arguments supplied to the agentinfo binary
-#   'nexec_args'       - arguments supplied to the nexec binary
-#   'ncp_args'         - arguments supplied to the ncp binary
-#   'agentinfo_binary' - agentinfo binary to be executed
-#   'nexec_binary'     - nexec binary to be executed
-#   'ncp_binary'       - ncp binary to be executed
-# }
+# $_host    - the host the command should be exeuted on
+# $_command - the command that should be executed
+# $_args    - arguments that should be supplied to $_command
 # <- (
 #      $ret - the return code (-128 indicates too many parallel connections)
 #      $out - command output
 #    )
 sub execute {
 
-    my $_self = shift;
-    my $_host = shift;
-    my $_opts = shift;
+    my $_self    = shift;
+    my $_host    = shift;
+    my $_command = shift;
+    my $_args    = shift;
 
     # nexec "steals" STDIN otherwise - no CTRL+C possible
     close(STDIN);
     open(STDIN, "/dev/null");
 
-    my ($ret, $out) = $_self->error_handler(_("$_opts->{agentinfo_binary} $_host"));
+    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));
     return ($ret, $out) if (not $ret == 0);
 
-    if (not defined($_self->{copy})) {
+    return $_self->error_handler(_("$_self->{nexec_binary} $_self->{nexec_args} -n $_host $_command $_args"));
+}
 
-        ($ret, $out) = $_self->error_handler(_("$_opts->{nexec_binary} $_opts->{nexec_args} -n $_host $_opts->{command} $_opts->{arguments}"));
-    } else {
+###
+# delete a file using nsh on $_host.
+#
+# $_host - the host the command should be exeuted on
+# $_file - the command that should be executed
+# <- (
+#      $ret - the return code (-128 indicates too many parallel connections)
+#      $out - command output
+#    )
+sub delete {
 
-        my $command = basename($_opts->{command}) . "." . $$;
+    my $_self = shift;
+    my $_host = shift;
+    my $_file = shift;
 
-        ($ret, $out) = $_self->error_handler(_("$_opts->{ncp_binary} $_opts->{ncp_args} $_opts->{command} - //$_host/tmp/$command"));
-        return ($ret, $out) if (not $ret == 0);
+    # nexec "steals" STDIN otherwise - no CTRL+C possible
+    close(STDIN);
+    open(STDIN, "/dev/null");
 
-        ($ret, $out) = $_self->error_handler(_("chmod 755 //$_host/tmp/$command"));
-        return ($ret, $out) if (not $ret == 0);
+    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));
+    return ($ret, $out) if (not $ret == 0);
 
-        ($ret, $out) = $_self->error_handler(_("$_opts->{nexec_binary} $_opts->{nexec_args} -n $_host /tmp/$command $_opts->{arguments}"));
-
-        $_self->error_handler(_("$_opts->{nexec_binary} $_opts->{nexec_args} -n $_host rm /tmp/$command"));
-
-    }
-
-    return ($ret, $out);
+    return $_self->error_handler(_("$_self->{nexec_binary} $_self->{nexec_args} -n $_host rm -f \"$_file\""));
 }
 
 ###
