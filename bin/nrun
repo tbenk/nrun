@@ -191,8 +191,7 @@ sub callback_action {
         return (-254, "dns entry is missing");
     }
 
-    #if (not (defined($options->{skip_ping_check}) or Net::Ping->new()->ping($_host))) {
-    if (not (defined($options->{skip_ping_check}) or $? == 0)) {
+    if (not (defined($options->{skip_ping_check}) or Net::Ping->new()->ping($_host))) {
 
         return (-253, "not pinging");
     }
