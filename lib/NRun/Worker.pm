@@ -11,6 +11,9 @@ package NRun::Worker;
 
 use strict;
 use warnings;
+use File::Basename;
+
+my $workers = {};
 
 ###
 # module specification
@@ -19,6 +22,39 @@ our $MODINFO = {
   'MODE' => "",
   'DESC' => "",
 };
+
+###
+# return all available worker modules
+sub workers {
+
+    return $workers;
+}
+
+###
+# dynamically load all available login module
+#
+# $_cfg - option hash given to the submodules on creation
+sub load_modules {
+
+    my $_cfg = shift;
+
+    my $basedir = dirname($INC{"NRun/Worker.pm"}) . "/Workers";
+
+    opendir(DIR, $basedir) or die("$basedir: $!");
+    while (my $module = readdir(DIR)) {
+
+        if ($module =~ /\.pm$/i) {
+
+            require "$basedir/$module";
+
+            $module =~ s/\.pm$//i;
+
+            my $object = $module->new($_cfg);
+            $workers->{$object->mode()} = $object;
+        }
+    }
+    close DIR;
+}
 
 ###
 # execute $_cmd. will die on SIGALRM.
