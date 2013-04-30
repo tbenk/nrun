@@ -72,7 +72,11 @@ $ nrun --hosts-file <HOSTS.LST> --command ls --mode ssh
 
 $ nrun --hosts-file <HOSTS.LST> --command bin/script.sh --copy
 
-5. copy file test.tar to all hosts in the file <HOSTS.LST>
+5. execute the local script test.sh for each target host
+
+$ nrun --hosts-file <HOSTS.LST> --command ./test.sh --mode local
+
+6. copy file test.tar to all hosts in the file <HOSTS.LST>
 
 $ ncopy --hosts-file <HOSTS.LST> --source test.tar --destination /tmp
 
