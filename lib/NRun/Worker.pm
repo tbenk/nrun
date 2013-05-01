@@ -2,7 +2,7 @@
 # Author:  <AUTHORNAME> <<AUTHOREMAIL>>
 # Date:    <COMMITTERDATE>
 # Ident:   <COMMITHASH>
-# Branch:  <REFNAMES>
+# Branch:  <BRANCH>
 #
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
