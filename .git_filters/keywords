@@ -2,14 +2,15 @@
 
 # Program:     keywords
 # Author:      Timo Benk
-# Date:        Sat Apr 27 08:42:58 2013 +0200
-# Ident:       7f143823b605c37f5bcd84e815a88f21e0a60444
-# Branch:      HEAD, origin/master, origin/HEAD, master
+# Date:        Wed May 1 14:52:53 2013 +0200
+# Ident:       b1e2f7cad04b4180db6ae6ff69f10eec0ad76432
+# Branch:      master
 # 
 # Changelog:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s
 # 
 # Timo Benk : 2012-08-17 19:30:24 +0200 : initial checkin
 # Timo Benk : 2012-08-20 18:15:37 +0200 : argument --walk-reflogs added to the "git log" commandline
+# Timo Benk : 2013-05-01 11:04:03 +0200 : keyword BRANCH added
 
 use strict;
 use warnings;
