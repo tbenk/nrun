@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# Program: <FILE>
+# Author:  <AUTHORNAME> <<AUTHOREMAIL>>
+# Date:    <COMMITTERDATE>
+# Ident:   <COMMITHASH>
+# Branch:  <BRANCH>
+#
+# <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
+#
+
+PUBK="$1"
+USER="$2"
+PASS="$3"
+
+cat <<"EOF" | sed 's/^  //' | /usr/bin/expect - "$TARGET_HOST" "$PUBK" "$USER" "$PASS"
+
+  set host [lindex $argv 0]
+  set pubk [lindex $argv 1]
+  set user [lindex $argv 2]
+  set pass [lindex $argv 3]
+  
+  send "$host $pubk $user $pass\n"
+  
+  set fkey [open $pubk r]
+  set data [read $fkey]
+  
+  set data [string trimright "$data"]
+  
+  set timeout 60
+  
+  spawn ssh $user@$host
+  
+  expect {
+    "yes/no"   { send "yes\r"   }
+    "assword:" { send "$pass\r" }
+  }
+  
+  send "echo S\"\"tArToFkEyUpDaTe\r"
+  expect "StArToFkEyUpDaTe"
+  
+  send "test -d .ssh || mkdir .ssh\r"
+  send "chmod 0600 .ssh\r"
+  send "PUBK='$data'\r"
+  send "test -f .ssh/authorized_keys && grep -v \"\$PUBK\" .ssh/authorized_keys >/tmp/authorizes_keys\r"
+  send "echo \"\$PUBK\" >> tmp/authorized_keys\r"
+  send "mv tmp/authorized_keys .ssh/authorized_keys\r"
+  
+  send "echo E\"\"nDoFkEyUpDaTe\r"
+  expect "EnDoFkEyUpDaTe"
+EOF
