@@ -183,6 +183,15 @@ the following configuration options must be set in the configuration file:
 'rsh_user'   - rsh login user
 'rcp_user'   - rcp login user
 
+transferring the public key
+===========================
+
+the helper script misc/put_pubkey can be used to transfer the ssh public key
+to the target hosts without supplying a password for each login. it is meant
+to be executed by the nrun script in mode local.
+
+$ nrun -h <HOSTS.LST> -c ./put_pubkey -a "<KEY> <USER> <PWD>" --mode local -t 120
+
 a note on the git repository
 ============================
 
