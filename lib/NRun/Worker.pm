@@ -2,7 +2,7 @@
 # Author:  <AUTHORNAME> <<AUTHOREMAIL>>
 # Date:    <COMMITTERDATE>
 # Ident:   <COMMITHASH>
-# Branch:  <BRANCH>
+# Branch:  <REFNAMES>
 #
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
@@ -69,15 +69,20 @@ sub _ {
     my $_cmd = shift;
 
     my $pid = -128;
+    my @out;
 
     local $SIG{ALRM} = sub {
 
         kill(9, $pid);
-        die "SIGALRM received (timeout)\n";
+        push(@out, "SIGALRM received (timeout)\n");
+        die join("", @out);
     };
 
     $pid = open(CMD, "$_cmd 2>&1 2>&1|") or die "$_cmd: $!\n"; 
-    my @out = <CMD>;
+    while (my $line = <CMD>) {
+    
+       push(@out, $line);
+    }
     close(CMD);
 
     return ($? >> 8, join("", @out));
