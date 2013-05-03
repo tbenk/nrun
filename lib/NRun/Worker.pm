@@ -71,6 +71,13 @@ sub _ {
     my $pid = -128;
     my @out;
 
+    local $SIG{INT} = sub {
+
+        kill(9, $pid);
+        push(@out, "SIGINT received\n");
+        die join("", @out);
+    };
+
     local $SIG{ALRM} = sub {
 
         kill(9, $pid);
