@@ -23,7 +23,7 @@ commandline options can be given in a configuration file.
 the following three places will be searched for configuration files (values in the last
 configuration file will overwrite values in the first configuration file):
 
-- $FindBin::Bin/../conf/nrun.config
+- $FindBin::Bin/../etc/nrun.config
 
 - /etc/nrun.config
 
