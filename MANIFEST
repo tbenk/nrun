@@ -2,6 +2,7 @@ README
 LICENSE
 MANIFEST
 Makefile.PL
+etc/nrun.config
 bin/nrun
 bin/ncopy
 lib/NRun/Dispatcher.pm
