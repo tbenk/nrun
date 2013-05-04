@@ -26,6 +26,3 @@
 #
 
 package NRun::Version 0.1;
-
-use strict;
-use warnings;
