@@ -52,7 +52,7 @@ our $options = {};
 # dump a short usage info to stdout.
 sub usage {
 
-    print "usage: " . basename($0) . " -h <HOSTS> -s <SRC> -d <DST>  [-l <DIR>] [-p <MAX>] [-t <SEC>] ...\n";
+    print "usage: " . basename($0) . " -s <SRC> -d <DST> [-h <HOSTS>] <HOST1> <HOST2> ...\n";
     print "--hosts-file,-h <HOSTS>    file containing the target hosts (one host per line).\n";
     print "--source,-s <SRC>          the file to be copied.\n";
     print "--destination,-d <DST>     destination the file should be copied to.\n";
@@ -108,12 +108,6 @@ sub parse_commandline {
 
     usage() if (not $ret);
 
-    if (not defined($arg_hosts_file)) {
-
-        print "error: parameter --hosts-file is mandatory.\n";
-        usage();
-    }
-
     if (not defined($arg_source)) {
 
         print "error: parameter --source is mandatory.\n";
@@ -167,6 +161,18 @@ sub parse_commandline {
         print "error: parameter --parallel must be bigger than 1.\n";
         usage();
     }
+
+    $options->{hosts} = \@ARGV ;
+    if (defined($arg_hosts_file)) {
+    
+        $options->{hosts} = [ read_hosts($arg_hosts_file), @ARGV ];
+    }
+
+    if (scalar(@{$options->{hosts}}) == 0) {
+
+        print "error: no hostnames given.\n";
+        usage();
+    }
 }
 
 ###
@@ -182,12 +188,12 @@ sub home {
 # read the hosts file.
 #
 # $_file - the file containing the hostnames, one per line
-# <- an array reference to the array containing all hostnames
+# <- an array containing all hostnames
 sub read_hosts {
 
     my $_file = shift;
 
-    my $hosts = ();
+    my $hosts = {};
 
     open(HOSTS, "<$_file") or die("Cannot open $_file: $!");
     foreach my $host (<HOSTS>) {
@@ -203,9 +209,7 @@ sub read_hosts {
         }
     }
 
-    my @hosts = keys(%$hosts);
-
-    return \@hosts;
+    return keys(%$hosts);
 }
 
 ###
@@ -285,13 +289,11 @@ sub main {
 
     parse_commandline();
 
-    my $hosts = read_hosts($options->{hosts_file});
-
     my $dispatcher = NRun::Dispatcher->new (
         {
             nmax    => $options->{parallel},
             timeout => $options->{timeout},
-            objects => $hosts,
+            objects => $options->{hosts},
     
             callback_action => \&callback_action,
             callback_result => \&callback_result,
