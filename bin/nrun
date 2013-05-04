@@ -40,6 +40,7 @@ use Date::Format;
 use Getopt::Long;
 use Net::Ping;
 use POSIX qw(getuid);
+use File::Temp qw(tempfile);
 
 use NRun::Worker;
 use NRun::Dumper;
@@ -231,7 +232,7 @@ sub callback_action {
     if (defined($options->{copy})) {
 
         my $src = $cmd;
-        $cmd = "/tmp/" . basename($options->{command}) . "." . $$;
+        $cmd  = (tempfile(OPEN => 0, DIR => "/tmp"))[1];
 
         my ($ret, $out) = NRun::Worker::workers()->{$options->{mode}}->copy($_host, $src, $cmd);
         return ($ret, $out) if (not $ret == 0);
