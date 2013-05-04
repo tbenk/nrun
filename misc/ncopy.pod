@@ -54,6 +54,8 @@ logging directory. the default logging directory is $HOME/.nrun.
 
 - $LOGDIR/hosts/HOSTNAME.log - will contain the command output for a single host
 
+=head1 MODES
+
 =head2 mode ssh
 
 use ssh as the underlying remote access mechanism.
@@ -87,8 +89,6 @@ suggested:
 	-o StrictHostKeyChecking=no
 	-o UserKnownHostsFile=/dev/null
 	-q
-
-=head1 MODES
 
 =head2 mode local
 
