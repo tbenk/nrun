@@ -7,7 +7,7 @@ WriteMakefile (
         'bin/nrun',
         'bin/ncopy',
     ],
-    'INSTALLSCRIPT' => 'bin', 
+    'INSTALLSCRIPT' => 'blib/bin', 
     'MAN1PODS'           => {
         'misc/nrun.pod'  => 'blib/man1/nrun.1',
         'misc/ncopy.pod' => 'blib/man1/ncopy.1',
