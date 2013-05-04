@@ -21,7 +21,10 @@ Main	bin/nrun	/^package Main;$/;"	p	class:Main
 SEMAPHORE	lib/NRun/Dumper.pm	/^my $SEMAPHORE = NRun::Semaphore->new({key => int(rand(100000))});$/;"	v	class:Dumper
 SEMAPHORE	lib/NRun/Logger.pm	/^my $SEMAPHORE = NRun::Semaphore->new({key => int(rand(100000))});$/;"	v	class:Logger
 SIG	lib/NRun/Worker.pm	/^    local $SIG{ALRM} = sub {$/;"	v	file:	class:Worker
+SIG	lib/NRun/Worker.pm	/^    local $SIG{INT} = sub {$/;"	v	file:	class:Worker
 Semaphore	lib/NRun/Semaphore.pm	/^package NRun::Semaphore;$/;"	p	class:Semaphore
+VERSION	lib/NRun/Version.pm	/^our $VERSION = qv(0.1);$/;"	v	class:Version
+Version	lib/NRun/Version.pm	/^package NRun::Version;$/;"	p	class:Version
 Worker	lib/NRun/Worker.pm	/^package NRun::Worker;$/;"	p	class:Worker
 WorkerLocal	lib/NRun/Workers/WorkerLocal.pm	/^package WorkerLocal;$/;"	p	class:WorkerLocal
 WorkerNsh	lib/NRun/Workers/WorkerNsh.pm	/^package WorkerNsh;$/;"	p	class:WorkerNsh
@@ -180,12 +183,8 @@ home	bin/ncopy	/^    my $home = (getpwuid(getuid()))[7];$/;"	v	file:	class:Main
 home	bin/ncopy	/^sub home {$/;"	s	class:Main
 home	bin/nrun	/^    my $home = (getpwuid(getuid()))[7];$/;"	v	file:	class:Main
 home	bin/nrun	/^sub home {$/;"	s	class:Main
-hosts	bin/ncopy	/^    my $hosts = ();$/;"	v	file:	class:Main
-hosts	bin/ncopy	/^    my $hosts = read_hosts($options->{hosts_file});$/;"	v	file:	class:Main
-hosts	bin/ncopy	/^    my @hosts = keys(%$hosts);$/;"	v	file:	class:Main
-hosts	bin/nrun	/^    my $hosts = ();$/;"	v	file:	class:Main
-hosts	bin/nrun	/^    my $hosts = read_hosts($options->{hosts_file});$/;"	v	file:	class:Main
-hosts	bin/nrun	/^    my @hosts = keys(%$hosts);$/;"	v	file:	class:Main
+hosts	bin/ncopy	/^    my $hosts = {};$/;"	v	file:	class:Main
+hosts	bin/nrun	/^    my $hosts = {};$/;"	v	file:	class:Main
 load_modules	lib/NRun/Worker.pm	/^sub load_modules {$/;"	s	class:Worker
 lock	lib/NRun/Semaphore.pm	/^sub lock {$/;"	s	class:Semaphore
 log	lib/NRun/Logger.pm	/^sub log {$/;"	s	class:Logger
@@ -217,6 +216,7 @@ parse_commandline	bin/nrun	/^sub parse_commandline {$/;"	s	class:Main
 pid	lib/NRun/Dispatcher.pm	/^        my $pid = pop(@pool);$/;"	v	file:	class:Dispatcher
 pid	lib/NRun/Dispatcher.pm	/^        my $pid = pop(@pool);$/;"	v	file:	class:Dispatcher
 pid	lib/NRun/Dispatcher.pm	/^    my $pid = fork();$/;"	v	file:	class:Dispatcher
+pid	lib/NRun/Worker.pm	/^        kill(9, $pid);$/;"	v	file:	class:Worker
 pid	lib/NRun/Worker.pm	/^        kill(9, $pid);$/;"	v	file:	class:Worker
 pid	lib/NRun/Worker.pm	/^    my $pid = -128;$/;"	v	file:	class:Worker
 pids	lib/NRun/Dispatcher.pm	/^    my (@pool, %pids);$/;"	v	file:	class:Dispatcher
