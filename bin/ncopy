@@ -279,7 +279,7 @@ sub main {
 
     read_config_files (
         [
-            "$FindBin::Bin/../conf/nrun.config",
+            "$FindBin::Bin/../etc/nrun.config",
             "/etc/nrun.config",
             home() . "/.nrun.config" 
         ]
