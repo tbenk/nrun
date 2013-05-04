@@ -25,4 +25,9 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
-package NRun::Version 0.1;
+package NRun::Version;
+
+use version;
+
+our $VERSION = qv(0.1);
+
