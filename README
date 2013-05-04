@@ -27,7 +27,8 @@ usage: nrun -c <CMD> [-h <HOSTS>] <HOST1> <HOST2> ...
 --command,-c <CMD>         command to be executed.
 --arguments,-a <ARGS>      the arguments that should be passed to command.
 --parallel,-p <MAX>        number of parallel connections (defaults to 5).
---dump-results             instead of dumping the command output, dump the exit status.
+--dump-results             instead of dumping the command output, dump the exit
+                           status.
 --log-directory,-l <DIR>   base directory for the log files.
 --timeout,-t <SEC>         timeout for each command execution (defaults to 60).
 --copy                     copy command to target host before execution.
@@ -46,7 +47,8 @@ usage: ncopy -s <SRC> -d <DST> [-h <HOSTS>] <HOST1> <HOST2> ...
 --source,-s <SRC>          the file to be copied.
 --destination,-d <DST>     destination the file should be copied to.
 --parallel,-p <MAX>        number of parallel connections (defaults to 5).
---dump-results             instead of dumping the command output, dump the exit status.
+--dump-results             instead of dumping the command output, dump the exit
+                           status.
 --log-directory,-l <DIR>   base directory for the log files.
 --timeout,-t <SEC>         timeout for each command execution (defaults to 60).
 --no-hostname              omit hostname prefix.
