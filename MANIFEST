@@ -10,9 +10,11 @@ lib/NRun/Dumper.pm
 lib/NRun/Logger.pm
 lib/NRun/Semaphore.pm
 lib/NRun/Version.pm
-lib/NRun/Worker.pm  
+lib/NRun/Worker.pm
 lib/NRun/Workers/WorkerLocal.pm
 lib/NRun/Workers/WorkerNsh.pm
 lib/NRun/Workers/WorkerRsh.pm
 lib/NRun/Workers/WorkerSsh.pm
-
+misc/put_pubkey
+misc/ncopy.pod
+misc/nrun.pod
