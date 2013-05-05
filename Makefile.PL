@@ -1,13 +1,16 @@
 use ExtUtils::MakeMaker;
   
 WriteMakefile (
-    'NAME'               => 'nrun',
-    'VERSION_FROM'       => 'lib/NRun/Version.pm',
-    'EXE_FILES'          => [
+    'NAME'             => 'nrun',
+    'VERSION_FROM'     => 'lib/NRun/Version.pm',
+    'INSTALLSCRIPT'    => 'blib/bin', 
+    'EXE_FILES'        => [
         'bin/nrun',
         'bin/ncopy',
     ],
-    'INSTALLSCRIPT' => 'blib/bin', 
+    'PREREQ_PM' => {
+        "Date::Format" => 0,
+    },
 );
 
 sub MY::postamble {
