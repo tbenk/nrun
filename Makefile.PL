@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
   
 WriteMakefile (
-    'NAME'             => 'nrun',
+    'NAME'             => 'App::nrun',
     'VERSION_FROM'     => 'lib/NRun/Version.pm',
     'INSTALLSCRIPT'    => 'blib/bin', 
     'EXE_FILES'        => [
