@@ -16,5 +16,3 @@ lib/NRun/Workers/WorkerNsh.pm
 lib/NRun/Workers/WorkerRsh.pm
 lib/NRun/Workers/WorkerSsh.pm
 misc/put_pubkey
-misc/ncopy.pod
-misc/nrun.pod
