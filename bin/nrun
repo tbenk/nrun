@@ -43,6 +43,7 @@ use Net::Ping;
 use POSIX qw(getuid);
 use File::Temp qw(tempfile);
 
+use NRun::Version;
 use NRun::Worker;
 use NRun::Dumper;
 use NRun::Logger;
@@ -62,6 +63,7 @@ sub usage {
     print "--dump-results             instead of dumping the command output, dump the exit status.\n";
     print "--log-directory,-l <DIR>   base directory for the log files.\n";
     print "--timeout,-t <SEC>         timeout for each command execution (defaults to 60).\n";
+    print "--version                  print the version string and exit.\n";
     print "--copy                     copy command to target host before execution.\n";
     print "--no-hostname              omit hostname prefix.\n";
     print "--no-logfile               do not generate any log files.\n";
@@ -91,6 +93,7 @@ sub parse_commandline {
     my $arg_log_directory   = $options->{arg_log_directory};
     my $arg_mode            = $options->{arg_mode};
     my $arg_copy            = $options->{arg_copy};
+    my $arg_version         = $options->{arg_version};
     my $arg_skip_ping_check = $options->{arg_skip_ping_check};
     my $arg_skip_ns_check   = $options->{arg_skip_ns_check};
     my $arg_timeout         = $options->{arg_timeout};
@@ -109,9 +112,16 @@ sub parse_commandline {
         "skip-ping-check"   => \$arg_skip_ping_check,
         "skip-ns-check"     => \$arg_skip_ns_check,
         "copy"              => \$arg_copy,
+        "version"           => \$arg_version,
     );
 
     usage() if (not $ret);
+
+    if (defined($arg_version)) {
+
+        print basename($0) .  " " . $NRun::Version::VERSION . "\n";
+        exit(0);
+    }
 
     if (not defined($arg_command)) {
 
@@ -336,7 +346,8 @@ synchronously.
 
 nrun -c CMD [-h HOSTS] [-a ARGS] [-p MAX] [-l DIR] [-t SEC]
 [--mode MODE] [--dump-results] [--copy] [--no-hostname]
-[--no-logfile] [--skip-ping-check] [--skip-ns-check] HOST1 HOST2 ...
+[--no-logfile] [--skip-ping-check] [--skip-ns-check] [--version] 
+HOST1 HOST2 ...
 
 
 =head1 DESCRIPTION
@@ -488,6 +499,8 @@ B<--no-logfile>            do not generate any log files.
 B<--skip-ping-check>       skip checking if the host answers on ping.
 
 B<--skip-ns-check>         skip checking if the hostname is resolvable.
+
+B<--version>               print the version string and exit.
 
 B<--mode MODE>             remote execution mode (see MODES)
 
