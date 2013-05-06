@@ -2,8 +2,8 @@
 
 # Program:     keywords
 # Author:      Timo Benk
-# Date:        Wed May 1 14:52:53 2013 +0200
-# Ident:       b1e2f7cad04b4180db6ae6ff69f10eec0ad76432
+# Date:        Mon May 6 09:23:54 2013 +0200
+# Ident:       c0b598cbc02c35b186b9513bf6ff1aa8039a51d5
 # Branch:      master
 # 
 # Changelog:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s
@@ -11,6 +11,7 @@
 # Timo Benk : 2012-08-17 19:30:24 +0200 : initial checkin
 # Timo Benk : 2012-08-20 18:15:37 +0200 : argument --walk-reflogs added to the "git log" commandline
 # Timo Benk : 2013-05-01 11:04:03 +0200 : keyword BRANCH added
+# Timo Benk : 2013-05-06 09:23:54 +0200 : fixing awk compatibility issues
 
 use strict;
 use warnings;
@@ -129,7 +130,7 @@ sub meta {
         $format .= "$k=$v%n";
     }
 
-    my $branch =  `git branch | awk '/*/ {print \$2}'`;
+    my $branch =  `git branch | awk '/\\*/ {print \$2}'`;
     chomp( $branch );
 
     $meta->{BRANCH} = $branch;
