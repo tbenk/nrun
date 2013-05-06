@@ -19,10 +19,23 @@ nrun is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the GNU General Public License for more details.
 
+installation
+============
+
+installation is straight forward:
+
+# perl Makefile.PL
+# make install
+
+if desired it is possible to change the installation prefix using the
+parameter INSTALLATION_BASE:
+
+# perl Makefile.PL INSTALLATION_BASE=~/applications
+
 usage
 =====
 
-usage: nrun -c <CMD> [-h <HOSTS>] <HOST1> <HOST2> ... 
+usage: nrun -c <CMD> [-h <HOSTS>] <HOST1> <HOST2> ...
 --hosts-file,-h <HOSTS>    file containing the target hosts (one host per line).
 --command,-c <CMD>         command to be executed.
 --arguments,-a <ARGS>      the arguments that should be passed to command.
@@ -31,16 +44,18 @@ usage: nrun -c <CMD> [-h <HOSTS>] <HOST1> <HOST2> ...
                            status.
 --log-directory,-l <DIR>   base directory for the log files.
 --timeout,-t <SEC>         timeout for each command execution (defaults to 60).
+--version                  print the version string and exit.
 --copy                     copy command to target host before execution.
 --no-hostname              omit hostname prefix.
 --no-logfile               do not generate any log files.
 --skip-ping-check          skip checking if the host answers on ping.
 --skip-ns-check            skip checking if the hostname is resolvable.
 --mode <MODE>              remote execution mode:
-                           rsh - rsh based remote execution
                            nsh - nsh based remote execution
+                           rsh - rsh based remote execution
                            ssh - ssh based remote execution
-                           local - execute the script locally, set TARGET_HOST on each execution
+                           local - execute the script locally, set TARGET_HOST
+                           on each execution
 
 usage: ncopy -s <SRC> -d <DST> [-h <HOSTS>] <HOST1> <HOST2> ...
 --hosts-file,-h <HOSTS>    file containing the target hosts (one host per line).
@@ -51,15 +66,17 @@ usage: ncopy -s <SRC> -d <DST> [-h <HOSTS>] <HOST1> <HOST2> ...
                            status.
 --log-directory,-l <DIR>   base directory for the log files.
 --timeout,-t <SEC>         timeout for each command execution (defaults to 60).
+--version                  print the version string and exit.
 --no-hostname              omit hostname prefix.
 --no-logfile               do not generate any log files.
 --skip-ping-check          skip checking if the host answers on ping.
 --skip-ns-check            skip checking if the hostname is resolvable.
 --mode <MODE>              remote execution mode:
-                           rsh - rsh based remote execution
                            nsh - nsh based remote execution
+                           rsh - rsh based remote execution
                            ssh - ssh based remote execution
-                           local - execute the script locally, set TARGET_HOST on each execution
+                           local - execute the script locally, set TARGET_HOST
+                           on each execution
 
 examples
 ========

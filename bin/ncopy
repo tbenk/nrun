@@ -42,6 +42,7 @@ use Getopt::Long;
 use Net::Ping;
 use POSIX qw(getuid);
 
+use NRun::Version;
 use NRun::Worker;
 use NRun::Dumper;
 use NRun::Logger;
@@ -61,6 +62,7 @@ sub usage {
     print "--dump-results             instead of dumping the command output, dump the exit status.\n";
     print "--log-directory,-l <DIR>   base directory for the log files.\n";
     print "--timeout,-t <SEC>         timeout for each command execution (defaults to 60).\n";
+    print "--version                  print the version string and exit.\n";
     print "--no-hostname              omit hostname prefix.\n";
     print "--no-logfile               do not generate any log files.\n";
     print "--skip-ping-check          skip checking if the host answers on ping.\n";
@@ -91,6 +93,7 @@ sub parse_commandline {
     my $arg_skip_ping_check = $options->{arg_skip_ping_check};
     my $arg_skip_ns_check   = $options->{arg_skip_ns_check};
     my $arg_timeout         = $options->{arg_timeout};
+    my $arg_version         = $options->{arg_version};
 
     my $ret = GetOptions (
         "hosts-file|h=s"    => \$arg_hosts_file,
@@ -105,9 +108,16 @@ sub parse_commandline {
         "mode|m=s"          => \$arg_mode,
         "skip-ping-check"   => \$arg_skip_ping_check,
         "skip-ns-check"     => \$arg_skip_ns_check,
+        "version"           => \$arg_version,
     );
 
     usage() if (not $ret);
+
+    if (defined($arg_version)) {
+
+        print basename($0) .  " " . $NRun::Version::VERSION . "\n";
+        exit(0);
+    }
 
     if (not defined($arg_source)) {
 
@@ -318,7 +328,7 @@ ncopy - copy a file or directory to multiple target servers.
 
 ncopy -s SRC -d DST [-h HOSTS] [-p MAX] [-l DIR] [-t SEC]
 [--mode MODE] [--dump-results] [--no-hostname] [--no-logfile]
-[--skip-ping-check] [--skip-ns-check] HOST1 HOST2 ...
+[--skip-ping-check] [--skip-ns-check] [--version] HOST1 HOST2 ...
 
 =head1 DESCRIPTION
 
@@ -466,6 +476,8 @@ B<--no-logfile>            do not generate any log files.
 B<--skip-ping-check>       skip checking if the host answers on ping.
 
 B<--skip-ns-check>         skip checking if the hostname is resolvable.
+
+B<--version>               print the version string and exit.
 
 B<--mode MODE>             remote execution mode (see MODES)
 
