@@ -26,7 +26,7 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
-package Main;
+package App::nrun;
 
 use strict;
 use warnings;
@@ -374,15 +374,15 @@ configuration file will overwrite values in the first configuration file):
 
 	###
 	# global options
-	$Main::options->{ssh_binary}     = "/usr/bin/ssh";
-	$Main::options->{scp_binary}     = "/usr/bin/scp";
-	$Main::options->{ssh_args}       = "-o PreferredAuthentications=publickey";
-	$Main::options->{ssh_user}       = "root";
-	$Main::options->{scp_args}       = "-o PreferredAuthentications=publickey";
-	$Main::options->{scp_user}       = "root";
-	$Main::options->{arg_mode}       = "ssh";
-	$Main::options->{arg_parallel}   = 5;
-	$Main::options->{arg_timeout}    = 60;
+	$options->{ssh_binary}   = "/usr/bin/ssh";
+	$options->{scp_binary}   = "/usr/bin/scp";
+	$options->{ssh_args}     = "-o PreferredAuthentications=publickey";
+	$options->{ssh_user}     = "root";
+	$options->{scp_args}     = "-o PreferredAuthentications=publickey";
+	$options->{scp_user}     = "root";
+	$options->{arg_mode}     = "ssh";
+	$options->{arg_parallel} = 5;
+	$options->{arg_timeout}  = 60;
 	
 	1;
 
