@@ -97,7 +97,7 @@ sub _ {
 
         $SEMAPHORE->lock();
         print STDERR "[$$]: ($pid) $_cmd\n";
-        print STDERR "[$$]: " . join("[$$]: ", @out);
+        print STDERR "[$$]: " . join("[$$]: ", @out) if (scalar(@out));
         $SEMAPHORE->unlock();
     };
 
@@ -112,7 +112,7 @@ sub _ {
         }
 
         print LOG "[$$]: ($pid) $_cmd\n";
-        print LOG "[$$]: " . join("[$$]: ", @out);
+        print LOG "[$$]: " . join("[$$]: ", @out) if (scalar(@out));
 
         close(LOG);
 
