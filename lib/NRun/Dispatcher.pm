@@ -129,10 +129,10 @@ sub run {
 
     my (@pool, %pids);
 
-    $SIG{USR1} = sub { kill(10, keys(%pids)); };
-    $SIG{USR2} = sub { kill(12, keys(%pids)); };
-    $SIG{INT}  = sub { kill(2,  keys(%pids)); exit; };
-    $SIG{TERM} = sub { kill(15, keys(%pids)); exit; };
+    $SIG{USR1} = sub { kill(USR1 => keys(%pids)); };
+    $SIG{USR2} = sub { kill(USR2 => keys(%pids)); };
+    $SIG{INT}  = sub { kill(INT  => keys(%pids)); exit; };
+    $SIG{TERM} = sub { kill(TERM => keys(%pids)); exit; };
 
     # rampup
     while (scalar(@pool) < $_self->{nmax} and scalar(@{$_self->{objects}}) > 0) {
