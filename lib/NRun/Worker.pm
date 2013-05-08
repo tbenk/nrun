@@ -29,7 +29,11 @@ package NRun::Worker;
 
 use strict;
 use warnings;
+
 use File::Basename;
+use NRun::Semaphore;
+
+my $SEMAPHORE = NRun::Semaphore->new({key => int(rand(100000))});
 
 my $workers = {};
 
@@ -89,6 +93,32 @@ sub _ {
     my $pid = -128;
     my @out;
 
+    local $SIG{USR1} = sub {
+
+        $SEMAPHORE->lock();
+        print STDERR "[$$]: ($pid) $_cmd\n";
+        print STDERR "[$$]: " . join("[$$]: ", @out);
+        $SEMAPHORE->unlock();
+    };
+
+    local $SIG{USR2} = sub {
+
+        $SEMAPHORE->lock();
+
+        if (not open(LOG, ">>trace.txt")) {
+
+            print STDERR "trace.txt: $!\n";
+            return;
+        }
+
+        print LOG "[$$]: ($pid) $_cmd\n";
+        print LOG "[$$]: " . join("[$$]: ", @out);
+
+        close(LOG);
+
+        $SEMAPHORE->unlock();
+    };
+
     local $SIG{INT} = sub {
 
         kill(9, $pid);
@@ -100,6 +130,13 @@ sub _ {
 
         kill(9, $pid);
         push(@out, "SIGALRM received (timeout)\n");
+        die join("", @out);
+    };
+
+    local $SIG{TERM} = sub {
+
+        kill(9, $pid);
+        push(@out, "SIGTERM received\n");
         die join("", @out);
     };
 

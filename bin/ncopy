@@ -489,6 +489,23 @@ B<--mode MODE>             remote execution mode (see MODES)
 
 =head1 NOTES
 
+=head2 inspecting long running processes
+
+it is possible to signal nrun with USR1 and USR2 to dump, resp. save the currently
+running processes. if nrun is signaled with USR2, it will create a file in
+the directory it was started in called trace.txt.
+
+the integer in square brackets is the pid of the perl process and the integer in
+round brackets is the pid of the executed process.
+
+        $ kill -USR1 1234
+        [14760]: (14761) TARGET_HOST=localhost /tmp/test.sh
+        [14760]: 1
+        [14760]: 2
+        [14756]: (14757) TARGET_HOST=qn439 /tmp/test.sh
+        [14756]: 1
+        [14756]: 2
+
 =head2 transferring the public key
 
 the helper script misc/put_pubkey can be used to transfer the ssh public key
