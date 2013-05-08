@@ -97,9 +97,7 @@ sub execute {
     my $_command = shift;
     my $_args    = shift;
 
-    $ENV{"TARGET_HOST"} = $_host;
-
-    return _("$_command $_args");
+    return _("TARGET_HOST=$_host $_command $_args");
 }
 
 ###
