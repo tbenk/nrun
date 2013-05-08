@@ -59,6 +59,7 @@ sub new {
     $self->{key} = $_obj->{key};
 
     $self->{semaphore} = new IPC::Semaphore($self->{key}, 1, 0777 | IPC_CREAT);
+    $self->{semaphore}->op(0,1,0);
 
     return $self;
 }
@@ -71,9 +72,7 @@ sub lock {
 
     my $_self = shift;
 
-    usleep(10) while ($_self->{semaphore}->getval(0));
-
-    return $_self->{semaphore}->setval(0, 1);
+    $_self->{semaphore}->op(0,-1,0);
 }
 
 ###
@@ -84,7 +83,7 @@ sub unlock {
 
     my $_self = shift;
 
-    return $_self->{semaphore}->setval(0, 0);
+    return  $_self->{semaphore}->op(0,1,0);
 }
 
 ###
