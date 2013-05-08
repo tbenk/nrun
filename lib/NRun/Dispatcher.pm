@@ -104,13 +104,13 @@ sub dispatch {
         };
         if (defined($_self->{callback_result})) {
 
-        }
-        if ($@) {
+            if ($@) {
 
-            $_self->{callback_result}->($_object, -255, $@);
-        } else {
+                $_self->{callback_result}->($_object, -255, $@);
+            } else {
 
-            $_self->{callback_result}->($_object, $ret, $out);
+                $_self->{callback_result}->($_object, $ret, $out);
+            }
         }
 
         exit(0);
