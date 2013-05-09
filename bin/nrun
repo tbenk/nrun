@@ -335,13 +335,16 @@ sub main {
     );
 
     $dispatcher->run();
+}
+
+main();
+
+END {
 
     $options->{sem_logger}->delete();
     $options->{sem_dumper}->delete();
     $options->{sem_worker}->delete();
 }
-
-main();
 
 __END__
 
