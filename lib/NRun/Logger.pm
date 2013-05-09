@@ -33,14 +33,13 @@ use warnings;
 use File::Path;
 use NRun::Semaphore;
 
-my $SEMAPHORE = NRun::Semaphore->new({key => int(rand(100000))});
-
 ###
 # create a new object.
 #
 # $_obj - parameter hash where
 # {
-#   'basedir' - the basedir the logs should be written to
+#   'basedir'   - the basedir the logs should be written to
+#   'semaphore' - the semaphore lock object
 # }
 # <- the new object
 sub new {
@@ -51,7 +50,8 @@ sub new {
     my $self = {};
     bless $self, $_pkg;
 
-    $self->{basedir} = $_obj->{basedir};
+    $self->{basedir}   = $_obj->{basedir};
+    $self->{semaphore} = $_obj->{semaphore};
 
     mkpath("$self->{basedir}/hosts");
 
@@ -74,7 +74,7 @@ sub log {
     my $_ret  = shift;
     my $_out  = shift;
 
-    $SEMAPHORE->lock();
+    $_self->{semaphore}->lock();
 
     open(RES, ">>$_self->{basedir}/results.log")
       or die("$_self->{basedir}/results.log: $!");
@@ -100,7 +100,7 @@ sub log {
     close(RES);
     close(LOG);
 
-    $SEMAPHORE->unlock();
+    $_self->{semaphore}->unlock();
 }
 
 1;

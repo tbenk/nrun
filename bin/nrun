@@ -269,7 +269,8 @@ sub callback_result {
 
     my $dumper = NRun::Dumper->new (
         {
-            dump => $options->{dump},
+            dump      => $options->{dump},
+            semaphore => $options->{sem_dumper},
         }
     );
 
@@ -277,7 +278,8 @@ sub callback_result {
 
     my $logger = NRun::Logger->new (
         {
-            basedir => $options->{log_directory},
+            basedir   => $options->{log_directory},
+            semaphore => $options->{sem_logger},
         }
     );
 
@@ -313,7 +315,11 @@ sub main {
         ]
     );
 
-    NRun::Worker::load_modules($options);
+    $options->{sem_logger} = NRun::Semaphore->new();
+    $options->{sem_dumper} = NRun::Semaphore->new();
+    $options->{sem_worker} = NRun::Semaphore->new();
+
+    NRun::Worker::init($options, $options->{sem_worker});
 
     parse_commandline();
 
@@ -329,6 +335,10 @@ sub main {
     );
 
     $dispatcher->run();
+
+    $options->{sem_logger}->delete();
+    $options->{sem_dumper}->delete();
+    $options->{sem_worker}->delete();
 }
 
 main();

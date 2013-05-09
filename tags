@@ -3,7 +3,6 @@
 !_TAG_PROGRAM_AUTHOR	Michael Schaap	/mscha@mscha.com/
 !_TAG_PROGRAM_NAME	pltags	//
 !_TAG_PROGRAM_VERSION	2.21	/supports multiple tags and extended format/
-DESTROY	lib/NRun/Semaphore.pm	/^sub DESTROY {$/;"	s	class:Semaphore
 Dispatcher	lib/NRun/Dispatcher.pm	/^package NRun::Dispatcher;$/;"	p	class:Dispatcher
 Dumper	lib/NRun/Dumper.pm	/^package NRun::Dumper;$/;"	p	class:Dumper
 ISA	lib/NRun/Workers/WorkerLocal.pm	/^our @ISA = qw(NRun::Worker);$/;"	v	class:WorkerLocal
@@ -16,18 +15,13 @@ MODINFO	lib/NRun/Workers/WorkerLocal.pm	/^our $MODINFO = {$/;"	v	class:WorkerLoc
 MODINFO	lib/NRun/Workers/WorkerNsh.pm	/^our $MODINFO = {$/;"	v	class:WorkerNsh
 MODINFO	lib/NRun/Workers/WorkerRsh.pm	/^our $MODINFO = {$/;"	v	class:WorkerRsh
 MODINFO	lib/NRun/Workers/WorkerSsh.pm	/^our $MODINFO = {$/;"	v	class:WorkerSsh
-SEMAPHORE	lib/NRun/Dumper.pm	/^my $SEMAPHORE = NRun::Semaphore->new({key => int(rand(100000))});$/;"	v	class:Dumper
-SEMAPHORE	lib/NRun/Logger.pm	/^my $SEMAPHORE = NRun::Semaphore->new({key => int(rand(100000))});$/;"	v	class:Logger
-SEMAPHORE	lib/NRun/Worker.pm	/^        $SEMAPHORE->lock();$/;"	v	file:	class:Worker
-SEMAPHORE	lib/NRun/Worker.pm	/^        $SEMAPHORE->lock();$/;"	v	file:	class:Worker
-SEMAPHORE	lib/NRun/Worker.pm	/^my $SEMAPHORE = NRun::Semaphore->new({key => int(rand(100000))});$/;"	v	class:Worker
 SIG	lib/NRun/Worker.pm	/^    local $SIG{ALRM} = sub {$/;"	v	file:	class:Worker
 SIG	lib/NRun/Worker.pm	/^    local $SIG{INT} = sub {$/;"	v	file:	class:Worker
 SIG	lib/NRun/Worker.pm	/^    local $SIG{TERM} = sub {$/;"	v	file:	class:Worker
 SIG	lib/NRun/Worker.pm	/^    local $SIG{USR1} = sub {$/;"	v	file:	class:Worker
 SIG	lib/NRun/Worker.pm	/^    local $SIG{USR2} = sub {$/;"	v	file:	class:Worker
 Semaphore	lib/NRun/Semaphore.pm	/^package NRun::Semaphore;$/;"	p	class:Semaphore
-VERSION	lib/NRun/Version.pm	/^our $VERSION = qv(1.0.0);$/;"	v	class:Version
+VERSION	lib/NRun/Version.pm	/^our $VERSION = qv(1.0.0_0);$/;"	v	class:Version
 Version	lib/NRun/Version.pm	/^package NRun::Version;$/;"	p	class:Version
 Worker	lib/NRun/Worker.pm	/^package NRun::Worker;$/;"	p	class:Worker
 WorkerLocal	lib/NRun/Workers/WorkerLocal.pm	/^package WorkerLocal;$/;"	p	class:WorkerLocal
@@ -122,6 +116,7 @@ _self	lib/NRun/Workers/WorkerRsh.pm	/^    my $_self = shift;$/;"	v	file:	class:W
 _self	lib/NRun/Workers/WorkerSsh.pm	/^    my $_self    = shift;$/;"	v	file:	class:WorkerSsh
 _self	lib/NRun/Workers/WorkerSsh.pm	/^    my $_self   = shift;$/;"	v	file:	class:WorkerSsh
 _self	lib/NRun/Workers/WorkerSsh.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerSsh
+_sem	lib/NRun/Worker.pm	/^    my $_sem = shift;$/;"	v	file:	class:Worker
 _source	lib/NRun/Workers/WorkerLocal.pm	/^    my $_source = shift;$/;"	v	file:	class:WorkerLocal
 _source	lib/NRun/Workers/WorkerNsh.pm	/^    my $_source = shift;$/;"	v	file:	class:WorkerNsh
 _source	lib/NRun/Workers/WorkerRsh.pm	/^    my $_source = shift;$/;"	v	file:	class:WorkerRsh
@@ -169,6 +164,7 @@ copy	lib/NRun/Workers/WorkerRsh.pm	/^sub copy {$/;"	s	class:WorkerRsh
 copy	lib/NRun/Workers/WorkerSsh.pm	/^sub copy {$/;"	s	class:WorkerSsh
 date	bin/ncopy	/^    my $date = time2str("%Y%m%d_%H_%M_%S", time);$/;"	v	file:	class:ncopy
 date	bin/nrun	/^    my $date = time2str("%Y%m%d_%H_%M_%S", time);$/;"	v	file:	class:nrun
+delete	lib/NRun/Semaphore.pm	/^sub delete {$/;"	s	class:Semaphore
 delete	lib/NRun/Workers/WorkerLocal.pm	/^sub delete {$/;"	s	class:WorkerLocal
 delete	lib/NRun/Workers/WorkerNsh.pm	/^sub delete {$/;"	s	class:WorkerNsh
 delete	lib/NRun/Workers/WorkerRsh.pm	/^sub delete {$/;"	s	class:WorkerRsh
@@ -191,7 +187,7 @@ home	bin/nrun	/^    my $home = (getpwuid(getuid()))[7];$/;"	v	file:	class:nrun
 home	bin/nrun	/^sub home {$/;"	s	class:nrun
 hosts	bin/ncopy	/^    my $hosts = {};$/;"	v	file:	class:ncopy
 hosts	bin/nrun	/^    my $hosts = {};$/;"	v	file:	class:nrun
-load_modules	lib/NRun/Worker.pm	/^sub load_modules {$/;"	s	class:Worker
+init	lib/NRun/Worker.pm	/^sub init {$/;"	s	class:Worker
 lock	lib/NRun/Semaphore.pm	/^sub lock {$/;"	s	class:Semaphore
 log	lib/NRun/Logger.pm	/^sub log {$/;"	s	class:Logger
 logger	bin/ncopy	/^    my $logger = NRun::Logger->new ($/;"	v	file:	class:ncopy
@@ -253,6 +249,9 @@ self	lib/NRun/Workers/WorkerLocal.pm	/^    my $self = {};$/;"	v	file:	class:Work
 self	lib/NRun/Workers/WorkerNsh.pm	/^    my $self = {};$/;"	v	file:	class:WorkerNsh
 self	lib/NRun/Workers/WorkerRsh.pm	/^    my $self = {};$/;"	v	file:	class:WorkerRsh
 self	lib/NRun/Workers/WorkerSsh.pm	/^    my $self = {};$/;"	v	file:	class:WorkerSsh
+semaphore	lib/NRun/Worker.pm	/^        $semaphore->lock();$/;"	v	file:	class:Worker
+semaphore	lib/NRun/Worker.pm	/^        $semaphore->lock();$/;"	v	file:	class:Worker
+semaphore	lib/NRun/Worker.pm	/^my $semaphore;$/;"	v	class:Worker
 src	bin/nrun	/^        my $src = $cmd;$/;"	v	file:	class:nrun
 unlock	lib/NRun/Semaphore.pm	/^sub unlock {$/;"	s	class:Semaphore
 usage	bin/ncopy	/^sub usage {$/;"	s	class:ncopy

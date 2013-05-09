@@ -32,17 +32,16 @@ use warnings;
 
 use NRun::Semaphore;
 
-my $SEMAPHORE = NRun::Semaphore->new({key => int(rand(100000))});
-
 ###
 # create a new object.
 #
 # $_obj - parameter hash where
 # {
-#   'dump' - one of ...
-#            output             - dump the command output 
-#            result             - dump the command result in csv format
-#            output_no_hostname - dump the command output out omit the hostname
+#   'dump'      - one of ...
+#                 output             - dump the command output 
+#                 result             - dump the command result in csv format
+#                 output_no_hostname - dump the command output out omit the hostname
+#   'semaphore' - the semaphore lock object
 # }
 # <- the new object
 sub new {
@@ -53,7 +52,8 @@ sub new {
     my $self = {};
     bless $self, $_pkg;
 
-    $self->{dump} = $_obj->{dump};
+    $self->{dump}      = $_obj->{dump};
+    $self->{semaphore} = $_obj->{semaphore};
 
     return $self;
 }
@@ -86,9 +86,9 @@ sub dump {
         $_out =  "$_host; exit code $_ret\n";
     }
 
-    $SEMAPHORE->lock();
+    $_self->{semaphore}->lock();
     print $_out;
-    $SEMAPHORE->unlock();
+    $_self->{semaphore}->unlock();
 }
 
 1;
