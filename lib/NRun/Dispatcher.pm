@@ -41,7 +41,6 @@ use Time::HiRes qw(usleep);
 #   'timeout' => timeout in seconds
 #   'objects' => the target objects
 #   'nmax'    => maximum number of parallel login processes
-
 #   'callback_action' => callback function to be executed in parallel
 #                        signature: my ($ret, $out) = sub callback_action ($object)
 #   'callback_result' => callback function to be executed to handle the 
