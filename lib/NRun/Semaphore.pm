@@ -78,6 +78,7 @@ sub lock {
     my $_self = shift;
 
     $_self->{semaphore}->op(0,-1,0);
+    $_self->{semaphore}->op(0,0,0);
 }
 
 ###
