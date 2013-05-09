@@ -81,6 +81,17 @@ sub lock {
 }
 
 ###
+# return the semaphore key of this instance.
+#
+# <- the semaphore key of this instance
+sub key {
+
+    my $_self = shift;
+  
+    return $_self->{key};
+}
+
+###
 # unset a global lock.
 #
 # <- returns 0 on failure and 1 on success
