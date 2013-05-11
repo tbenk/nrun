@@ -140,7 +140,7 @@ sub parse_commandline {
     my $date = time2str("%Y%m%d_%H_%M_%S", time);
 
     $options->{hosts_file}      = $arg_hosts_file;
-    $options->{parallel}        = $arg_parallel;
+    $options->{parallel}        = $arg_parallel ? $arg_parallel : 5;
     $options->{source}          = $arg_source;
     $options->{destination}     = $arg_destination;
     $options->{timeout}         = $arg_timeout;
