@@ -55,7 +55,7 @@ our $options = {};
 # dump a short usage info to stdout.
 sub usage {
 
-    print "usage: " . basename($0) . " -t HOST1,HOST2 -- SRC DST ... \n";
+    print "usage: " . basename($0) . " -t HOST1,HOST2 -- SRC DST\n";
     print "--target,-t HOST1,HOST2  comma separated list of target hosts.\n";
     print "--parallel,-p MAX        number of parallel connections (defaults to 5).\n";
     print "--dump-results,-d        instead of dumping the command output, dump the exit status.\n";
