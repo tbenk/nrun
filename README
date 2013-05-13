@@ -35,43 +35,37 @@ parameter INSTALLATION_BASE:
 usage
 =====
 
-usage: nrun -c <CMD> [-h <HOSTS>] <HOST1> <HOST2> ...
---hosts-file,-h <HOSTS>    file containing the target hosts (one host per line).
---command,-c <CMD>         command to be executed.
---arguments,-a <ARGS>      the arguments that should be passed to command.
---parallel,-p <MAX>        number of parallel connections (defaults to 5).
---dump-results             instead of dumping the command output, dump the exit
-                           status.
---log-directory,-l <DIR>   base directory for the log files.
---timeout,-t <SEC>         timeout for each command execution (defaults to 60).
---version                  print the version string and exit.
---copy                     copy command to target host before execution.
---no-hostname              omit hostname prefix.
---no-logfile               do not generate any log files.
---skip-ping-check          skip checking if the host answers on ping.
---skip-ns-check            skip checking if the hostname is resolvable.
---mode <MODE>              remote execution mode:
+usage: nrun -t HOST1,HOST2 -- COMMAND...
+--target,-t HOST1,HOST2  comma separated list of target hosts.
+--parallel,-p MAX        number of parallel connections (defaults to 5).
+--dump-results           instead of dumping the command output, dump the exit status.
+--log-directory,-l DIR   base directory for the log files.
+--timeout SEC            timeout for each command execution (defaults to 60).
+--version                print the version string and exit.
+--copy                   copy command to target host before execution.
+--no-hostname            omit hostname prefix.
+--no-logfile             do not generate any log files.
+--skip-ping-check        skip checking if the host answers on ping.
+--skip-ns-check          skip checking if the hostname is resolvable.
+--mode MODE              remote execution mode:
                            nsh - nsh based remote execution
                            rsh - rsh based remote execution
                            ssh - ssh based remote execution
                            local - execute the script locally, set TARGET_HOST
                            on each execution
 
-usage: ncopy -s <SRC> -d <DST> [-h <HOSTS>] <HOST1> <HOST2> ...
---hosts-file,-h <HOSTS>    file containing the target hosts (one host per line).
---source,-s <SRC>          the file to be copied.
---destination,-d <DST>     destination the file should be copied to.
---parallel,-p <MAX>        number of parallel connections (defaults to 5).
---dump-results             instead of dumping the command output, dump the exit
-                           status.
---log-directory,-l <DIR>   base directory for the log files.
---timeout,-t <SEC>         timeout for each command execution (defaults to 60).
---version                  print the version string and exit.
---no-hostname              omit hostname prefix.
---no-logfile               do not generate any log files.
---skip-ping-check          skip checking if the host answers on ping.
---skip-ns-check            skip checking if the hostname is resolvable.
---mode <MODE>              remote execution mode:
+usage: ncopy -t HOST1,HOST2 -- SRC DST ...
+--target,-t HOST1,HOST2  comma separated list of target hosts.
+--parallel,-p MAX        number of parallel connections (defaults to 5).
+--dump-results           instead of dumping the command output, dump the exit status.
+--log-directory,-l DIR   base directory for the log files.
+--timeout SEC            timeout for each command execution (defaults to 60).
+--version                print the version string and exit.
+--no-hostname            omit hostname prefix.
+--no-logfile             do not generate any log files.
+--skip-ping-check        skip checking if the host answers on ping.
+--skip-ns-check          skip checking if the hostname is resolvable.
+--mode MODE              remote execution mode:
                            nsh - nsh based remote execution
                            rsh - rsh based remote execution
                            ssh - ssh based remote execution
@@ -83,27 +77,27 @@ examples
 
 1. run the command "ls" on host1 and host2.
 
-$ nrun --command ls host1 host2
+$ nrun --target host1,host2 -- ls
 
-2. run the command "ls -al" on host1, host2 and all hosts in the file <HOSTS.LST>.
+2. run the command "ls -al" on host1, host2 and all hosts in the file HOSTS.LST.
 
-$ nrun --hosts-file <HOSTS.LST> --command ls --arguments "-al" host1 host2
+$ nrun --target HOSTS.LST,host1,host2 -- ls -al
 
-3. run the command "ls" on all hosts in the file <HOSTS.LST> - mode "ssh".
+3. run the command "ls" on all hosts in the file HOSTS.LST - mode "ssh".
 
-$ nrun --hosts-file <HOSTS.LST> --command ls --mode ssh
+$ nrun --target HOSTS.LST --mode ssh -- ls 
 
 4. copy the script bin/script.sh to each target hosts and execute it.
 
-$ nrun --hosts-file <HOSTS.LST> --command bin/script.sh --copy
+$ nrun --target HOSTS.LST --copy -- bin/script.sh
 
 5. execute the local script test.sh for each target host
 
-$ nrun --hosts-file <HOSTS.LST> --command ./test.sh --mode local
+$ nrun --target HOSTS.LST --mode local -- ./test.sh
 
-6. copy file test.tar to all hosts in the file <HOSTS.LST>
+6. copy file test.tar to host1, host2 and all hosts in the file HOSTS.LST
 
-$ ncopy --hosts-file <HOSTS.LST> --source test.tar --destination /tmp
+$ ncopy --target HOSTS.LST -- test.tar /tmp 
 
 configuration
 =============
@@ -225,6 +219,26 @@ $ kill -USR1 1234
 [14756]: 1
 [14756]: 2
 
+targets
+=======
+
+a target name may be either a filename containing the target hosts, one per line,
+an alias definition in the configuration file or simply a hostname.
+
+if there is a conflict, for example an alias named identically as an existing
+file, the alias will always overrule the filename and the filename will always
+overrule the hostname.
+
+an alias can be defined in the configuration file the following way. an alias
+definition may contain additional alias names, filenames or simply hostnames.
+
+$options->{alias} = {
+
+	production  => [ "host1", "host2" ],
+	development => [ "host3", "host4" ],
+	all         => [ "production", "development" ],
+}
+
 transferring the public key
 ===========================
 
@@ -232,7 +246,7 @@ the helper script misc/put_pubkey can be used to transfer the ssh public key
 to the target hosts without supplying a password for each login. it is meant
 to be executed by the nrun script in mode local.
 
-$ nrun -h <HOSTS.LST> -c ./put_pubkey -a "<KEY> <USER> <PWD>" --mode local -t 120
+$ nrun -t HOSTS.LST --mode local --timeout 120 -- ./put_pubkey KEY USER PWD
 
 a note on the git repository
 ============================
