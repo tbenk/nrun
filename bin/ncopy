@@ -192,6 +192,10 @@ sub callback_action {
     
     my $_host = shift;
 
+    # ensure we will not die before our childs
+    local $SIG{INT}  = 'IGNORE';
+    local $SIG{TERM} = 'IGNORE';
+
     if (not (defined($options->{skip_ns_check}) or gethostbyname($_host))) {
 
         return (-254, "dns entry is missing");
@@ -212,6 +216,10 @@ sub callback_result {
     my $_host   = shift;
     my $_return = shift;
     my $_output = shift;
+
+    # ensure we will not die before our childs
+    local $SIG{INT}  = 'IGNORE';
+    local $SIG{TERM} = 'IGNORE';
 
     my $dumper = NRun::Dumper->new (
         {
