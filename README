@@ -48,11 +48,11 @@ usage: nrun -t HOST1,HOST2 -- COMMAND...
 --skip-ping-check        skip checking if the host answers on ping.
 --skip-ns-check          skip checking if the hostname is resolvable.
 --mode MODE              remote execution mode:
-                           nsh - nsh based remote execution
-                           rsh - rsh based remote execution
-                           ssh - ssh based remote execution
-                           local - execute the script locally, set TARGET_HOST
-                           on each execution
+                         nsh - nsh based remote execution
+                         rsh - rsh based remote execution
+                         ssh - ssh based remote execution
+                         local - execute the script locally, set TARGET_HOST
+                         on each execution
 
 usage: ncopy -t HOST1,HOST2 -- SRC DST ...
 --target,-t HOST1,HOST2  comma separated list of target hosts.
@@ -66,11 +66,11 @@ usage: ncopy -t HOST1,HOST2 -- SRC DST ...
 --skip-ping-check        skip checking if the host answers on ping.
 --skip-ns-check          skip checking if the hostname is resolvable.
 --mode MODE              remote execution mode:
-                           nsh - nsh based remote execution
-                           rsh - rsh based remote execution
-                           ssh - ssh based remote execution
-                           local - execute the script locally, set TARGET_HOST
-                           on each execution
+                         nsh - nsh based remote execution
+                         rsh - rsh based remote execution
+                         ssh - ssh based remote execution
+                         local - execute the script locally, set TARGET_HOST
+                         on each execution
 
 examples
 ========

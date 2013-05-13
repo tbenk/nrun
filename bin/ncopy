@@ -70,7 +70,7 @@ sub usage {
 
     foreach my $object (values(%{NRun::Worker::workers()})) {
 
-        print "                           " . $object->mode() . " - " . $object->desc() ."\n";
+        print "                         " . $object->mode() . " - " . $object->desc() ."\n";
     }
 
     exit;
