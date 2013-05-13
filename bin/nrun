@@ -59,16 +59,16 @@ sub usage {
     print "usage: " . basename($0) . " -t HOST1,HOST2 -- COMMAND... \n";
     print "--target,-t HOST1,HOST2  comma separated list of target hosts.\n";
     print "--parallel,-p MAX        number of parallel connections (defaults to 5).\n";
-    print "--dump-results           instead of dumping the command output, dump the exit status.\n";
+    print "--dump-results,-d        instead of dumping the command output, dump the exit status.\n";
     print "--log-directory,-l DIR   base directory for the log files.\n";
     print "--timeout SEC            timeout for each command execution (defaults to 60).\n";
-    print "--version                print the version string and exit.\n";
-    print "--copy                   copy command to target host before execution.\n";
+    print "--version,-v             print the version string and exit.\n";
+    print "--copy,-c                copy command to target host before execution.\n";
     print "--no-hostname            omit hostname prefix.\n";
     print "--no-logfile             do not generate any log files.\n";
     print "--skip-ping-check        skip checking if the host answers on ping.\n";
     print "--skip-ns-check          skip checking if the hostname is resolvable.\n";
-    print "--mode MODE              remote execution mode:\n";
+    print "--mode,-m MODE           remote execution mode:\n";
 
     foreach my $object (values(%{NRun::Worker::workers()})) { 
 
@@ -99,15 +99,15 @@ sub parse_commandline {
         "parallel|p=i"      => \$arg_parallel,
         "target|t=s"        => \$arg_target,
         "no-hostname"       => \$arg_no_hostname,
-        "dump-results"      => \$arg_dump_results,
+        "dump-results|d"    => \$arg_dump_results,
         "log-directory|l=s" => \$arg_log_directory,
         "timeout=i"         => \$arg_timeout,
         "no-logfile"        => \$arg_no_logfile,
         "mode|m=s"          => \$arg_mode,
         "skip-ping-check"   => \$arg_skip_ping_check,
         "skip-ns-check"     => \$arg_skip_ns_check,
-        "copy"              => \$arg_copy,
-        "version"           => \$arg_version,
+        "copy|c"            => \$arg_copy,
+        "version|v"         => \$arg_version,
     );
 
     usage() if (not $ret);
@@ -458,13 +458,13 @@ B<--target,-t HOST1[,HOST2,...]> comma separated list of target hosts (see TARGE
 
 B<--parallel,-p MAX>             number of parallel connections (defaults to 5).
 
-B<--dump-results>                instead of dumping the command output, dump the exit status.
+B<--dump-results,-d>             instead of dumping the command output, dump the exit status.
 
 B<--log-directory,-l DIR>        base directory for the log files.
 
-B<--timeout,-t SEC>              timeout for each command execution (defaults to 60).
+B<--timeout SEC>                 timeout for each command execution (defaults to 60).
 
-B<--copy>                        copy command to target host before execution.
+B<--copy,-c>                     copy command to target host before execution.
 
 B<--no-hostname>                 omit hostname prefix.
 
@@ -474,9 +474,9 @@ B<--skip-ping-check>             skip checking if the host answers on ping.
 
 B<--skip-ns-check>               skip checking if the hostname is resolvable.
 
-B<--version>                     print the version string and exit.
+B<--version,-v>                  print the version string and exit.
 
-B<--mode MODE>                   remote execution mode (see MODES)
+B<--mode,-m MODE>                remote execution mode (see MODES)
 
 =head1 TARGETS
 

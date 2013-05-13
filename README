@@ -38,16 +38,16 @@ usage
 usage: nrun -t HOST1,HOST2 -- COMMAND...
 --target,-t HOST1,HOST2  comma separated list of target hosts.
 --parallel,-p MAX        number of parallel connections (defaults to 5).
---dump-results           instead of dumping the command output, dump the exit status.
+--dump-results,-d        instead of dumping the command output, dump the exit status.
 --log-directory,-l DIR   base directory for the log files.
 --timeout SEC            timeout for each command execution (defaults to 60).
---version                print the version string and exit.
---copy                   copy command to target host before execution.
+--version,-v             print the version string and exit.
+--copy,-c                copy command to target host before execution.
 --no-hostname            omit hostname prefix.
 --no-logfile             do not generate any log files.
 --skip-ping-check        skip checking if the host answers on ping.
 --skip-ns-check          skip checking if the hostname is resolvable.
---mode MODE              remote execution mode:
+--mode,-m MODE           remote execution mode:
                          nsh - nsh based remote execution
                          rsh - rsh based remote execution
                          ssh - ssh based remote execution
@@ -57,15 +57,15 @@ usage: nrun -t HOST1,HOST2 -- COMMAND...
 usage: ncopy -t HOST1,HOST2 -- SRC DST ...
 --target,-t HOST1,HOST2  comma separated list of target hosts.
 --parallel,-p MAX        number of parallel connections (defaults to 5).
---dump-results           instead of dumping the command output, dump the exit status.
+--dump-results,-d        instead of dumping the command output, dump the exit status.
 --log-directory,-l DIR   base directory for the log files.
 --timeout SEC            timeout for each command execution (defaults to 60).
---version                print the version string and exit.
+--version,-v             print the version string and exit.
 --no-hostname            omit hostname prefix.
 --no-logfile             do not generate any log files.
 --skip-ping-check        skip checking if the host answers on ping.
 --skip-ns-check          skip checking if the hostname is resolvable.
---mode MODE              remote execution mode:
+--mode,-m MODE           remote execution mode:
                          nsh - nsh based remote execution
                          rsh - rsh based remote execution
                          ssh - ssh based remote execution
