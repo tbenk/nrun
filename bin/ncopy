@@ -273,6 +273,8 @@ sub main {
     $options->{sem_dumper} = NRun::Semaphore->new();
     $options->{sem_worker} = NRun::Semaphore->new();
 
+    $options->{sem_ppid} = $$;
+
     NRun::Worker::init($options, $options->{sem_worker});
 
     parse_commandline();
@@ -295,9 +297,12 @@ main();
 
 END {
 
-    $options->{sem_logger}->delete();
-    $options->{sem_dumper}->delete();
-    $options->{sem_worker}->delete();
+    if ($options->{sem_ppid} == $$) {
+
+        $options->{sem_logger}->delete();
+        $options->{sem_dumper}->delete();
+        $options->{sem_worker}->delete();
+    }
 }
 
 __END__
