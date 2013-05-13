@@ -10,6 +10,7 @@ lib/NRun/Dumper.pm
 lib/NRun/Logger.pm
 lib/NRun/Semaphore.pm
 lib/NRun/Version.pm
+lib/NRun/Util.pm
 lib/NRun/Worker.pm
 lib/NRun/Workers/WorkerLocal.pm
 lib/NRun/Workers/WorkerNsh.pm
