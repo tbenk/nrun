@@ -98,7 +98,7 @@ sub parse_commandline {
         "no-hostname"       => \$arg_no_hostname,
         "dump-results"      => \$arg_dump_results,
         "log-directory|l=s" => \$arg_log_directory,
-        "timeout|t=i"       => \$arg_timeout,
+        "timeout=i"         => \$arg_timeout,
         "no-logfile"        => \$arg_no_logfile,
         "mode|m=s"          => \$arg_mode,
         "skip-ping-check"   => \$arg_skip_ping_check,
