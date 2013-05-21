@@ -249,7 +249,7 @@ sub callback_action {
     if (defined($options->{copy})) {
 
         my $source = $command;
-        $command = (tempfile(OPEN => 0, DIR => "/tmp"))[1];
+        $command = (tempfile(OPEN => 0, DIR => "/tmp"))[1] . "$$";
 
         my $ret = $worker->copy($source, $command);
         if (not $ret == 0) {
