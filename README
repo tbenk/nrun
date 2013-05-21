@@ -35,26 +35,28 @@ parameter INSTALLATION_BASE:
 usage
 =====
 
-usage: nrun -t HOST1,HOST2 -- COMMAND...
---target,-t HOST1,HOST2  comma separated list of target hosts.
---parallel,-p MAX        number of parallel connections (defaults to 5).
+usage: nrun -t HOST1[,HOST2,...] -- COMMAND
+--async,-a               asynchronous output mode.
+--copy,-c                copy command to target host before execution.
 --dump-results,-d        instead of dumping the command output, dump the exit status.
 --log-directory,-l DIR   base directory for the log files.
---timeout SEC            timeout for each command execution (defaults to 60).
---version,-v             print the version string and exit.
---copy,-c                copy command to target host before execution.
+--mode,-m MODE           remote execution mode:
 --no-hostname            omit hostname prefix.
 --no-logfile             do not generate any log files.
---skip-ping-check        skip checking if the host answers on ping.
+--parallel,-p MAX        number of parallel connections (defaults to 5).
 --skip-ns-check          skip checking if the hostname is resolvable.
---mode,-m MODE           remote execution mode:
-                         nsh - nsh based remote execution
+--skip-ping-check        skip checking if the host answers on ping.
+--target,-t HOST1,HOST2  comma separated list of target hosts.
+--timeout SEC            timeout for each command execution (defaults to 60).
+--version,-v             print the version string and exit.
                          rsh - rsh based remote execution
+                         nsh - nsh based remote execution
                          ssh - ssh based remote execution
                          local - execute the script locally, set TARGET_HOST
                          on each execution
 
-usage: ncopy -t HOST1,HOST2 -- SRC DST ...
+
+usage: ncopy -t HOST1[,HOST2,...] -- SRC DST
 --target,-t HOST1,HOST2  comma separated list of target hosts.
 --parallel,-p MAX        number of parallel connections (defaults to 5).
 --dump-results,-d        instead of dumping the command output, dump the exit status.
@@ -66,8 +68,8 @@ usage: ncopy -t HOST1,HOST2 -- SRC DST ...
 --skip-ping-check        skip checking if the host answers on ping.
 --skip-ns-check          skip checking if the hostname is resolvable.
 --mode,-m MODE           remote execution mode:
-                         nsh - nsh based remote execution
                          rsh - rsh based remote execution
+                         nsh - nsh based remote execution
                          ssh - ssh based remote execution
                          local - execute the script locally, set TARGET_HOST
                          on each execution
@@ -117,9 +119,7 @@ configuration file will overwrite values in the first configuration file):
 $options->{ssh_binary}   = "/usr/bin/ssh";
 $options->{scp_binary}   = "/usr/bin/scp";
 $options->{ssh_args}     = "-o PreferredAuthentications=publickey";
-$options->{ssh_user}     = "root";
 $options->{scp_args}     = "-o PreferredAuthentications=publickey";
-$options->{scp_user}     = "root";
 $options->{arg_mode}     = "ssh";
 $options->{arg_parallel} = 5;
 $options->{arg_timeout}  = 60;
@@ -149,8 +149,6 @@ the following configuration options must be set in the configuration file:
 'scp_args'   - arguments supplied to the scp binary
 'ssh_binary' - ssh binary to be executed
 'scp_binary' - scp binary to be executed
-'ssh_user'   - ssh login user
-'scp_user'   - scp login user
 
 for passwordless login ssh-agent can be used:
 
@@ -163,10 +161,11 @@ for passwordless login ssh-agent can be used:
 to prevent any ssh interaction the following ssh command paramters are
 suggested:
 
+-o User=root
 -o PreferredAuthentications=hostbased,publickey
 -o StrictHostKeyChecking=no
 -o UserKnownHostsFile=/dev/null
--q
+-o LogLevel=FATAL
 
 mode local
 ==========
@@ -206,18 +205,19 @@ inspecting long running processes
 
 it is possible to signal nrun with USR1 and USR2 to dump, resp. save the currently
 running processes. if nrun is signaled with USR2, it will create a file in
-the directory it was started in called trace.txt.
+the log directory trace_<%Y%m%d_%H_%M_%S>.log.
 
-the integer in square brackets is the pid of the perl process and the integer in
-round brackets is the pid of the executed process.
+the integer in square brackets is the pid of the perl process.
 
 $ kill -USR1 1234
-[14760]: (14761) TARGET_HOST=localhost /tmp/test.sh
-[14760]: 1
-[14760]: 2
-[14756]: (14757) TARGET_HOST=qn439 /tmp/test.sh
-[14756]: 1
-[14756]: 2
+host1[14760]: (31800) /usr/bin/ssh -o User=root localhost sleep 120
+host1[14760]: 1
+host1[14760]: 2
+host1[14760]: SIGUSR1 received
+host1[14756]: (31801) /usr/bin/ssh -o User=root localhost sleep 120
+host2[14756]: 1
+host2[14756]: 2
+host2[14756]: SIGUSR1 received
 
 targets
 =======

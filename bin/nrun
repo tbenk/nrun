@@ -49,6 +49,7 @@ use NRun::Worker;
 use NRun::Dumper;
 use NRun::Logger;
 use NRun::Dispatcher;
+use NRun::Signal;
 
 our $options = {};
 
@@ -57,22 +58,23 @@ our $options = {};
 sub usage {
 
     print "usage: " . basename($0) . " -t HOST1[,HOST2,...] -- COMMAND\n";
-    print "--target,-t HOST1,HOST2  comma separated list of target hosts.\n";
-    print "--parallel,-p MAX        number of parallel connections (defaults to 5).\n";
+    print "--async,-a               asynchronous output mode.\n";
+    print "--copy,-c                copy command to target host before execution.\n";
     print "--dump-results,-d        instead of dumping the command output, dump the exit status.\n";
     print "--log-directory,-l DIR   base directory for the log files.\n";
-    print "--timeout SEC            timeout for each command execution (defaults to 60).\n";
-    print "--version,-v             print the version string and exit.\n";
-    print "--copy,-c                copy command to target host before execution.\n";
+    print "--mode,-m MODE           remote execution mode:\n";
     print "--no-hostname            omit hostname prefix.\n";
     print "--no-logfile             do not generate any log files.\n";
-    print "--skip-ping-check        skip checking if the host answers on ping.\n";
+    print "--parallel,-p MAX        number of parallel connections (defaults to 5).\n";
     print "--skip-ns-check          skip checking if the hostname is resolvable.\n";
-    print "--mode,-m MODE           remote execution mode:\n";
+    print "--skip-ping-check        skip checking if the host answers on ping.\n";
+    print "--target,-t HOST1,HOST2  comma separated list of target hosts.\n";
+    print "--timeout SEC            timeout for each command execution (defaults to 60).\n";
+    print "--version,-v             print the version string and exit.\n";
 
     foreach my $object (values(%{NRun::Worker::workers()})) { 
 
-        print "                         " . $object->mode() . " - " . $object->desc() ."\n";
+        print "                         " . $object->{MODE} . " - " . $object->{DESC} ."\n";
     }
 
     exit;
@@ -83,6 +85,7 @@ sub usage {
 sub parse_commandline {
 
     my $arg_parallel        = $options->{arg_parallel};
+    my $arg_async           = $options->{arg_async };
     my $arg_target          = $options->{arg_target};
     my $arg_dump_results    = $options->{arg_dump_results};
     my $arg_no_hostname     = $options->{arg_no_hostname};
@@ -96,6 +99,7 @@ sub parse_commandline {
     my $arg_timeout         = $options->{arg_timeout};
 
     my $ret = GetOptions (
+        "async|a"           => \$arg_async,
         "parallel|p=i"      => \$arg_parallel,
         "target|t=s"        => \$arg_target,
         "no-hostname"       => \$arg_no_hostname,
@@ -130,6 +134,12 @@ sub parse_commandline {
         usage();
     }
 
+    if (defined($arg_async) and defined($arg_dump_results)) {
+
+        print "error: parameters --async and --dump-results are mutually excludive.\n";
+        usage();
+    }
+
     if (not defined($arg_target)) {
 
         print "error: parameter --target is mandatory.\n";
@@ -149,13 +159,27 @@ sub parse_commandline {
     $options->{skip_ping_check} = $arg_skip_ping_check;
     $options->{mode}            = lc($arg_mode);
 
-    $options->{dump} = "output";
     if (defined($arg_dump_results)) {
     
-        $options->{dump} = "result";
-    } elsif (defined($arg_no_hostname)) {
+        $options->{dumpmode} = "result";
+    } else {
 
-        $options->{dump} = "output_no_hostname";
+        $options->{dumpmode} = "output";
+        if (defined($arg_async)) {
+
+            $options->{dumpmode} = "$options->{dumpmode}_async";
+        } else {
+
+            $options->{dumpmode} = "$options->{dumpmode}_sync";
+        }
+
+        if (defined($arg_no_hostname)) {
+
+            $options->{dumpmode} = "$options->{dumpmode}_no_hostname";
+        } else {
+
+            $options->{dumpmode} = "$options->{dumpmode}_hostname";
+        }
     }
 
     $options->{log_directory} = basename($options->{command}) . "/" . $date;
@@ -193,73 +217,60 @@ sub callback_action {
     
     my $_host = shift;
 
-    # ensure we will not die before our childs
-    local $SIG{INT}  = 'IGNORE';
-    local $SIG{TERM} = 'IGNORE';
-
-    if (not (defined($options->{skip_ns_check}) or gethostbyname($_host))) {
-
-        return (-254, "dns entry is missing");
-    }
-
-    if (not (defined($options->{skip_ping_check}) or Net::Ping->new()->ping($_host))) {
-
-        return (-253, "not pinging");
-    }
-
-    my $cmd = $options->{command};
-
-    if (defined($options->{copy})) {
-
-        my $src = $cmd;
-        $cmd  = (tempfile(OPEN => 0, DIR => "/tmp"))[1];
-
-        my ($ret, $out) = NRun::Worker::workers()->{$options->{mode}}->copy($_host, $src, $cmd);
-        return ($ret, $out) if (not $ret == 0);
-    }
-
-    my ($ret, $out) = NRun::Worker::workers()->{$options->{mode}}->execute($_host, $cmd, $options->{arguments});
-
-    if (defined($options->{copy})) {
-
-        NRun::Worker::workers()->{$options->{mode}}->delete($_host, $cmd);
-    }
-
-    return ($ret, $out);
-}
-
-###
-# callback function used by the dispatcher
-sub callback_result {
-
-    my $_host   = shift;
-    my $_return = shift;
-    my $_output = shift;
-
-    # ensure we will not die before our childs
-    local $SIG{INT}  = 'IGNORE';
-    local $SIG{TERM} = 'IGNORE';
+    my $command = $options->{command};
+    my $worker = NRun::Worker::workers()->{$options->{mode}}->{NAME}->new();
 
     my $dumper = NRun::Dumper->new (
         {
-            dump      => $options->{dump},
+            hostname  => $_host,
+            mode      => $options->{dumpmode},
             semaphore => $options->{sem_dumper},
         }
     );
 
-    $dumper->dump($_host, $_return, $_output);
-
     my $logger = NRun::Logger->new (
         {
+            hostname  => $_host,
             basedir   => $options->{log_directory},
             semaphore => $options->{sem_logger},
         }
     );
 
-    $logger->log($_host, $_return, $_output) if (not defined($options->{no_logfile}));
+    $worker->init (
+        {
+            %$options,
+            hostname => $_host,
+            dumper   => $dumper,
+            logger   => $logger,
+        }
+    );
+
+    # TODO: pre_check();
+    if (defined($options->{copy})) {
+
+        my $source = $command;
+        $command = (tempfile(OPEN => 0, DIR => "/tmp"))[1];
+
+        my $ret = $worker->copy($source, $command);
+        if (not $ret == 0) {
+
+            $worker->destroy();
+            return;
+        }
+    }
+
+    $worker->execute($command, $options->{arguments});
+
+    if (defined($options->{copy})) {
+
+        # TODO: delete sets exit code
+        $worker->delete($command);
+    }
+
+    $worker->destroy();
 }
 
-##
+###
 # read configuration files
 #
 # $_files - the files to be read (values in last file will overwrite values in first file)
@@ -277,8 +288,20 @@ sub read_config_files {
 }
 
 ###
+# ensure exit on TERM, INT and ALRM
+sub handler {
+
+    wait();
+    exit();
+}
+
+###
 # main
 sub main {
+
+    NRun::Signal::register('TERM', \&handler);
+    NRun::Signal::register('INT',  \&handler);
+    NRun::Signal::register('ALRM', \&handler);
 
     read_config_files (
         [
@@ -290,11 +313,8 @@ sub main {
 
     $options->{sem_logger} = NRun::Semaphore->new();
     $options->{sem_dumper} = NRun::Semaphore->new();
-    $options->{sem_worker} = NRun::Semaphore->new();
 
     $options->{sem_ppid} = $$;
-
-    NRun::Worker::init($options, $options->{sem_worker});
 
     parse_commandline();
 
@@ -305,7 +325,6 @@ sub main {
             objects => $options->{hosts},
     
             callback_action => \&callback_action,
-            callback_result => \&callback_result,
         }
     );
 
@@ -320,7 +339,6 @@ END {
 
         $options->{sem_logger}->delete();
         $options->{sem_dumper}->delete();
-        $options->{sem_worker}->delete();
     }
 }
 
@@ -368,9 +386,7 @@ configuration file will overwrite values in the first configuration file):
 	$options->{ssh_binary}   = "/usr/bin/ssh";
 	$options->{scp_binary}   = "/usr/bin/scp";
 	$options->{ssh_args}     = "-o PreferredAuthentications=publickey";
-	$options->{ssh_user}     = "root";
 	$options->{scp_args}     = "-o PreferredAuthentications=publickey";
-	$options->{scp_user}     = "root";
 	$options->{arg_mode}     = "ssh";
 	$options->{arg_parallel} = 5;
 	$options->{arg_timeout}  = 60;
@@ -404,10 +420,6 @@ the following configuration options must be set in the configuration file:
 
 'scp_binary' - scp binary to be executed
 
-'ssh_user'   - ssh login user
-
-'scp_user'   - scp login user
-
 for passwordless login ssh-agent can be used:
 
 	# ssh-keygen
@@ -419,10 +431,11 @@ for passwordless login ssh-agent can be used:
 to prevent any ssh interaction the following ssh command paramters are
 suggested:
 
+	-o User=root
 	-o PreferredAuthentications=hostbased,publickey
 	-o StrictHostKeyChecking=no
 	-o UserKnownHostsFile=/dev/null
-	-q
+	-o LogLevel=FATAL
 
 =head2 mode local
 
@@ -539,18 +552,19 @@ definition may contain additional alias names, filenames or simply hostnames.
 
 it is possible to signal nrun with USR1 and USR2 to dump, resp. save the currently
 running processes. if nrun is signaled with USR2, it will create a file in
-the directory it was started in called trace.txt.
+the log directory trace_<%Y%m%d_%H_%M_%S>.log.
 
-the integer in square brackets is the pid of the perl process and the integer in 
-round brackets is the pid of the executed process.
+the integer in square brackets is the pid of the perl process.
 
 	$ kill -USR1 1234
-        [14760]: (14761) TARGET_HOST=localhost /tmp/test.sh
-        [14760]: 1
-        [14760]: 2
-        [14756]: (14757) TARGET_HOST=qn439 /tmp/test.sh
-        [14756]: 1
-        [14756]: 2
+	host1[14760]: (31800) /usr/bin/ssh -o User=root localhost sleep 120
+	host1[14760]: 1
+	host1[14760]: 2
+	host1[14760]: SIGUSR1 received
+	host1[14756]: (31801) /usr/bin/ssh -o User=root localhost sleep 120
+	host2[14756]: 1
+	host2[14756]: 2
+	host2[14756]: SIGUSR1 received
 
 =head2 transferring the public key
 

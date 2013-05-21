@@ -32,36 +32,12 @@ use warnings;
 
 use File::Basename;
 use NRun::Semaphore;
-
-my $semaphore;
-my $workers = {};
-
-###
-# module specification
-our $MODINFO = {
-
-  'MODE' => "",
-  'DESC' => "",
-};
+use NRun::Signal;
+use NRun::Constants;
 
 ###
-# return all available worker modules
-sub workers {
-
-    return $workers;
-}
-
-###
-# dynamically load all available login modules
-#
-# $_cfg - option hash given to the submodules on creation
-# $_sem - semaphore object 
-sub init {
-
-    my $_cfg = shift;
-    my $_sem = shift;
-
-    $semaphore = $_sem;
+# automagically load all available modules
+INIT {
 
     my $basedir = dirname($INC{"NRun/Worker.pm"}) . "/Workers";
 
@@ -71,102 +47,185 @@ sub init {
         if ($module =~ /\.pm$/i) {
 
             require "$basedir/$module";
-
-            $module =~ s/\.pm$//i;
-
-            my $object = $module->new($_cfg);
-            $workers->{$object->mode()} = $object;
         }
     }
     close DIR;
 }
 
 ###
-# execute $_cmd. will die on SIGALRM.
+# all available workers will be registered here
+my $workers = {};
+
+###
+# will be called by the worker modules on INIT.
+#
+# $_cfg - parameter hash where
+# {
+#   'MODE' - mode name
+#   'DESC' - mode description
+#   'NAME' - module name
+# }
+sub register {
+
+    my $_cfg = shift;
+
+    $workers->{$_cfg->{MODE}} = $_cfg;
+}
+
+###
+# return all available worker modules
+sub workers {
+
+    return $workers;
+}
+
+###
+# create a new object.
+#
+# <- the new object
+sub new {
+
+    my $_pkg = shift;
+
+    my $self = {};
+    bless $self, $_pkg;
+
+    return $self;
+}
+
+###
+# initialize this worker module.
+#
+# $_cfg - parameter hash where
+# {
+#   'hostname' - hostname this worker should act on
+#   'dumper'   - dumper object
+#   'logger'   - logger object
+# }
+sub init {
+
+    my $_self = shift;
+    my $_cfg  = shift;
+
+    $_self->{hostname} = $_cfg->{hostname};
+    $_self->{dumper}   = $_cfg->{dumper};
+    $_self->{logger}   = $_cfg->{logger};
+}
+
+###
+# signal handler.
+sub handler {
+
+    my $_pid  = shift;
+
+    if (defined($$_pid) and $$_pid != -128) {
+
+        kill(KILL => $$_pid);
+    }
+}
+
+###
+# execute $_cmd.
 #
 # $_cmd -  the command to be executed
 # <- (
-#      $ret - the return code
-#      $out - command output (joined stderr and stdout)
+#      $out - command output
+#      $ret - the return code (-128 indicates too many parallel connections)
 #    )
-sub _ {
+sub do {
 
-    my $_cmd = shift;
+    my $_self = shift;
+    my $_cmd  = shift;
 
     my $pid = -128;
-    my @out;
+    my @out = ();
 
-    local $SIG{USR1} = sub {
+    my $handler_alrm = NRun::Signal::register('ALRM', \&handler, [ \$pid ]);
+    my $handler_int  = NRun::Signal::register('INT',  \&handler, [ \$pid ]);
+    my $handler_term = NRun::Signal::register('TERM', \&handler, [ \$pid ]);
 
-        $semaphore->lock();
-        print STDERR "[$$]: ($pid) $_cmd\n";
-        print STDERR "[$$]: " . join("[$$]: ", @out) if (scalar(@out));
-        $semaphore->unlock();
-    };
+    $pid = open(CMD, "$_cmd 2>&1 2>&1|");
+    if (not defined($pid)) {
 
-    local $SIG{USR2} = sub {
+        $_self->{dumper}->push("$_cmd: $!\n");
+        $_self->{logger}->push("$_cmd: $!\n");
+        $_self->{dumper}->code($NRun::Constants::EXECUTION_FAILED);
+        $_self->{logger}->code($NRun::Constants::EXECUTION_FAILED);
 
-        $semaphore->lock();
+        NRun::Signal::deregister('ALRM', $handler_alrm);
+        NRun::Signal::deregister('INT',  $handler_int);
+        NRun::Signal::deregister('TERM', $handler_term);
 
-        if (not open(LOG, ">>trace.txt")) {
-
-            print STDERR "trace.txt: $!\n";
-            return;
-        }
-
-        print LOG "[$$]: ($pid) $_cmd\n";
-        print LOG "[$$]: " . join("[$$]: ", @out) if (scalar(@out));
-
-        close(LOG);
-
-        $semaphore->unlock();
-    };
-
-    local $SIG{INT} = sub {
-
-        kill(9, $pid);
-        push(@out, "SIGINT received\n");
-        die join("", @out);
-    };
-
-    local $SIG{ALRM} = sub {
-
-        kill(9, $pid);
-        push(@out, "SIGALRM received (timeout)\n");
-        die join("", @out);
-    };
-
-    local $SIG{TERM} = sub {
-
-        kill(9, $pid);
-        push(@out, "SIGTERM received\n");
-        die join("", @out);
-    };
-
-    $pid = open(CMD, "$_cmd 2>&1 2>&1|") or die "$_cmd: $!\n"; 
+        return ( "$_cmd: $!\n", $NRun::Constants::EXECUTION_FAILED );
+    }
+    
+    $_self->{dumper}->command("($pid) $_cmd");
+    $_self->{logger}->command("($pid) $_cmd");
     while (my $line = <CMD>) {
     
-       push(@out, $line);
+        $_self->{dumper}->push($line);
+        $_self->{logger}->push($line);
+        push(@out, $line);
     }
     close(CMD);
+    $_self->{dumper}->command();
+    $_self->{logger}->command();
 
-    return ($? >> 8, join("", @out));
+    $_self->{dumper}->code($? >> 8);
+    $_self->{logger}->code($? >> 8);
+
+    NRun::Signal::deregister('ALRM', $handler_alrm);
+    NRun::Signal::deregister('INT',  $handler_int);
+    NRun::Signal::deregister('TERM', $handler_term);
+
+
+    return ( join("", @out), $? >> 8 );
 }
 
 ###
-# return this modules mode
-sub mode {
+# must be called at end of execution.
+#
+# global destruction in DESTROY is not safe
+sub destroy {
 
     my $_self = shift;
-    return $_self->{MODINFO}->{MODE};
+
+    $_self->{dumper}->destroy();
+    $_self->{logger}->destroy();
 }
 
 ###
-# return this modules description
-sub desc {
+# do some general checks.
+#
+# - ping check (will be checked if $_self->{skip_ns_check})
+# - dns check (will be checked if $_self->{skip_dns_check)
+#
+# <- 1 on success and 0 on error
+sub pre_check {
 
-    my $_self = shift;
-    return $_self->{MODINFO}->{DESC};
+    my $_self = shift; 
+
+    if (not (defined($_self->{skip_ns_check}) or gethostbyname($_self->{hostname}))) {
+
+        $_self->{dumper}->push("dns entry is missing");
+        $_self->{logger}->push("dns entry is missing");
+        $_self->{dumper}->code($NRun::Constants::MISSING_DNS_ENTRY);
+        $_self->{logger}->code($NRun::Constants::MISSING_DNS_ENTRY);
+
+        return 0;
+    }
+
+    if (not (defined($_self->{skip_ping_check}) or Net::Ping->new()->ping($_self->{hostname}))) {
+
+        $_self->{dumper}->push("not pinging");
+        $_self->{logger}->push("not pinging");
+        $_self->{dumper}->code($NRun::Constants::PING_FAILED);
+        $_self->{logger}->code($NRun::Constants::PING_FAILED);
+
+        return 0;
+    }
+
+    return 1;
 }
 
 1;

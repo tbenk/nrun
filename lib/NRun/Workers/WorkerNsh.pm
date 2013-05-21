@@ -25,29 +25,49 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
-package WorkerNsh;
+package NRun::Worker::WorkerNsh;
 
 use strict;
 use warnings;
 
 use File::Basename;
 use NRun::Worker;
+use NRun::Constants;
 
 our @ISA = qw(NRun::Worker);
 
-###
-# module specification
-our $MODINFO = {
+BEGIN {
 
-  'MODE' => "nsh",
-  'DESC' => "nsh based remote execution",
-};
+    NRun::Worker::register ( {
+
+        'MODE' => "nsh",
+        'DESC' => "nsh based remote execution",
+        'NAME' => "NRun::Worker::WorkerNsh",
+    } );
+}
 
 ###
 # create a new object.
 #
+# <- the new object
+sub new {
+
+    my $_pkg = shift;
+
+    my $self = {};
+    bless $self, $_pkg;
+
+    return $self;
+}
+
+###
+# initialize this worker module.
+#
 # $_cfg - parameter hash where
 # {
+#   'hostname'         - hostname this worker should act on
+#   'dumper'           - dumper object
+#   'logger'           - logger object
 #   'agentinfo_args'   - arguments supplied to the agentinfo binary
 #   'agentinfo_binary' - agentinfo binary to be executed
 #   'ncp_args'         - arguments supplied to the ncp binary
@@ -55,40 +75,51 @@ our $MODINFO = {
 #   'nexec_args'       - arguments supplied to the nexec binary
 #   'nexec_binary'     - nexec binary to be executed
 # }
-# <- the new object
-sub new {
+sub init {
 
-    my $_pkg = shift;
-    my $_cfg = shift;
+    my $_self = shift;
+    my $_cfg  = shift;
 
-    my $self = {};
-    bless $self, $_pkg;
+    $_self->SUPER::init($_cfg);
 
-    $self->{agentinfo_args}   = $_cfg->{agentinfo_args};
-    $self->{agentinfo_binary} = $_cfg->{agentinfo_binary};
-    $self->{nexec_args}       = $_cfg->{nexec_args};
-    $self->{nexec_binary}     = $_cfg->{nexec_binary};
-    $self->{ncp_args}         = $_cfg->{ncp_args};
-    $self->{ncp_binary}       = $_cfg->{ncp_binary};
-
-    $self->{MODINFO} = $MODINFO;
-    return $self;
+    $_self->{agentinfo_args}   = $_cfg->{agentinfo_args};
+    $_self->{agentinfo_binary} = $_cfg->{agentinfo_binary};
+    $_self->{nexec_args}       = $_cfg->{nexec_args};
+    $_self->{nexec_binary}     = $_cfg->{nexec_binary};
+    $_self->{ncp_args}         = $_cfg->{ncp_args};
+    $_self->{ncp_binary}       = $_cfg->{ncp_binary};
 }
 
 ###
-# copy a file using nsh to $_host.
+# do some general checks.
 #
-# $_host   - the host the command should be exeuted on
+# - ping check will be checked if $_self->{skip_ns_check}
+# - dns check will be checked if $_self->{skip_dns_check}
+#
+# <- 1 on success and 0 on error
+sub pre_check {
+
+    my $_self = shift;
+
+    # nexec "steals" STDIN otherwise - no CTRL+C possible
+    close(STDIN);
+    open(STDIN, "/dev/null");
+
+    my ($out, $ret) = $_self->do("$_self->{agentinfo_binary} $_self->{hostname}");
+    return 1 if ($ret != 0);
+
+    return $_self->SUPER::pre_check();
+}
+
+###
+# copy a file using nsh to $_self->{hostname}.
+#
 # $_source - source file to be copied
 # $_target - destination $_source should be copied to
-# <- (
-#      $ret - the return code (-128 indicates too many parallel connections)
-#      $out - command output
-#    )
+# <- the return code (-128 indicates too many parallel connections)
 sub copy {
 
     my $_self   = shift;
-    my $_host   = shift;
     my $_source = shift;
     my $_target = shift;
 
@@ -96,26 +127,19 @@ sub copy {
     close(STDIN);
     open(STDIN, "/dev/null");
 
-    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));
-    return ($ret, $out) if (not $ret == 0);
-
-    return $_self->error_handler(_("$_self->{ncp_binary} $_self->{ncp_args} $_source - //$_host/$_target"));
+    my ( $out, $ret ) = $_self->do("$_self->{ncp_binary} $_self->{ncp_args} $_source - //$_self->{hostname}/$_target");
+    return $ret;
 }
 
 ###
-# execute the command using nsh on $_host.
+# execute the command using nsh on $_self->{hostname}.
 #
-# $_host    - the host the command should be exeuted on
 # $_command - the command that should be executed
 # $_args    - arguments that should be supplied to $_command
-# <- (
-#      $ret - the return code (-128 indicates too many parallel connections)
-#      $out - command output
-#    )
+# <- the return code (-128 indicates too many parallel connections)
 sub execute {
 
     my $_self    = shift;
-    my $_host    = shift;
     my $_command = shift;
     my $_args    = shift;
 
@@ -123,68 +147,65 @@ sub execute {
     close(STDIN);
     open(STDIN, "/dev/null");
 
-    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));
-    return ($ret, $out) if (not $ret == 0);
-
-    return $_self->error_handler(_("$_self->{nexec_binary} $_self->{nexec_args} -n $_host $_command $_args"));
+    my ( $out, $ret ) = $_self->do("$_self->{nexec_binary} $_self->{nexec_args} -n $_self->{hostname} $_command $_args");
+    return $ret;
 }
 
 ###
-# delete a file using nsh on $_host.
+# delete a file using nsh on $_self->{hostname}.
 #
-# $_host - the host the command should be exeuted on
 # $_file - the command that should be executed
-# <- (
-#      $ret - the return code (-128 indicates too many parallel connections)
-#      $out - command output
-#    )
+# <- the return code (-128 indicates too many parallel connections)
 sub delete {
 
     my $_self = shift;
-    my $_host = shift;
     my $_file = shift;
 
     # nexec "steals" STDIN otherwise - no CTRL+C possible
     close(STDIN);
     open(STDIN, "/dev/null");
 
-    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));
-    return ($ret, $out) if (not $ret == 0);
-
-    return $_self->error_handler(_("$_self->{nexec_binary} $_self->{nexec_args} -n $_host rm -f \"$_file\""));
+    my ( $out, $ret ) = $_self->do("$_self->{nexec_binary} $_self->{nexec_args} -n $_self->{hostname} rm -f \"$_file\"");
+    return $ret;
 }
 
 ###
-# scan command output for nsh error messages.
+# execute $_cmd. will die on SIGALRM, SIGINT or SIGTERM.
+#
+# additionally to Worker::do() do() will scan command output
+# for nsh error messages.
 #
 # bladelogic seems to have a problem when doing too many parallel
 # requests at once. If this is the case and the action fails for that
 # reason, -128 is returned.
 #
-# $_ret - the return code
-# $_out - the command output
+# $_cmd -  the command to be executed
 # <- (
-#      $ret - the return code (-128 indicates too many parallel connections)
 #      $out - command output
+#      $ret - the return code (-128 indicates too many parallel connections)
 #    )
-sub error_handler {
+sub do {
 
     my $_self = shift;
-    my $_ret  = shift;
-    my $_out  = shift;
+    my $_cmd  = shift;
+
+    my ( $out, $ret ) = $_self->SUPER::do($_cmd);
 
     # return -128 on messages indicating too many parallel connections
-    if (   grep(/SSO Error: Error reading server greeting/,            $_out)
-        or grep(/SSO Error: Could not load credential cache file/,     $_out)
-        or grep(/SSL_connect/,                                         $_out)
-        or grep(/nexec: Error accessing host .* Connection timed out/, $_out)
-        or grep(/Unable to reach .* Connection timed out/,             $_out))
+    if (   grep(/SSO Error: Error reading server greeting/,            $out)
+        or grep(/SSO Error: Could not load credential cache file/,     $out)
+        or grep(/SSL_connect/,                                         $out)
+        or grep(/nexec: Error accessing host .* Connection timed out/, $out)
+        or grep(/Unable to reach .* Connection timed out/,             $out))
     {
 
-        return (-128, $_out);
+        $_self->{dumper}->code($NRun::Constants::RSCD_ERROR);
+        $_self->{logger}->code($NRun::Constants::RSCD_ERROR);
+
+        return ( $out, $NRun::Constants::RSCD_ERROR );
     }
 
-    return ($_ret, $_out);
+    return ( $out, $ret );
 }
 
 1;

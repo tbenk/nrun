@@ -31,29 +31,47 @@ use strict;
 use warnings;
 
 use File::Path;
+use Date::Format;
 use NRun::Semaphore;
+use NRun::Signal;
 
 ###
 # create a new object.
 #
-# $_obj - parameter hash where
+# $_cfg - parameter hash where
 # {
-#   'basedir'   - the basedir the logs should be written to
+#   'hostname'  - the hostname this dumper is responsible for
 #   'semaphore' - the semaphore lock object
+#   'mode'      - one of ...
+#                 output_sync_hostname     - dump the command output incl hostname (synchronized)
+#                 output_sync_no_hostname  - dump the command output excl hostname (synchronized)
+#                 output_async_hostname    - dump the command output incl hostname (not synchronized)
+#                 output_async_no_hostname - dump the command output excl hostname (not synchronized)
+#                 result                   - dump the command result in csv format
 # }
 # <- the new object
 sub new {
 
     my $_pkg = shift;
-    my $_obj = shift;
+    my $_cfg = shift;
 
     my $self = {};
     bless $self, $_pkg;
 
-    $self->{basedir}   = $_obj->{basedir};
-    $self->{semaphore} = $_obj->{semaphore};
+    $self->{basedir}       = $_cfg->{basedir};
+    $self->{hostname}      = $_cfg->{hostname};
+    $self->{semaphore}     = $_cfg->{semaphore};
+    $self->{semaphore_key} = $_cfg->{semaphore}->key();
+
+    $self->{buffer} = [];
+    $self->{code}   = 0;
 
     mkpath("$self->{basedir}/hosts");
+
+    $self->{handler_term} = NRun::Signal::register('USR2', \&handler_usr2, [ \$self ]);
+    $self->{handler_term} = NRun::Signal::register('TERM', \&handler_term, [ \$self ]);
+    $self->{handler_int}  = NRun::Signal::register('INT',  \&handler_int,  [ \$self ]);
+    $self->{handler_alrm} = NRun::Signal::register('ALRM', \&handler_alrm, [ \$self ]);
 
     unlink("$self->{basedir}/../latest");
     symlink("$self->{basedir}", "$self->{basedir}/../latest");
@@ -62,39 +80,149 @@ sub new {
 }
 
 ###
-# log the output
-#
-# $_host - the host this result belongs to
-# $_ret  - the script return code
-# $_out  - the script output
-sub log {
+# SIGTERM signal handler
+sub handler_term {
 
     my $_self = shift;
-    my $_host = shift;
-    my $_ret  = shift;
-    my $_out  = shift;
+
+    $$_self->push("SIGTERM received\n");
+    $$_self->code($NRun::Constants::CODE_SIGTERM);
+
+    $$_self->destroy();
+}
+
+###
+# SIGINT signal handler
+sub handler_int {
+
+    my $_self = shift;
+
+    $$_self->push("SIGINT received\n");
+    $$_self->code($NRun::Constants::CODE_SIGINT);
+
+    $$_self->destroy();
+}
+
+###
+# SIGALRM signal handler
+sub handler_alrm {
+
+    my $_self = shift;
+
+    $$_self->push("SIGALRM received\n");
+    $$_self->code($NRun::Constants::CODE_SIGALRM); 
+
+    $$_self->destroy();
+}
+
+###
+# SIGUSR2 signal handler
+sub handler_usr2 {
+
+    my $_self = shift;
+
+    return if (defined($$_self->{closed}));
+
+    $$_self->{semaphore}->unlock();
+    $$_self->{semaphore}->lock();
+
+    my $date = time2str("%Y%m%d_%H_%M_%S", time);
+    if (not open(TRC, ">>$$_self->{basedir}/trace_$date.log")) {
+
+        print "error: $$_self->{basedir}/trace.log: $!\n";
+
+        $$_self->{semaphore}->unlock();
+        return;
+    }
+
+    if (defined($$_self->{command})) {
+
+        print TRC "$$_self->{hostname}\[$$\]: $$_self->{command}\n";
+    }
+
+    if (scalar(@{$$_self->{buffer}})) {
+  
+        print TRC "$$_self->{hostname}\[$$\]: " . join("$$_self->{hostname}\[$$\]: ", @{$$_self->{buffer}});
+    }
+
+    print TRC "$$_self->{hostname}\[$$\]: SIGUSR1 received\n";
+
+    close(TRC);
+
+    $$_self->{semaphore}->unlock();
+}
+
+###
+# push a message into the buffer.
+#
+# $_msg - the message to be pushed
+sub push {
+
+    my $_self = shift;
+    my $_msg  = shift;
+
+    return if (defined($_self->{closed}));
+
+    push(@{$_self->{buffer}}, $_msg);
+}
+
+###
+# set the return code value.
+#
+# $_code - the code to be set
+sub code {
+
+    my $_self = shift;
+    my $_code = shift;
+
+    return if (defined($_self->{closed}));
+
+    $_self->{code} = $_code;
+}
+
+###
+# set the currently running command.
+#
+# $_command - the command to be set
+sub command {
+
+    my $_self = shift;
+    my $_command = shift;
+
+    return if (defined($_self->{closed}));
+
+    $_self->{command} = $_command;
+}
+
+###
+# global destruction in DESTROY may set $_self->{semaphore} to undef.
+sub destroy {
+
+    my $_self = shift;
+
+    return if (defined($_self->{closed}));
+
+    $_self->{closed} = 1;
+
+    NRun::Signal::deregister('USR2', $_self->{handler_usr2});
+    NRun::Signal::deregister('TERM', $_self->{handler_term});
+    NRun::Signal::deregister('INT',  $_self->{handler_int});
+    NRun::Signal::deregister('ALRM', $_self->{handler_alrm});
 
     $_self->{semaphore}->lock();
 
-    open(RES, ">>$_self->{basedir}/results.log")
-      or die("$_self->{basedir}/results.log: $!");
+    open(RES, ">>$_self->{basedir}/results.log")                  or die("$_self->{basedir}/results.log: $!");
+    open(LOG, ">>$_self->{basedir}/hosts/$_self->{hostname}.log") or die("$_self->{basedir}/$_self->{hostname}.log: $!");
+    open(OUT, ">>$_self->{basedir}/output.log")                   or die("$_self->{basedir}/output.log: $!");
 
-    open(LOG, ">>$_self->{basedir}/hosts/$_host.log")
-      or die("$_self->{basedir}/$_host.log: $!");
+    print RES "$_self->{hostname}; exit code $_self->{code}; $_self->{basedir}/hosts/$_self->{hostname}.log\n";
 
-    open(OUT, ">>$_self->{basedir}/output.log")
-      or die("$_self->{basedir}/output.log: $!");
+    if (scalar(@{$_self->{buffer}})) {
+  
+        print LOG join("", @{$_self->{buffer}});
+        print OUT $_self->{hostname} . ": " . join($_self->{hostname} . ": ", @{$_self->{buffer}});
+    }
 
-    print RES "$_host; exit code $_ret; $_self->{basedir}/hosts/$_host.log\n";
-
-    print LOG "$_out";
-
-    $_out =~ s/^/$_host: /gms;
-
-    chomp($_out);
-    $_out .= "\n";    # ensure newline at end of line
-
-    print OUT $_out;
 
     close(OUT);
     close(RES);

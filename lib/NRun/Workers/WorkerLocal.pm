@@ -25,7 +25,7 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
-package WorkerLocal;
+package NRun::Worker::WorkerLocal;
 
 use strict;
 use warnings;
@@ -35,13 +35,15 @@ use NRun::Worker;
 
 our @ISA = qw(NRun::Worker);
 
-###
-# module specification
-our $MODINFO = {
+BEGIN {
 
-  'MODE' => "local",
-  'DESC' => "execute the script locally, set TARGET_HOST on each execution",
-};
+    NRun::Worker::register ( {
+
+        'MODE' => "local",
+        'DESC' => "execute the script locally, set TARGET_HOST on each execution",
+        'NAME' => "NRun::Worker::WorkerLocal",
+    } );
+}
 
 ###
 # create a new object.
@@ -50,72 +52,83 @@ our $MODINFO = {
 sub new {
 
     my $_pkg = shift;
-    my $_obj = shift;
 
     my $self = {};
     bless $self, $_pkg;
 
-    $self->{MODINFO} = $MODINFO;
     return $self;
 }
 
 ###
-# copy a file to $_host.
+# initialize this worker module.
 #
-# $_host   - the host the command should be exeuted on
+# $_cfg - parameter hash where
+# {
+#   'hostname'   - hostname this worker should act on
+#   'dumper'     - dumper object
+#   'logger'     - logger object
+# }
+sub init {
+
+    my $_self = shift;
+    my $_cfg  = shift;
+
+    $_self->SUPER::init($_cfg);
+}
+
+###
+# copy a file to $_self->{hostname}.
+#
 # $_source - source file to be copied
 # $_target - destination $_source should be copied to
-# <- (
-#      $ret - the return code
-#      $out - command output
-#    )
+# <- the return code
 sub copy {
 
     my $_self   = shift;
-    my $_host   = shift;
     my $_source = shift;
     my $_target = shift;
 
-    return (1, "not implemented");
+    $_self->{logger}->push("not implemented");
+    $_self->{dumper}->push("not implemented");
+    $_self->{logger}->code(1);
+    $_self->{dumper}->code(1);
+
+    return 1;
 }
 
 ###
 # execute the command locally and set environment variable TARGET_HOST
-# to $_host.
+# to $_self->{hostname}.
 #
-# $_host    - the host the command should be exeuted on
 # $_command - the command that should be executed
 # $_args    - arguments that should be supplied to $_command
-# <- (
-#      $ret - the return code
-#      $out - command output
-#    )
+# <- the return code
 sub execute {
 
     my $_self    = shift;
-    my $_host    = shift;
     my $_command = shift;
     my $_args    = shift;
 
-    return _("TARGET_HOST=$_host $_command $_args");
+    my ( $out, $ret ) = $_self->do("TARGET_HOST=$_self->{hostname} $_command $_args");
+    return $ret;
 }
 
 ###
-# delete a file on $_host.
+# delete a file on $_self->{hostname}.
 #
-# $_host - the host the command should be exeuted on
 # $_file - the command that should be executed
-# <- (
-#      $ret - the return code
-#      $out - command output
-#    )
+# <- the return code
 sub delete {
 
     my $_self = shift;
-    my $_host = shift;
     my $_file = shift;
 
-    return (1, "not implemented");
+    $_self->{logger}->push("not implemented");
+    $_self->{dumper}->push("not implemented");
+    $_self->{logger}->code(1);
+    $_self->{dumper}->code(1);
+
+    return 1;
 }
 
 1;

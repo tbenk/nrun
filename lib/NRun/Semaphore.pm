@@ -57,14 +57,13 @@ sub new {
 
             $self->{key} = int(rand(100000));
         }
-
-        $self->{semaphore} = new IPC::Semaphore($self->{key}, 1, 0600 | IPC_CREAT);
-        $self->{semaphore}->op(0,1,0);
     } else {
 
         $self->{key} = $_obj->{key};
-        $self->{semaphore} = new IPC::Semaphore($self->{key}, 1, 0);
     }
+
+    $self->{semaphore} = new IPC::Semaphore($self->{key}, 1, 0600 | IPC_CREAT);
+    $self->{semaphore}->op(0,1,0);
 
     return $self;
 }
