@@ -56,7 +56,8 @@ our $options = {};
 sub usage {
 
     print "usage: " . basename($0) . " -t HOST1[,HOST2,...] -- SRC DST\n";
-    print "--dump-results,-d        instead of dumping the command output, dump the exit status.\n";
+    print "--async,-a               asynchronous output mode.\n";
+    print "--dump-output,-d         instead of dumping the exit status, dump the command output.\n";
     print "--log-directory,-l DIR   base directory for the log files.\n";
     print "--mode,-m MODE           remote execution mode:\n";
     print "--no-hostname            omit hostname prefix.\n";
@@ -81,8 +82,9 @@ sub usage {
 sub parse_commandline {
 
     my $arg_target          = $options->{arg_target};
+    my $arg_async           = $options->{arg_async };
     my $arg_parallel        = $options->{arg_parallel};
-    my $arg_dump_results    = $options->{arg_dump_results};
+    my $arg_dump_output     = $options->{arg_dump_output};
     my $arg_no_hostname     = $options->{arg_no_hostname};
     my $arg_no_logfile      = $options->{arg_no_logfile};
     my $arg_log_directory   = $options->{arg_log_directory};
@@ -93,10 +95,11 @@ sub parse_commandline {
     my $arg_version         = $options->{arg_version};
 
     my $ret = GetOptions (
+        "async|a"           => \$arg_async,
         "target|t=s"        => \$arg_target,
         "parallel|p=i"      => \$arg_parallel,
         "no-hostname"       => \$arg_no_hostname,
-        "dump-results|d"    => \$arg_dump_results,
+        "dump-output|d"     => \$arg_dump_output,
         "log-directory|l=s" => \$arg_log_directory,
         "timeout=i"         => \$arg_timeout,
         "no-logfile"        => \$arg_no_logfile,
@@ -148,20 +151,26 @@ sub parse_commandline {
     $options->{skip_ping_check} = $arg_skip_ping_check;
     $options->{mode}            = lc($arg_mode);
 
-    if (defined($arg_dump_results)) {
+    $options->{dumpmode} = "result";
+    if (defined($arg_dump_output)) {
 
-        $options->{dumpmode} = "result";
+        $options->{dumpmode} = "output";
+    }
+
+    if (defined($arg_async)) {
+
+        $options->{dumpmode} .= "_async";
     } else {
 
-        $options->{dumpmode} = "output_sync";
+        $options->{dumpmode} .= "_sync";
+    }
 
-        if (defined($arg_no_hostname)) {
+    if (defined($arg_no_hostname)) {
 
-            $options->{dumpmode} = "$options->{dumpmode}_no_hostname";
-        } else {
+        $options->{dumpmode} .= "_no_hostname";
+    } else {
 
-            $options->{dumpmode} = "$options->{dumpmode}_hostname";
-        }
+        $options->{dumpmode} .= "_hostname";
     }
 
     $options->{log_directory} = "copy/" . $date;
@@ -308,8 +317,8 @@ ncopy - copy a file or directory to multiple target servers.
 =head1 SYNOPSIS
 
 ncopy -t HOST1[,HOST2,...] [-p MAX] [-l DIR] [--timeout SEC]
-[--mode MODE] [--dump-results] [--no-hostname] [--no-logfile]
-[--skip-ping-check] [--skip-ns-check] [--version] 
+[--mode MODE] [--dump-output] [--no-hostname] [--no-logfile]
+[--skip-ping-check] [--skip-ns-check] [--version] [--async]
 -- SRC DST
 
 =head1 DESCRIPTION
@@ -455,7 +464,9 @@ the following configuration options must be set in the configuration file:
 
 =head1 OPTIONS
 
-B<--dump-results,-d>             instead of dumping the command output, dump the exit status.
+B<--async,-a>                    asynchronous output mode.
+
+B<--dump-output,-d>              instead of dumping the exit status, dump the command output.
 
 B<--log-directory,-l DIR>        base directory for the log files.
 

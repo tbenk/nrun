@@ -159,27 +159,26 @@ sub parse_commandline {
     $options->{skip_ping_check} = $arg_skip_ping_check;
     $options->{mode}            = lc($arg_mode);
 
+    $options->{dumpmode} = "output";
     if (defined($arg_dump_results)) {
-    
+
         $options->{dumpmode} = "result";
+    }
+
+    if (defined($arg_async)) {
+
+        $options->{dumpmode} .= "_async";
     } else {
 
-        $options->{dumpmode} = "output";
-        if (defined($arg_async)) {
+        $options->{dumpmode} .= "_sync";
+    }
 
-            $options->{dumpmode} = "$options->{dumpmode}_async";
-        } else {
+    if (defined($arg_no_hostname)) {
 
-            $options->{dumpmode} = "$options->{dumpmode}_sync";
-        }
+        $options->{dumpmode} .= "_no_hostname";
+    } else {
 
-        if (defined($arg_no_hostname)) {
-
-            $options->{dumpmode} = "$options->{dumpmode}_no_hostname";
-        } else {
-
-            $options->{dumpmode} = "$options->{dumpmode}_hostname";
-        }
+        $options->{dumpmode} .= "_hostname";
     }
 
     $options->{log_directory} = basename($options->{command}) . "/" . $date;

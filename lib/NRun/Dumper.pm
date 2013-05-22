@@ -46,7 +46,8 @@ use NRun::Constants;
 #                 output_sync_no_hostname  - dump the command output excl hostname (synchronized)
 #                 output_async_hostname    - dump the command output incl hostname (not synchronized)
 #                 output_async_no_hostname - dump the command output excl hostname (not synchronized)
-#                 result                   - dump the command result in csv format
+#                 result_no_hostname       - dump the command result in csv format excl hostname
+#                 result_hostname          - dump the command result in csv format incl hostname
 # }
 # <- the new object
 sub new {
@@ -208,9 +209,15 @@ sub destroy {
 
     $_self->{semaphore}->lock();
 
-    if ($_self->{mode} eq 'result') {
+    if ($_self->{mode}  =~ /^result/) {
 
-        print "$_self->{hostname}; exit code $_self->{code}\n";
+        if ($_self->{mode} =~ /no_hostname$/) {
+
+            print "exit code $_self->{code}\n";
+        } else {
+
+            print "$_self->{hostname}; exit code $_self->{code}\n";
+        }
     } elsif (scalar(@{$_self->{buffer}})) {
   
         if ($_self->{mode} =~ /no_hostname$/) {
