@@ -249,7 +249,12 @@ sub callback_action {
         }
     );
 
-    # TODO: pre_check();
+    if (not $worker->pre_check()) {
+
+        $worker->destroy();
+        return
+    }
+
     if (defined($options->{copy})) {
 
         my $source = $command;

@@ -230,7 +230,12 @@ sub callback_action {
         }
     );
 
-    # TODO: pre_check();
+    if (not $worker->pre_check()) {
+
+        $worker->destroy();
+        return
+    }
+
     $worker->copy($options->{source}, $options->{destination});
     $worker->destroy();
 }

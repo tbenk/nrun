@@ -101,6 +101,8 @@ sub new {
 #   'hostname' - hostname this worker should act on
 #   'dumper'   - dumper object
 #   'logger'   - logger object
+#   'skip_ns_check'   - skip nslookup test in pre_check()
+#   'skip_ping_check' - skip ping test in pre_check()
 # }
 sub init {
 
@@ -110,6 +112,9 @@ sub init {
     $_self->{hostname} = $_cfg->{hostname};
     $_self->{dumper}   = $_cfg->{dumper};
     $_self->{logger}   = $_cfg->{logger};
+
+    $_self->{skip_ns_check}   = $_cfg->{skip_ns_check};
+    $_self->{skip_ping_check} = $_cfg->{skip_ping_check};
 }
 
 ###
@@ -207,8 +212,8 @@ sub pre_check {
 
     if (not (defined($_self->{skip_ns_check}) or gethostbyname($_self->{hostname}))) {
 
-        $_self->{dumper}->push("dns entry is missing") if (defined($_self->{dumper}));
-        $_self->{logger}->push("dns entry is missing") if (defined($_self->{logger}));
+        $_self->{dumper}->push("dns entry is missing\n") if (defined($_self->{dumper}));
+        $_self->{logger}->push("dns entry is missing\n") if (defined($_self->{logger}));
         $_self->{dumper}->code($NRun::Constants::MISSING_DNS_ENTRY) if (defined($_self->{dumper}));
         $_self->{logger}->code($NRun::Constants::MISSING_DNS_ENTRY) if (defined($_self->{logger}));
 
@@ -217,8 +222,8 @@ sub pre_check {
 
     if (not (defined($_self->{skip_ping_check}) or Net::Ping->new()->ping($_self->{hostname}))) {
 
-        $_self->{dumper}->push("not pinging") if (defined($_self->{dumper}));
-        $_self->{logger}->push("not pinging") if (defined($_self->{logger}));
+        $_self->{dumper}->push("not pinging\n") if (defined($_self->{dumper}));
+        $_self->{logger}->push("not pinging\n") if (defined($_self->{logger}));
         $_self->{dumper}->code($NRun::Constants::PING_FAILED) if (defined($_self->{dumper}));
         $_self->{logger}->code($NRun::Constants::PING_FAILED) if (defined($_self->{logger}));
 
