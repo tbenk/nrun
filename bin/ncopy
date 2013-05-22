@@ -145,7 +145,7 @@ sub parse_commandline {
     $options->{parallel}        = $arg_parallel ? $arg_parallel : 5;
     $options->{source}          = $ARGV[0];
     $options->{destination}     = $ARGV[1];
-    $options->{timeout}         = $arg_timeout;
+    $options->{timeout}         = $arg_timeout ? $arg_timeout : 60;
     $options->{no_logfile}      = $arg_no_logfile;
     $options->{skip_ns_check}   = $arg_skip_ns_check;
     $options->{skip_ping_check} = $arg_skip_ping_check;
