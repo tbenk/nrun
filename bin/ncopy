@@ -233,7 +233,7 @@ sub callback_action {
     if (not $worker->pre_check()) {
 
         $worker->destroy();
-        return
+        return;
     }
 
     $worker->copy($options->{source}, $options->{destination});

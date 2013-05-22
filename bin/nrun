@@ -252,7 +252,7 @@ sub callback_action {
     if (not $worker->pre_check()) {
 
         $worker->destroy();
-        return
+        return;
     }
 
     if (defined($options->{copy})) {
@@ -269,14 +269,13 @@ sub callback_action {
     }
 
     $worker->execute($command, $options->{arguments});
+    $worker->destroy();
 
     if (defined($options->{copy})) {
 
-        # TODO: delete sets exit code
         $worker->delete($command);
     }
 
-    $worker->destroy();
 }
 
 ###
