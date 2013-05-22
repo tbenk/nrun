@@ -347,7 +347,7 @@ synchronously.
 nrun -t HOST1[,HOST2,...] [-p MAX] [-l DIR] [-t SEC]
 [--mode MODE] [--dump-results] [--copy] [--no-hostname]
 [--no-logfile] [--skip-ping-check] [--skip-ns-check] [--version] 
--- COMMAND
+[--async] -- COMMAND
 
 
 =head1 DESCRIPTION
@@ -494,29 +494,31 @@ the following configuration options must be set in the configuration file:
 
 =head1 OPTIONS
 
-B<--target,-t HOST1[,HOST2,...]> comma separated list of target hosts (see TARGETS).
+B<--async,-a>                    asynchronous output mode.
 
-B<--parallel,-p MAX>             number of parallel connections (defaults to 5).
+B<--copy,-c>                     copy command to target host before execution.
 
 B<--dump-results,-d>             instead of dumping the command output, dump the exit status.
 
 B<--log-directory,-l DIR>        base directory for the log files.
 
-B<--timeout SEC>                 timeout for each command execution (defaults to 60).
-
-B<--copy,-c>                     copy command to target host before execution.
+B<--mode,-m MODE>                remote execution mode (see MODES)
 
 B<--no-hostname>                 omit hostname prefix.
 
 B<--no-logfile>                  do not generate any log files.
 
+B<--parallel,-p MAX>             number of parallel connections (defaults to 5).
+
 B<--skip-ping-check>             skip checking if the host answers on ping.
 
 B<--skip-ns-check>               skip checking if the hostname is resolvable.
 
-B<--version,-v>                  print the version string and exit.
+B<--target,-t HOST1[,HOST2,...]> comma separated list of target hosts (see TARGETS).
 
-B<--mode,-m MODE>                remote execution mode (see MODES)
+B<--timeout SEC>                 timeout for each command execution (defaults to 60).
+
+B<--version,-v>                  print the version string and exit.
 
 =head1 TARGETS
 
