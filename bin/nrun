@@ -134,12 +134,6 @@ sub parse_commandline {
         usage();
     }
 
-    if (defined($arg_async) and defined($arg_dump_results)) {
-
-        print "error: parameters --async and --dump-results are mutually excludive.\n";
-        usage();
-    }
-
     if (not defined($arg_target)) {
 
         print "error: parameter --target is mandatory.\n";
