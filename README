@@ -40,7 +40,6 @@ usage: nrun -t HOST1[,HOST2,...] -- COMMAND
 --copy,-c                copy command to target host before execution.
 --dump-results,-d        instead of dumping the command output, dump the exit status.
 --log-directory,-l DIR   base directory for the log files.
---mode,-m MODE           remote execution mode:
 --no-hostname            omit hostname prefix.
 --no-logfile             do not generate any log files.
 --parallel,-p MAX        number of parallel connections (defaults to 5).
@@ -49,17 +48,16 @@ usage: nrun -t HOST1[,HOST2,...] -- COMMAND
 --target,-t HOST1,HOST2  comma separated list of target hosts.
 --timeout SEC            timeout for each command execution (defaults to 60).
 --version,-v             print the version string and exit.
+--mode,-m MODE           remote execution mode:
                          rsh - rsh based remote execution
                          nsh - nsh based remote execution
                          ssh - ssh based remote execution
-                         local - execute the script locally, set TARGET_HOST
-                         on each execution
+                         local - execute the script locally, set TARGET_HOST on each execution
 
 usage: ncopy -t HOST1[,HOST2,...] -- SRC DST
 --async,-a               asynchronous output mode.
 --dump-output,-d         instead of dumping the exit status, dump the command output.
 --log-directory,-l DIR   base directory for the log files.
---mode,-m MODE           remote execution mode:
 --no-hostname            omit hostname prefix.
 --no-logfile             do not generate any log files.
 --parallel,-p MAX        number of parallel connections (defaults to 5).
@@ -68,11 +66,11 @@ usage: ncopy -t HOST1[,HOST2,...] -- SRC DST
 --target,-t HOST1,HOST2  comma separated list of target hosts.
 --timeout SEC            timeout for each command execution (defaults to 60).
 --version,-v             print the version string and exit.
+--mode,-m MODE           remote execution mode:
                          rsh - rsh based remote execution
                          nsh - nsh based remote execution
                          ssh - ssh based remote execution
-                         local - execute the script locally, set TARGET_HOST
-                         on each execution
+                         local - execute the script locally, set TARGET_HOST on each execution
 
 examples
 ========

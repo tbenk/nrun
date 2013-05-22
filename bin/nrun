@@ -62,7 +62,6 @@ sub usage {
     print "--copy,-c                copy command to target host before execution.\n";
     print "--dump-results,-d        instead of dumping the command output, dump the exit status.\n";
     print "--log-directory,-l DIR   base directory for the log files.\n";
-    print "--mode,-m MODE           remote execution mode:\n";
     print "--no-hostname            omit hostname prefix.\n";
     print "--no-logfile             do not generate any log files.\n";
     print "--parallel,-p MAX        number of parallel connections (defaults to 5).\n";
@@ -71,6 +70,7 @@ sub usage {
     print "--target,-t HOST1,HOST2  comma separated list of target hosts.\n";
     print "--timeout SEC            timeout for each command execution (defaults to 60).\n";
     print "--version,-v             print the version string and exit.\n";
+    print "--mode,-m MODE           remote execution mode:\n";
 
     foreach my $object (values(%{NRun::Worker::workers()})) { 
 
