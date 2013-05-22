@@ -2,9 +2,11 @@ README
 LICENSE
 MANIFEST
 Makefile.PL
-etc/nrun.config
+etc/nrunrc
 bin/nrun
 bin/ncopy
+lib/NRun/Constants.pm
+lib/NRun/Signal.pm
 lib/NRun/Dispatcher.pm
 lib/NRun/Dumper.pm
 lib/NRun/Logger.pm

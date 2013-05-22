@@ -3,48 +3,57 @@
 !_TAG_PROGRAM_AUTHOR	Michael Schaap	/mscha@mscha.com/
 !_TAG_PROGRAM_NAME	pltags	//
 !_TAG_PROGRAM_VERSION	2.21	/supports multiple tags and extended format/
+CODE_SIGALRM	lib/NRun/Constants.pm	/^our $CODE_SIGALRM      = -253;$/;"	v	class:Constants
+CODE_SIGINT	lib/NRun/Constants.pm	/^our $CODE_SIGINT       = -255;$/;"	v	class:Constants
+CODE_SIGTERM	lib/NRun/Constants.pm	/^our $CODE_SIGTERM      = -254;$/;"	v	class:Constants
+Constants	lib/NRun/Constants.pm	/^package NRun::Constants;$/;"	p	class:Constants
 Dispatcher	lib/NRun/Dispatcher.pm	/^package NRun::Dispatcher;$/;"	p	class:Dispatcher
 Dumper	lib/NRun/Dumper.pm	/^package NRun::Dumper;$/;"	p	class:Dumper
+EXECUTON_FAILED	lib/NRun/Constants.pm	/^our $EXECUTON_FAILED   = -250;$/;"	v	class:Constants
+HANDLERS	lib/NRun/Signal.pm	/^my $HANDLERS = {};$/;"	v	class:Signal
 ISA	lib/NRun/Workers/WorkerLocal.pm	/^our @ISA = qw(NRun::Worker);$/;"	v	class:WorkerLocal
 ISA	lib/NRun/Workers/WorkerNsh.pm	/^our @ISA = qw(NRun::Worker);$/;"	v	class:WorkerNsh
 ISA	lib/NRun/Workers/WorkerRsh.pm	/^our @ISA = qw(NRun::Worker);$/;"	v	class:WorkerRsh
 ISA	lib/NRun/Workers/WorkerSsh.pm	/^our @ISA = qw(NRun::Worker);$/;"	v	class:WorkerSsh
 Logger	lib/NRun/Logger.pm	/^package NRun::Logger;$/;"	p	class:Logger
-MODINFO	lib/NRun/Worker.pm	/^our $MODINFO = {$/;"	v	class:Worker
-MODINFO	lib/NRun/Workers/WorkerLocal.pm	/^our $MODINFO = {$/;"	v	class:WorkerLocal
-MODINFO	lib/NRun/Workers/WorkerNsh.pm	/^our $MODINFO = {$/;"	v	class:WorkerNsh
-MODINFO	lib/NRun/Workers/WorkerRsh.pm	/^our $MODINFO = {$/;"	v	class:WorkerRsh
-MODINFO	lib/NRun/Workers/WorkerSsh.pm	/^our $MODINFO = {$/;"	v	class:WorkerSsh
-SIG	lib/NRun/Dispatcher.pm	/^    local $SIG{INT}  = sub { kill(INT  => keys(%pids)); exit; };$/;"	v	file:	class:Dispatcher
-SIG	lib/NRun/Dispatcher.pm	/^    local $SIG{TERM} = sub { kill(TERM => keys(%pids)); exit; };$/;"	v	file:	class:Dispatcher
-SIG	lib/NRun/Dispatcher.pm	/^    local $SIG{USR1} = sub { kill(USR1 => keys(%pids)); };$/;"	v	file:	class:Dispatcher
-SIG	lib/NRun/Dispatcher.pm	/^    local $SIG{USR2} = sub { kill(USR2 => keys(%pids)); };$/;"	v	file:	class:Dispatcher
-SIG	lib/NRun/Worker.pm	/^    local $SIG{ALRM} = sub {$/;"	v	file:	class:Worker
-SIG	lib/NRun/Worker.pm	/^    local $SIG{INT} = sub {$/;"	v	file:	class:Worker
-SIG	lib/NRun/Worker.pm	/^    local $SIG{TERM} = sub {$/;"	v	file:	class:Worker
-SIG	lib/NRun/Worker.pm	/^    local $SIG{USR1} = sub {$/;"	v	file:	class:Worker
-SIG	lib/NRun/Worker.pm	/^    local $SIG{USR2} = sub {$/;"	v	file:	class:Worker
+MISSING_DNS_ENTRY	lib/NRun/Constants.pm	/^our $MISSING_DNS_ENTRY = -249;$/;"	v	class:Constants
+PING_FAILED	lib/NRun/Constants.pm	/^our $PING_FAILED       = -248;$/;"	v	class:Constants
+RSCD_ERROR	lib/NRun/Constants.pm	/^our $RSCD_ERROR        = -128;$/;"	v	class:Constants
+RSCD_NOT_ALIVE	lib/NRun/Constants.pm	/^our $RSCD_NOT_ALIVE    = -251;$/;"	v	class:Constants
 Semaphore	lib/NRun/Semaphore.pm	/^package NRun::Semaphore;$/;"	p	class:Semaphore
+Signal	lib/NRun/Signal.pm	/^package NRun::Signal;$/;"	p	class:Signal
 Util	lib/NRun/Util.pm	/^package NRun::Util;$/;"	p	class:Util
-VERSION	lib/NRun/Version.pm	/^our $VERSION = qv(1.0.0_3);$/;"	v	class:Version
+VERSION	lib/NRun/Version.pm	/^our $VERSION = qv(1.0.0_5);$/;"	v	class:Version
 Version	lib/NRun/Version.pm	/^package NRun::Version;$/;"	p	class:Version
 Worker	lib/NRun/Worker.pm	/^package NRun::Worker;$/;"	p	class:Worker
-WorkerLocal	lib/NRun/Workers/WorkerLocal.pm	/^package WorkerLocal;$/;"	p	class:WorkerLocal
-WorkerNsh	lib/NRun/Workers/WorkerNsh.pm	/^package WorkerNsh;$/;"	p	class:WorkerNsh
-WorkerRsh	lib/NRun/Workers/WorkerRsh.pm	/^package WorkerRsh;$/;"	p	class:WorkerRsh
-WorkerSsh	lib/NRun/Workers/WorkerSsh.pm	/^package WorkerSsh;$/;"	p	class:WorkerSsh
-_	lib/NRun/Worker.pm	/^sub _ {$/;"	s	class:Worker
+WorkerLocal	lib/NRun/Workers/WorkerLocal.pm	/^package NRun::Worker::WorkerLocal;$/;"	p	class:WorkerLocal
+WorkerNsh	lib/NRun/Workers/WorkerNsh.pm	/^package NRun::Worker::WorkerNsh;$/;"	p	class:WorkerNsh
+WorkerRsh	lib/NRun/Workers/WorkerRsh.pm	/^package NRun::Worker::WorkerRsh;$/;"	p	class:WorkerRsh
+WorkerSsh	lib/NRun/Workers/WorkerSsh.pm	/^package NRun::Worker::WorkerSsh;$/;"	p	class:WorkerSsh
 _alias	lib/NRun/Util.pm	/^    my $_alias = shift;$/;"	v	file:	class:Util
 _args	lib/NRun/Workers/WorkerLocal.pm	/^    my $_args    = shift;$/;"	v	file:	class:WorkerLocal
 _args	lib/NRun/Workers/WorkerNsh.pm	/^    my $_args    = shift;$/;"	v	file:	class:WorkerNsh
 _args	lib/NRun/Workers/WorkerRsh.pm	/^    my $_args    = shift;$/;"	v	file:	class:WorkerRsh
 _args	lib/NRun/Workers/WorkerSsh.pm	/^    my $_args    = shift;$/;"	v	file:	class:WorkerSsh
+_arguments	lib/NRun/Signal.pm	/^    my $_arguments = shift;$/;"	v	file:	class:Signal
 _arr	lib/NRun/Util.pm	/^    my @_arr = @_;$/;"	v	file:	class:Util
+_callback	lib/NRun/Signal.pm	/^    my $_callback  = shift;$/;"	v	file:	class:Signal
+_cfg	lib/NRun/Dumper.pm	/^    my $_cfg = shift;$/;"	v	file:	class:Dumper
+_cfg	lib/NRun/Logger.pm	/^    my $_cfg = shift;$/;"	v	file:	class:Logger
+_cfg	lib/NRun/Worker.pm	/^    my $_cfg  = shift;$/;"	v	file:	class:Worker
 _cfg	lib/NRun/Worker.pm	/^    my $_cfg = shift;$/;"	v	file:	class:Worker
-_cfg	lib/NRun/Workers/WorkerNsh.pm	/^    my $_cfg = shift;$/;"	v	file:	class:WorkerNsh
+_cfg	lib/NRun/Workers/WorkerLocal.pm	/^    my $_cfg  = shift;$/;"	v	file:	class:WorkerLocal
+_cfg	lib/NRun/Workers/WorkerNsh.pm	/^    my $_cfg  = shift;$/;"	v	file:	class:WorkerNsh
+_cfg	lib/NRun/Workers/WorkerRsh.pm	/^    my $_cfg  = shift;$/;"	v	file:	class:WorkerRsh
 _cfg	lib/NRun/Workers/WorkerRsh.pm	/^    my $_cfg = shift;$/;"	v	file:	class:WorkerRsh
+_cfg	lib/NRun/Workers/WorkerSsh.pm	/^    my $_cfg  = shift;$/;"	v	file:	class:WorkerSsh
 _cfg	lib/NRun/Workers/WorkerSsh.pm	/^    my $_cfg = shift;$/;"	v	file:	class:WorkerSsh
-_cmd	lib/NRun/Worker.pm	/^    my $_cmd = shift;$/;"	v	file:	class:Worker
+_cmd	lib/NRun/Worker.pm	/^    my $_cmd  = shift;$/;"	v	file:	class:Worker
+_cmd	lib/NRun/Workers/WorkerNsh.pm	/^    my $_cmd  = shift;$/;"	v	file:	class:WorkerNsh
+_code	lib/NRun/Dumper.pm	/^    my $_code = shift;$/;"	v	file:	class:Dumper
+_code	lib/NRun/Logger.pm	/^    my $_code = shift;$/;"	v	file:	class:Logger
+_command	lib/NRun/Dumper.pm	/^    my $_command = shift;$/;"	v	file:	class:Dumper
+_command	lib/NRun/Logger.pm	/^    my $_command = shift;$/;"	v	file:	class:Logger
 _command	lib/NRun/Workers/WorkerLocal.pm	/^    my $_command = shift;$/;"	v	file:	class:WorkerLocal
 _command	lib/NRun/Workers/WorkerNsh.pm	/^    my $_command = shift;$/;"	v	file:	class:WorkerNsh
 _command	lib/NRun/Workers/WorkerRsh.pm	/^    my $_command = shift;$/;"	v	file:	class:WorkerRsh
@@ -54,67 +63,83 @@ _file	lib/NRun/Workers/WorkerLocal.pm	/^    my $_file = shift;$/;"	v	file:	class
 _file	lib/NRun/Workers/WorkerNsh.pm	/^    my $_file = shift;$/;"	v	file:	class:WorkerNsh
 _file	lib/NRun/Workers/WorkerRsh.pm	/^    my $_file = shift;$/;"	v	file:	class:WorkerRsh
 _file	lib/NRun/Workers/WorkerSsh.pm	/^    my $_file = shift;$/;"	v	file:	class:WorkerSsh
-_host	lib/NRun/Dumper.pm	/^    my $_host = shift;$/;"	v	file:	class:Dumper
-_host	lib/NRun/Logger.pm	/^    my $_host = shift;$/;"	v	file:	class:Logger
-_host	lib/NRun/Workers/WorkerLocal.pm	/^    my $_host    = shift;$/;"	v	file:	class:WorkerLocal
-_host	lib/NRun/Workers/WorkerLocal.pm	/^    my $_host   = shift;$/;"	v	file:	class:WorkerLocal
-_host	lib/NRun/Workers/WorkerLocal.pm	/^    my $_host = shift;$/;"	v	file:	class:WorkerLocal
-_host	lib/NRun/Workers/WorkerNsh.pm	/^    my $_host    = shift;$/;"	v	file:	class:WorkerNsh
-_host	lib/NRun/Workers/WorkerNsh.pm	/^    my $_host   = shift;$/;"	v	file:	class:WorkerNsh
-_host	lib/NRun/Workers/WorkerNsh.pm	/^    my $_host = shift;$/;"	v	file:	class:WorkerNsh
-_host	lib/NRun/Workers/WorkerRsh.pm	/^    my $_host    = shift;$/;"	v	file:	class:WorkerRsh
-_host	lib/NRun/Workers/WorkerRsh.pm	/^    my $_host   = shift;$/;"	v	file:	class:WorkerRsh
-_host	lib/NRun/Workers/WorkerRsh.pm	/^    my $_host = shift;$/;"	v	file:	class:WorkerRsh
-_host	lib/NRun/Workers/WorkerSsh.pm	/^    my $_host    = shift;$/;"	v	file:	class:WorkerSsh
-_host	lib/NRun/Workers/WorkerSsh.pm	/^    my $_host   = shift;$/;"	v	file:	class:WorkerSsh
-_host	lib/NRun/Workers/WorkerSsh.pm	/^    my $_host = shift;$/;"	v	file:	class:WorkerSsh
+_files	lib/NRun/Util.pm	/^    my $_files = shift;$/;"	v	file:	class:Util
+_h1	lib/NRun/Util.pm	/^    my $_h1 = shift;$/;"	v	file:	class:Util
+_h2	lib/NRun/Util.pm	/^    my $_h2 = shift;$/;"	v	file:	class:Util
+_handler	lib/NRun/Signal.pm	/^    my $_handler = shift;$/;"	v	file:	class:Signal
+_handler	lib/NRun/Signal.pm	/^sub _handler {$/;"	s	class:Signal
+_host	bin/ncopy	/^    my $_host = shift;$/;"	v	file:	class:ncopy
+_host	bin/nrun	/^    my $_host = shift;$/;"	v	file:	class:nrun
+_msg	lib/NRun/Dumper.pm	/^    my $_msg  = shift;$/;"	v	file:	class:Dumper
+_msg	lib/NRun/Logger.pm	/^    my $_msg  = shift;$/;"	v	file:	class:Logger
 _obj	lib/NRun/Dispatcher.pm	/^    my $_obj = shift;$/;"	v	file:	class:Dispatcher
-_obj	lib/NRun/Dumper.pm	/^    my $_obj = shift;$/;"	v	file:	class:Dumper
-_obj	lib/NRun/Logger.pm	/^    my $_obj = shift;$/;"	v	file:	class:Logger
 _obj	lib/NRun/Semaphore.pm	/^    my $_obj = shift;$/;"	v	file:	class:Semaphore
-_obj	lib/NRun/Workers/WorkerLocal.pm	/^    my $_obj = shift;$/;"	v	file:	class:WorkerLocal
 _object	lib/NRun/Dispatcher.pm	/^    my $_object = shift;$/;"	v	file:	class:Dispatcher
-_out	lib/NRun/Dumper.pm	/^    my $_out  = shift;$/;"	v	file:	class:Dumper
-_out	lib/NRun/Logger.pm	/^    my $_out  = shift;$/;"	v	file:	class:Logger
-_out	lib/NRun/Workers/WorkerNsh.pm	/^    my $_out  = shift;$/;"	v	file:	class:WorkerNsh
+_pid	lib/NRun/Signal.pm	/^    my $_pid       = shift;$/;"	v	file:	class:Signal
+_pid	lib/NRun/Worker.pm	/^    my $_pid  = shift;$/;"	v	file:	class:Worker
 _pids	lib/NRun/Dispatcher.pm	/^    my $_pids   = shift;$/;"	v	file:	class:Dispatcher
+_pids	lib/NRun/Dispatcher.pm	/^    my $_pids = shift;$/;"	v	file:	class:Dispatcher
+_pids	lib/NRun/Dispatcher.pm	/^    my $_pids = shift;$/;"	v	file:	class:Dispatcher
+_pids	lib/NRun/Dispatcher.pm	/^    my $_pids = shift;$/;"	v	file:	class:Dispatcher
+_pids	lib/NRun/Dispatcher.pm	/^    my $_pids = shift;$/;"	v	file:	class:Dispatcher
 _pkg	lib/NRun/Dispatcher.pm	/^    my $_pkg = shift;$/;"	v	file:	class:Dispatcher
 _pkg	lib/NRun/Dumper.pm	/^    my $_pkg = shift;$/;"	v	file:	class:Dumper
 _pkg	lib/NRun/Logger.pm	/^    my $_pkg = shift;$/;"	v	file:	class:Logger
 _pkg	lib/NRun/Semaphore.pm	/^    my $_pkg = shift;$/;"	v	file:	class:Semaphore
+_pkg	lib/NRun/Worker.pm	/^    my $_pkg = shift;$/;"	v	file:	class:Worker
 _pkg	lib/NRun/Workers/WorkerLocal.pm	/^    my $_pkg = shift;$/;"	v	file:	class:WorkerLocal
 _pkg	lib/NRun/Workers/WorkerNsh.pm	/^    my $_pkg = shift;$/;"	v	file:	class:WorkerNsh
 _pkg	lib/NRun/Workers/WorkerRsh.pm	/^    my $_pkg = shift;$/;"	v	file:	class:WorkerRsh
 _pkg	lib/NRun/Workers/WorkerSsh.pm	/^    my $_pkg = shift;$/;"	v	file:	class:WorkerSsh
 _pool	lib/NRun/Dispatcher.pm	/^    my $_pool   = shift;$/;"	v	file:	class:Dispatcher
-_ret	lib/NRun/Dumper.pm	/^    my $_ret  = shift;$/;"	v	file:	class:Dumper
-_ret	lib/NRun/Logger.pm	/^    my $_ret  = shift;$/;"	v	file:	class:Logger
-_ret	lib/NRun/Workers/WorkerNsh.pm	/^    my $_ret  = shift;$/;"	v	file:	class:WorkerNsh
 _seen	lib/NRun/Util.pm	/^    my $_seen  = shift;$/;"	v	file:	class:Util
 _self	lib/NRun/Dispatcher.pm	/^    my $_self   = shift;$/;"	v	file:	class:Dispatcher
 _self	lib/NRun/Dispatcher.pm	/^    my $_self = shift;$/;"	v	file:	class:Dispatcher
 _self	lib/NRun/Dumper.pm	/^    my $_self = shift;$/;"	v	file:	class:Dumper
+_self	lib/NRun/Dumper.pm	/^    my $_self = shift;$/;"	v	file:	class:Dumper
+_self	lib/NRun/Dumper.pm	/^    my $_self = shift;$/;"	v	file:	class:Dumper
+_self	lib/NRun/Dumper.pm	/^    my $_self = shift;$/;"	v	file:	class:Dumper
+_self	lib/NRun/Dumper.pm	/^    my $_self = shift;$/;"	v	file:	class:Dumper
+_self	lib/NRun/Dumper.pm	/^    my $_self = shift;$/;"	v	file:	class:Dumper
+_self	lib/NRun/Dumper.pm	/^    my $_self = shift;$/;"	v	file:	class:Dumper
+_self	lib/NRun/Dumper.pm	/^    my $_self = shift;$/;"	v	file:	class:Dumper
+_self	lib/NRun/Logger.pm	/^    my $_self = shift;$/;"	v	file:	class:Logger
+_self	lib/NRun/Logger.pm	/^    my $_self = shift;$/;"	v	file:	class:Logger
+_self	lib/NRun/Logger.pm	/^    my $_self = shift;$/;"	v	file:	class:Logger
+_self	lib/NRun/Logger.pm	/^    my $_self = shift;$/;"	v	file:	class:Logger
+_self	lib/NRun/Logger.pm	/^    my $_self = shift;$/;"	v	file:	class:Logger
+_self	lib/NRun/Logger.pm	/^    my $_self = shift;$/;"	v	file:	class:Logger
+_self	lib/NRun/Logger.pm	/^    my $_self = shift;$/;"	v	file:	class:Logger
 _self	lib/NRun/Logger.pm	/^    my $_self = shift;$/;"	v	file:	class:Logger
 _self	lib/NRun/Semaphore.pm	/^    my $_self = shift;$/;"	v	file:	class:Semaphore
 _self	lib/NRun/Semaphore.pm	/^    my $_self = shift;$/;"	v	file:	class:Semaphore
 _self	lib/NRun/Semaphore.pm	/^    my $_self = shift;$/;"	v	file:	class:Semaphore
 _self	lib/NRun/Semaphore.pm	/^    my $_self = shift;$/;"	v	file:	class:Semaphore
+_self	lib/NRun/Worker.pm	/^    my $_self = shift; $/;"	v	file:	class:Worker
+_self	lib/NRun/Worker.pm	/^    my $_self = shift;$/;"	v	file:	class:Worker
 _self	lib/NRun/Worker.pm	/^    my $_self = shift;$/;"	v	file:	class:Worker
 _self	lib/NRun/Worker.pm	/^    my $_self = shift;$/;"	v	file:	class:Worker
 _self	lib/NRun/Workers/WorkerLocal.pm	/^    my $_self    = shift;$/;"	v	file:	class:WorkerLocal
 _self	lib/NRun/Workers/WorkerLocal.pm	/^    my $_self   = shift;$/;"	v	file:	class:WorkerLocal
 _self	lib/NRun/Workers/WorkerLocal.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerLocal
+_self	lib/NRun/Workers/WorkerLocal.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerLocal
 _self	lib/NRun/Workers/WorkerNsh.pm	/^    my $_self    = shift;$/;"	v	file:	class:WorkerNsh
 _self	lib/NRun/Workers/WorkerNsh.pm	/^    my $_self   = shift;$/;"	v	file:	class:WorkerNsh
+_self	lib/NRun/Workers/WorkerNsh.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerNsh
+_self	lib/NRun/Workers/WorkerNsh.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerNsh
 _self	lib/NRun/Workers/WorkerNsh.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerNsh
 _self	lib/NRun/Workers/WorkerNsh.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerNsh
 _self	lib/NRun/Workers/WorkerRsh.pm	/^    my $_self    = shift;$/;"	v	file:	class:WorkerRsh
 _self	lib/NRun/Workers/WorkerRsh.pm	/^    my $_self   = shift;$/;"	v	file:	class:WorkerRsh
 _self	lib/NRun/Workers/WorkerRsh.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerRsh
+_self	lib/NRun/Workers/WorkerRsh.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerRsh
 _self	lib/NRun/Workers/WorkerSsh.pm	/^    my $_self    = shift;$/;"	v	file:	class:WorkerSsh
 _self	lib/NRun/Workers/WorkerSsh.pm	/^    my $_self   = shift;$/;"	v	file:	class:WorkerSsh
 _self	lib/NRun/Workers/WorkerSsh.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerSsh
-_sem	lib/NRun/Worker.pm	/^    my $_sem = shift;$/;"	v	file:	class:Worker
+_self	lib/NRun/Workers/WorkerSsh.pm	/^    my $_self = shift;$/;"	v	file:	class:WorkerSsh
+_signal	lib/NRun/Signal.pm	/^    my $_signal    = shift;$/;"	v	file:	class:Signal
+_signal	lib/NRun/Signal.pm	/^    my $_signal  = shift;$/;"	v	file:	class:Signal
+_signal	lib/NRun/Signal.pm	/^    my $_signal = shift;$/;"	v	file:	class:Signal
 _source	lib/NRun/Workers/WorkerLocal.pm	/^    my $_source = shift;$/;"	v	file:	class:WorkerLocal
 _source	lib/NRun/Workers/WorkerNsh.pm	/^    my $_source = shift;$/;"	v	file:	class:WorkerNsh
 _source	lib/NRun/Workers/WorkerRsh.pm	/^    my $_source = shift;$/;"	v	file:	class:WorkerRsh
@@ -124,77 +149,191 @@ _target	lib/NRun/Workers/WorkerNsh.pm	/^    my $_target = shift;$/;"	v	file:	cla
 _target	lib/NRun/Workers/WorkerRsh.pm	/^    my $_target = shift;$/;"	v	file:	class:WorkerRsh
 _target	lib/NRun/Workers/WorkerSsh.pm	/^    my $_target = shift;$/;"	v	file:	class:WorkerSsh
 _tgt	lib/NRun/Util.pm	/^    my $_tgt   = shift;$/;"	v	file:	class:Util
-basedir	lib/NRun/Worker.pm	/^    my $basedir = dirname($INC{"NRun\/Worker.pm"}) . "\/Workers";$/;"	v	file:	class:Worker
+aliases	lib/NRun/Util.pm	/^            my $aliases = merge($config->{alias}, $options->{alias});$/;"	v	file:	class:Util
+arg	lib/NRun/Signal.pm	/^        my $arg = $handler->{arguments};$/;"	v	file:	class:Signal
+arg_async	bin/nrun	/^    my $arg_async           = $options->{arg_async };$/;"	v	file:	class:nrun
+arg_copy	bin/nrun	/^    my $arg_copy            = $options->{arg_copy};$/;"	v	file:	class:nrun
+arg_dump_results	bin/ncopy	/^    my $arg_dump_results    = $options->{arg_dump_results};$/;"	v	file:	class:ncopy
+arg_dump_results	bin/nrun	/^    my $arg_dump_results    = $options->{arg_dump_results};$/;"	v	file:	class:nrun
+arg_log_directory	bin/ncopy	/^    my $arg_log_directory   = $options->{arg_log_directory};$/;"	v	file:	class:ncopy
+arg_log_directory	bin/nrun	/^    my $arg_log_directory   = $options->{arg_log_directory};$/;"	v	file:	class:nrun
+arg_mode	bin/ncopy	/^    my $arg_mode            = $options->{arg_mode};$/;"	v	file:	class:ncopy
+arg_mode	bin/nrun	/^    my $arg_mode            = $options->{arg_mode};$/;"	v	file:	class:nrun
+arg_no_hostname	bin/ncopy	/^    my $arg_no_hostname     = $options->{arg_no_hostname};$/;"	v	file:	class:ncopy
+arg_no_hostname	bin/nrun	/^    my $arg_no_hostname     = $options->{arg_no_hostname};$/;"	v	file:	class:nrun
+arg_no_logfile	bin/ncopy	/^    my $arg_no_logfile      = $options->{arg_no_logfile};$/;"	v	file:	class:ncopy
+arg_no_logfile	bin/nrun	/^    my $arg_no_logfile      = $options->{arg_no_logfile};$/;"	v	file:	class:nrun
+arg_parallel	bin/ncopy	/^    my $arg_parallel        = $options->{arg_parallel};$/;"	v	file:	class:ncopy
+arg_parallel	bin/nrun	/^    my $arg_parallel        = $options->{arg_parallel};$/;"	v	file:	class:nrun
+arg_skip_ns_check	bin/ncopy	/^    my $arg_skip_ns_check   = $options->{arg_skip_ns_check};$/;"	v	file:	class:ncopy
+arg_skip_ns_check	bin/nrun	/^    my $arg_skip_ns_check   = $options->{arg_skip_ns_check};$/;"	v	file:	class:nrun
+arg_skip_ping_check	bin/ncopy	/^    my $arg_skip_ping_check = $options->{arg_skip_ping_check};$/;"	v	file:	class:ncopy
+arg_skip_ping_check	bin/nrun	/^    my $arg_skip_ping_check = $options->{arg_skip_ping_check};$/;"	v	file:	class:nrun
+arg_target	bin/ncopy	/^    my $arg_target          = $options->{arg_target};$/;"	v	file:	class:ncopy
+arg_target	bin/nrun	/^    my $arg_target          = $options->{arg_target};$/;"	v	file:	class:nrun
+arg_timeout	bin/ncopy	/^    my $arg_timeout         = $options->{arg_timeout};$/;"	v	file:	class:ncopy
+arg_timeout	bin/nrun	/^    my $arg_timeout         = $options->{arg_timeout};$/;"	v	file:	class:nrun
+arg_version	bin/ncopy	/^    my $arg_version         = $options->{arg_version};$/;"	v	file:	class:ncopy
+arg_version	bin/nrun	/^    my $arg_version         = $options->{arg_version};$/;"	v	file:	class:nrun
+basedir	lib/NRun/Worker.pm	/^    my $basedir = dirname($INC{"NRun\/Worker.pm"}) . "\/Workers";$/;"	v	class:Worker
+callback_action	bin/ncopy	/^sub callback_action {$/;"	s	class:ncopy
+callback_action	bin/nrun	/^sub callback_action {$/;"	s	class:nrun
+code	lib/NRun/Dumper.pm	/^sub code {$/;"	s	class:Dumper
+code	lib/NRun/Logger.pm	/^sub code {$/;"	s	class:Logger
+command	bin/nrun	/^    my $command = $options->{command};$/;"	v	file:	class:nrun
+command	lib/NRun/Dumper.pm	/^sub command {$/;"	s	class:Dumper
+command	lib/NRun/Logger.pm	/^sub command {$/;"	s	class:Logger
+config	lib/NRun/Util.pm	/^    my $config = {};$/;"	v	file:	class:Util
 copy	lib/NRun/Workers/WorkerLocal.pm	/^sub copy {$/;"	s	class:WorkerLocal
 copy	lib/NRun/Workers/WorkerNsh.pm	/^sub copy {$/;"	s	class:WorkerNsh
 copy	lib/NRun/Workers/WorkerRsh.pm	/^sub copy {$/;"	s	class:WorkerRsh
 copy	lib/NRun/Workers/WorkerSsh.pm	/^sub copy {$/;"	s	class:WorkerSsh
+date	bin/ncopy	/^    my $date = time2str("%Y%m%d_%H_%M_%S", time);$/;"	v	file:	class:ncopy
+date	bin/nrun	/^    my $date = time2str("%Y%m%d_%H_%M_%S", time);$/;"	v	file:	class:nrun
+date	lib/NRun/Logger.pm	/^    my $date = time2str("%Y%m%d_%H_%M_%S", time);$/;"	v	file:	class:Logger
 delete	lib/NRun/Semaphore.pm	/^sub delete {$/;"	s	class:Semaphore
 delete	lib/NRun/Workers/WorkerLocal.pm	/^sub delete {$/;"	s	class:WorkerLocal
 delete	lib/NRun/Workers/WorkerNsh.pm	/^sub delete {$/;"	s	class:WorkerNsh
 delete	lib/NRun/Workers/WorkerRsh.pm	/^sub delete {$/;"	s	class:WorkerRsh
 delete	lib/NRun/Workers/WorkerSsh.pm	/^sub delete {$/;"	s	class:WorkerSsh
-desc	lib/NRun/Worker.pm	/^sub desc {$/;"	s	class:Worker
+deregister	lib/NRun/Signal.pm	/^sub deregister {$/;"	s	class:Signal
+destroy	lib/NRun/Dumper.pm	/^sub destroy {$/;"	s	class:Dumper
+destroy	lib/NRun/Logger.pm	/^sub destroy {$/;"	s	class:Logger
+destroy	lib/NRun/Worker.pm	/^sub destroy {$/;"	s	class:Worker
 dispatch	lib/NRun/Dispatcher.pm	/^sub dispatch {$/;"	s	class:Dispatcher
-dump	lib/NRun/Dumper.pm	/^sub dump {$/;"	s	class:Dumper
-error_handler	lib/NRun/Workers/WorkerNsh.pm	/^sub error_handler {$/;"	s	class:WorkerNsh
+dispatcher	bin/ncopy	/^    my $dispatcher = NRun::Dispatcher->new ($/;"	v	file:	class:ncopy
+dispatcher	bin/nrun	/^    my $dispatcher = NRun::Dispatcher->new ($/;"	v	file:	class:nrun
+do	lib/NRun/Worker.pm	/^sub do {$/;"	s	class:Worker
+do	lib/NRun/Workers/WorkerNsh.pm	/^sub do {$/;"	s	class:WorkerNsh
+dumper	bin/ncopy	/^    my $dumper = NRun::Dumper->new ($/;"	v	file:	class:ncopy
+dumper	bin/nrun	/^    my $dumper = NRun::Dumper->new ($/;"	v	file:	class:nrun
 execute	lib/NRun/Workers/WorkerLocal.pm	/^sub execute {$/;"	s	class:WorkerLocal
 execute	lib/NRun/Workers/WorkerNsh.pm	/^sub execute {$/;"	s	class:WorkerNsh
 execute	lib/NRun/Workers/WorkerRsh.pm	/^sub execute {$/;"	s	class:WorkerRsh
 execute	lib/NRun/Workers/WorkerSsh.pm	/^sub execute {$/;"	s	class:WorkerSsh
+handler	bin/ncopy	/^sub handler {$/;"	s	class:ncopy
+handler	bin/nrun	/^sub handler {$/;"	s	class:nrun
+handler	lib/NRun/Signal.pm	/^    my $handler = {$/;"	v	file:	class:Signal
+handler	lib/NRun/Worker.pm	/^sub handler {$/;"	s	class:Worker
+handler_alrm	lib/NRun/Dumper.pm	/^sub handler_alrm {$/;"	s	class:Dumper
+handler_alrm	lib/NRun/Logger.pm	/^sub handler_alrm {$/;"	s	class:Logger
+handler_alrm	lib/NRun/Worker.pm	/^    my $handler_alrm = NRun::Signal::register('ALRM', \\&handler, [ \\$pid ]);$/;"	v	file:	class:Worker
+handler_int	lib/NRun/Dispatcher.pm	/^    my $handler_int  = NRun::Signal::register('INT',  \\&handler_int,  [ \\%pids ], $$);$/;"	v	file:	class:Dispatcher
+handler_int	lib/NRun/Dispatcher.pm	/^sub handler_int {$/;"	s	class:Dispatcher
+handler_int	lib/NRun/Dumper.pm	/^sub handler_int {$/;"	s	class:Dumper
+handler_int	lib/NRun/Logger.pm	/^sub handler_int {$/;"	s	class:Logger
+handler_int	lib/NRun/Worker.pm	/^    my $handler_int  = NRun::Signal::register('INT',  \\&handler, [ \\$pid ]);$/;"	v	file:	class:Worker
+handler_term	lib/NRun/Dispatcher.pm	/^    my $handler_term = NRun::Signal::register('TERM', \\&handler_term, [ \\%pids ], $$);$/;"	v	file:	class:Dispatcher
+handler_term	lib/NRun/Dispatcher.pm	/^sub handler_term {$/;"	s	class:Dispatcher
+handler_term	lib/NRun/Dumper.pm	/^sub handler_term {$/;"	s	class:Dumper
+handler_term	lib/NRun/Logger.pm	/^sub handler_term {$/;"	s	class:Logger
+handler_term	lib/NRun/Worker.pm	/^    my $handler_term = NRun::Signal::register('TERM', \\&handler, [ \\$pid ]);$/;"	v	file:	class:Worker
+handler_usr1	lib/NRun/Dispatcher.pm	/^    my $handler_usr1 = NRun::Signal::register('USR1', \\&handler_usr1, [ \\%pids ], $$);$/;"	v	file:	class:Dispatcher
+handler_usr1	lib/NRun/Dispatcher.pm	/^sub handler_usr1 {$/;"	s	class:Dispatcher
+handler_usr1	lib/NRun/Dumper.pm	/^sub handler_usr1 {$/;"	s	class:Dumper
+handler_usr2	lib/NRun/Dispatcher.pm	/^    my $handler_usr2 = NRun::Signal::register('USR2', \\&handler_usr2, [ \\%pids ], $$);$/;"	v	file:	class:Dispatcher
+handler_usr2	lib/NRun/Dispatcher.pm	/^sub handler_usr2 {$/;"	s	class:Dispatcher
+handler_usr2	lib/NRun/Logger.pm	/^sub handler_usr2 {$/;"	s	class:Logger
+handlers	lib/NRun/Signal.pm	/^    my $handlers = $HANDLERS->{$_signal};$/;"	v	file:	class:Signal
 home	lib/NRun/Util.pm	/^    my $home = (getpwuid(getuid()))[7];$/;"	v	file:	class:Util
 home	lib/NRun/Util.pm	/^sub home {$/;"	s	class:Util
 hosts	lib/NRun/Util.pm	/^    my $hosts = {};$/;"	v	file:	class:Util
+index	lib/NRun/Signal.pm	/^    my $index = $index{$_handler};$/;"	v	file:	class:Signal
+index	lib/NRun/Signal.pm	/^    my %index;$/;"	v	file:	class:Signal
 init	lib/NRun/Worker.pm	/^sub init {$/;"	s	class:Worker
+init	lib/NRun/Workers/WorkerLocal.pm	/^sub init {$/;"	s	class:WorkerLocal
+init	lib/NRun/Workers/WorkerNsh.pm	/^sub init {$/;"	s	class:WorkerNsh
+init	lib/NRun/Workers/WorkerRsh.pm	/^sub init {$/;"	s	class:WorkerRsh
+init	lib/NRun/Workers/WorkerSsh.pm	/^sub init {$/;"	s	class:WorkerSsh
 key	lib/NRun/Semaphore.pm	/^sub key {$/;"	s	class:Semaphore
 lock	lib/NRun/Semaphore.pm	/^sub lock {$/;"	s	class:Semaphore
-log	lib/NRun/Logger.pm	/^sub log {$/;"	s	class:Logger
-mode	lib/NRun/Worker.pm	/^sub mode {$/;"	s	class:Worker
+logger	bin/ncopy	/^    my $logger = NRun::Logger->new ($/;"	v	file:	class:ncopy
+logger	bin/nrun	/^    my $logger = NRun::Logger->new ($/;"	v	file:	class:nrun
+main	bin/ncopy	/^sub main {$/;"	s	class:ncopy
+main	bin/nrun	/^sub main {$/;"	s	class:nrun
+merge	lib/NRun/Util.pm	/^sub merge {$/;"	s	class:Util
+ncopy	bin/ncopy	/^package App::ncopy;$/;"	p	class:ncopy
 new	lib/NRun/Dispatcher.pm	/^sub new {$/;"	s	class:Dispatcher
 new	lib/NRun/Dumper.pm	/^sub new {$/;"	s	class:Dumper
 new	lib/NRun/Logger.pm	/^sub new {$/;"	s	class:Logger
 new	lib/NRun/Semaphore.pm	/^sub new {$/;"	s	class:Semaphore
+new	lib/NRun/Worker.pm	/^sub new {$/;"	s	class:Worker
 new	lib/NRun/Workers/WorkerLocal.pm	/^sub new {$/;"	s	class:WorkerLocal
 new	lib/NRun/Workers/WorkerNsh.pm	/^sub new {$/;"	s	class:WorkerNsh
 new	lib/NRun/Workers/WorkerRsh.pm	/^sub new {$/;"	s	class:WorkerRsh
 new	lib/NRun/Workers/WorkerSsh.pm	/^sub new {$/;"	s	class:WorkerSsh
-object	lib/NRun/Worker.pm	/^            my $object = $module->new($_cfg);$/;"	v	file:	class:Worker
+nrun	bin/nrun	/^package App::nrun;$/;"	p	class:nrun
+options	bin/ncopy	/^our $options = {};$/;"	v	class:ncopy
+options	bin/nrun	/^our $options = {};$/;"	v	class:nrun
+options	lib/NRun/Util.pm	/^            my $options = { %{LoadFile($file)} };$/;"	v	file:	class:Util
 out	lib/NRun/Dispatcher.pm	/^        my ($ret, $out);$/;"	v	file:	class:Dispatcher
-out	lib/NRun/Worker.pm	/^    my @out;$/;"	v	file:	class:Worker
-out	lib/NRun/Workers/WorkerNsh.pm	/^    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));$/;"	v	file:	class:WorkerNsh
-out	lib/NRun/Workers/WorkerNsh.pm	/^    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));$/;"	v	file:	class:WorkerNsh
-out	lib/NRun/Workers/WorkerNsh.pm	/^    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));$/;"	v	file:	class:WorkerNsh
+out	lib/NRun/Worker.pm	/^    my @out = ();$/;"	v	file:	class:Worker
+out	lib/NRun/Workers/WorkerLocal.pm	/^    my ( $out, $ret ) = $_self->do("TARGET_HOST=$_self->{hostname} $_command $_args");$/;"	v	file:	class:WorkerLocal
+out	lib/NRun/Workers/WorkerNsh.pm	/^    my ( $out, $ret ) = $_self->SUPER::do($_cmd);$/;"	v	file:	class:WorkerNsh
+out	lib/NRun/Workers/WorkerNsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{ncp_binary} $_self->{ncp_args} $_source - \/\/$_self->{hostname}\/$_target");$/;"	v	file:	class:WorkerNsh
+out	lib/NRun/Workers/WorkerNsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{nexec_binary} $_self->{nexec_args} -n $_self->{hostname} $_command $_args");$/;"	v	file:	class:WorkerNsh
+out	lib/NRun/Workers/WorkerNsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{nexec_binary} $_self->{nexec_args} -n $_self->{hostname} rm -f \\"$_file\\"");$/;"	v	file:	class:WorkerNsh
+out	lib/NRun/Workers/WorkerNsh.pm	/^    my ($out, $ret) = $_self->do("$_self->{agentinfo_binary} $_self->{hostname}");$/;"	v	file:	class:WorkerNsh
+out	lib/NRun/Workers/WorkerRsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{rcp_binary} $_self->{rcp_args} $_source $_self->{rcp_user}\\@$_self->{hostname}:$_target");$/;"	v	file:	class:WorkerRsh
+out	lib/NRun/Workers/WorkerRsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{rsh_binary} $_self->{rsh_args} -l $_self->{rsh_user} $_self->{hostname} $_command $_args");$/;"	v	file:	class:WorkerRsh
+out	lib/NRun/Workers/WorkerRsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{rsh_binary} $_self->{rsh_args} -l $_self->{rsh_user} $_self->{hostname} rm -f \\"$_file\\"");$/;"	v	file:	class:WorkerRsh
+out	lib/NRun/Workers/WorkerSsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{scp_binary} $_self->{scp_args} $_source $_self->{hostname}:$_target");$/;"	v	file:	class:WorkerSsh
+out	lib/NRun/Workers/WorkerSsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{ssh_binary} $_self->{ssh_args} $_self->{hostname} $_command $_args");$/;"	v	file:	class:WorkerSsh
+out	lib/NRun/Workers/WorkerSsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{ssh_binary} $_self->{ssh_args} $_self->{hostname} rm -f \\"$_file\\"");$/;"	v	file:	class:WorkerSsh
+parse_commandline	bin/ncopy	/^sub parse_commandline {$/;"	s	class:ncopy
+parse_commandline	bin/nrun	/^sub parse_commandline {$/;"	s	class:nrun
 pid	lib/NRun/Dispatcher.pm	/^        my $pid = pop(@pool);$/;"	v	file:	class:Dispatcher
 pid	lib/NRun/Dispatcher.pm	/^        my $pid = pop(@pool);$/;"	v	file:	class:Dispatcher
 pid	lib/NRun/Dispatcher.pm	/^    my $pid = fork();$/;"	v	file:	class:Dispatcher
-pid	lib/NRun/Worker.pm	/^        kill(9, $pid);$/;"	v	file:	class:Worker
-pid	lib/NRun/Worker.pm	/^        kill(9, $pid);$/;"	v	file:	class:Worker
-pid	lib/NRun/Worker.pm	/^        kill(9, $pid);$/;"	v	file:	class:Worker
+pid	lib/NRun/Signal.pm	/^        my $pid = $handler->{pid};$/;"	v	file:	class:Signal
 pid	lib/NRun/Worker.pm	/^    my $pid = -128;$/;"	v	file:	class:Worker
 pids	lib/NRun/Dispatcher.pm	/^    my (@pool, %pids);$/;"	v	file:	class:Dispatcher
 pool	lib/NRun/Dispatcher.pm	/^    my (@pool, %pids);$/;"	v	file:	class:Dispatcher
+pre_check	lib/NRun/Worker.pm	/^sub pre_check {$/;"	s	class:Worker
+pre_check	lib/NRun/Workers/WorkerNsh.pm	/^sub pre_check {$/;"	s	class:WorkerNsh
+push	lib/NRun/Dumper.pm	/^sub push {$/;"	s	class:Dumper
+push	lib/NRun/Logger.pm	/^sub push {$/;"	s	class:Logger
+read_config_files	lib/NRun/Util.pm	/^sub read_config_files {$/;"	s	class:Util
 read_hosts	lib/NRun/Util.pm	/^sub read_hosts {$/;"	s	class:Util
+register	lib/NRun/Signal.pm	/^sub register {$/;"	s	class:Signal
+register	lib/NRun/Worker.pm	/^sub register {$/;"	s	class:Worker
 resolve_target	lib/NRun/Util.pm	/^sub resolve_target {$/;"	s	class:Util
+ret	bin/ncopy	/^    my $ret = GetOptions ($/;"	v	file:	class:ncopy
+ret	bin/nrun	/^        my $ret = $worker->copy($source, $command);$/;"	v	file:	class:nrun
+ret	bin/nrun	/^    my $ret = GetOptions ($/;"	v	file:	class:nrun
 ret	lib/NRun/Dispatcher.pm	/^        my $ret = waitpid($pid, WNOHANG);$/;"	v	file:	class:Dispatcher
 ret	lib/NRun/Dispatcher.pm	/^        my $ret = waitpid($pid, WNOHANG);$/;"	v	file:	class:Dispatcher
 ret	lib/NRun/Dispatcher.pm	/^        my ($ret, $out);$/;"	v	file:	class:Dispatcher
-ret	lib/NRun/Workers/WorkerNsh.pm	/^    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));$/;"	v	file:	class:WorkerNsh
-ret	lib/NRun/Workers/WorkerNsh.pm	/^    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));$/;"	v	file:	class:WorkerNsh
-ret	lib/NRun/Workers/WorkerNsh.pm	/^    my ($ret, $out) = $_self->error_handler(_("$_self->{agentinfo_binary} $_host"));$/;"	v	file:	class:WorkerNsh
+ret	lib/NRun/Workers/WorkerLocal.pm	/^    my ( $out, $ret ) = $_self->do("TARGET_HOST=$_self->{hostname} $_command $_args");$/;"	v	file:	class:WorkerLocal
+ret	lib/NRun/Workers/WorkerNsh.pm	/^    my ( $out, $ret ) = $_self->SUPER::do($_cmd);$/;"	v	file:	class:WorkerNsh
+ret	lib/NRun/Workers/WorkerNsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{ncp_binary} $_self->{ncp_args} $_source - \/\/$_self->{hostname}\/$_target");$/;"	v	file:	class:WorkerNsh
+ret	lib/NRun/Workers/WorkerNsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{nexec_binary} $_self->{nexec_args} -n $_self->{hostname} $_command $_args");$/;"	v	file:	class:WorkerNsh
+ret	lib/NRun/Workers/WorkerNsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{nexec_binary} $_self->{nexec_args} -n $_self->{hostname} rm -f \\"$_file\\"");$/;"	v	file:	class:WorkerNsh
+ret	lib/NRun/Workers/WorkerNsh.pm	/^    my ($out, $ret) = $_self->do("$_self->{agentinfo_binary} $_self->{hostname}");$/;"	v	file:	class:WorkerNsh
+ret	lib/NRun/Workers/WorkerRsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{rcp_binary} $_self->{rcp_args} $_source $_self->{rcp_user}\\@$_self->{hostname}:$_target");$/;"	v	file:	class:WorkerRsh
+ret	lib/NRun/Workers/WorkerRsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{rsh_binary} $_self->{rsh_args} -l $_self->{rsh_user} $_self->{hostname} $_command $_args");$/;"	v	file:	class:WorkerRsh
+ret	lib/NRun/Workers/WorkerRsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{rsh_binary} $_self->{rsh_args} -l $_self->{rsh_user} $_self->{hostname} rm -f \\"$_file\\"");$/;"	v	file:	class:WorkerRsh
+ret	lib/NRun/Workers/WorkerSsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{scp_binary} $_self->{scp_args} $_source $_self->{hostname}:$_target");$/;"	v	file:	class:WorkerSsh
+ret	lib/NRun/Workers/WorkerSsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{ssh_binary} $_self->{ssh_args} $_self->{hostname} $_command $_args");$/;"	v	file:	class:WorkerSsh
+ret	lib/NRun/Workers/WorkerSsh.pm	/^    my ( $out, $ret ) = $_self->do("$_self->{ssh_binary} $_self->{ssh_args} $_self->{hostname} rm -f \\"$_file\\"");$/;"	v	file:	class:WorkerSsh
 run	lib/NRun/Dispatcher.pm	/^sub run {$/;"	s	class:Dispatcher
 self	lib/NRun/Dispatcher.pm	/^    my $self = {};$/;"	v	file:	class:Dispatcher
 self	lib/NRun/Dumper.pm	/^    my $self = {};$/;"	v	file:	class:Dumper
 self	lib/NRun/Logger.pm	/^    my $self = {};$/;"	v	file:	class:Logger
 self	lib/NRun/Semaphore.pm	/^    my $self = {};$/;"	v	file:	class:Semaphore
+self	lib/NRun/Worker.pm	/^    my $self = {};$/;"	v	file:	class:Worker
 self	lib/NRun/Workers/WorkerLocal.pm	/^    my $self = {};$/;"	v	file:	class:WorkerLocal
 self	lib/NRun/Workers/WorkerNsh.pm	/^    my $self = {};$/;"	v	file:	class:WorkerNsh
 self	lib/NRun/Workers/WorkerRsh.pm	/^    my $self = {};$/;"	v	file:	class:WorkerRsh
 self	lib/NRun/Workers/WorkerSsh.pm	/^    my $self = {};$/;"	v	file:	class:WorkerSsh
-semaphore	lib/NRun/Worker.pm	/^        $semaphore->lock();$/;"	v	file:	class:Worker
-semaphore	lib/NRun/Worker.pm	/^        $semaphore->lock();$/;"	v	file:	class:Worker
-semaphore	lib/NRun/Worker.pm	/^my $semaphore;$/;"	v	class:Worker
+source	bin/nrun	/^        my $source = $command;$/;"	v	file:	class:nrun
+sub	lib/NRun/Signal.pm	/^        my $sub = $handler->{callback};$/;"	v	file:	class:Signal
 targets	lib/NRun/Util.pm	/^    my @targets;$/;"	v	file:	class:Util
 uniq	lib/NRun/Util.pm	/^sub uniq {$/;"	s	class:Util
 unlock	lib/NRun/Semaphore.pm	/^sub unlock {$/;"	s	class:Semaphore
+usage	bin/ncopy	/^sub usage {$/;"	s	class:ncopy
+usage	bin/nrun	/^sub usage {$/;"	s	class:nrun
+worker	bin/ncopy	/^    my $worker = NRun::Worker::workers()->{$options->{mode}}->{NAME}->new();$/;"	v	file:	class:ncopy
+worker	bin/nrun	/^    my $worker = NRun::Worker::workers()->{$options->{mode}}->{NAME}->new();$/;"	v	file:	class:nrun
 workers	lib/NRun/Worker.pm	/^my $workers = {};$/;"	v	class:Worker
 workers	lib/NRun/Worker.pm	/^sub workers {$/;"	s	class:Worker
