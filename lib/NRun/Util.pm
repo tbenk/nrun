@@ -31,6 +31,7 @@ package NRun::Util;
 use strict;
 use warnings;
 
+use YAML qw(LoadFile);
 use POSIX qw(getuid);
 
 ###
@@ -126,6 +127,53 @@ sub read_hosts {
     }
 
     return keys(%$hosts);
+}
+
+##
+# read configuration files
+#
+# $_files - the files to be read (values in last file will overwrite values in first file)
+sub read_config_files {
+
+    my $_files = shift;
+
+    my $config = {};
+
+    foreach my $file (@$_files) {
+  
+        if (-e $file) {
+  
+            my $options = { %{LoadFile($file)} };
+            my $aliases = merge($config->{alias}, $options->{alias});
+
+            $config = merge($config, $options);
+
+            $config->{alias} = $aliases; 
+        }
+    }
+
+    return $config;
+}
+
+###
+# merge two hashes, values from $_h2 will overwrite values from $_h1.
+#
+# $_h1 - hash reference 1 to be merged
+# $_h2 - hash reference 2 to be merged
+sub merge {
+
+    my $_h1 = shift;
+    my $_h2 = shift;
+
+    if (not defined($_h1)) {
+
+        return $_h2;
+    } elsif (not defined($_h2)) {
+
+        return $_h2;
+    } 
+
+    return { %$_h1, %$_h2 };
 }
 
 1;

@@ -1,0 +1,39 @@
+---
+# mode ssh options
+ssh_binary: /usr/bin/ssh
+scp_binary: /usr/bin/scp
+ssh_args:   -o User=root -o PreferredAuthentications=hostbased,publickey -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=FATAL
+scp_args:   -o User=root -o PreferredAuthentications=hostbased,publickey -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=FATAL
+
+# mode nsh options
+agentinfo_binary: agentinfo
+nexec_binary:     nexec
+ncp_binary:       ncp
+nexec_args: 
+agentinfo_args: 
+ncp_args: 
+
+# mode rsh options
+rsh_binary: /usr/bin/rsh
+rcp_binary: /usr/bin/rcp
+rsh_user:   root
+rcp_user:   root
+rsh_args:
+rcp_args:
+
+# additional commandline options
+arg_mode:     ssh
+arg_parallel: 5
+arg_timeout:  60
+
+# alias definitions
+alias:
+    production:
+        - host1
+        - host2
+    development:
+        - host3
+        - host4
+    all:
+        - production
+        - development

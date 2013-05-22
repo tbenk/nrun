@@ -107,24 +107,47 @@ configuration
 special configuration options for the different modes and additional all
 commandline options can be given in a configuration file. the following three
 places will be searched for configuration files (values in the last
-configuration file will overwrite values in the first configuration file):
+configuration file will overwrite values in the first configuration file).
+indentation does matter.
 
-- $FindBin::Bin/../etc/nrun.config
-- /etc/nrun.config
-- $HOME/.nrun.config
+- $FindBin::Bin/../etc/nrunrc
+- /etc/nrunrc
+- $HOME/.nrunrc
 
 --<snip>--
-###
-# global options
-$options->{ssh_binary}   = "/usr/bin/ssh";
-$options->{scp_binary}   = "/usr/bin/scp";
-$options->{ssh_args}     = "-o PreferredAuthentications=publickey";
-$options->{scp_args}     = "-o PreferredAuthentications=publickey";
-$options->{arg_mode}     = "ssh";
-$options->{arg_parallel} = 5;
-$options->{arg_timeout}  = 60;
+---
+# mode ssh options
+ssh_binary: /usr/bin/ssh
+scp_binary: /usr/bin/scp
+ssh_args:   -o PreferredAuthentications=publickey
+scp_args:   -o PreferredAuthentications=publickey
 
-1;
+# mode nsh options
+agentinfo_binary: agentinfo
+nexec_binary:     nexec
+ncp_binary:       ncp
+nexec_args:
+agentinfo_args:
+ncp_args:
+
+# mode rsh options
+rsh_binary: /usr/bin/rsh
+rcp_binary: /usr/bin/rcp
+rsh_user:   root
+rcp_user:   root
+rsh_args:
+rcp_args:
+
+# additional commandline options
+arg_mode:     ssh
+arg_parallel: 5
+arg_timeout:  60
+
+# alias definitions
+alias:
+    production:
+        - host1
+        - host2
 --<snap>--
 
 logging
@@ -231,13 +254,19 @@ overrule the hostname.
 
 an alias can be defined in the configuration file the following way. an alias
 definition may contain additional alias names, filenames or simply hostnames.
+indentation does matter.
 
-$options->{alias} = {
-
-	production  => [ "host1", "host2" ],
-	development => [ "host3", "host4" ],
-	all         => [ "production", "development" ],
-}
+    # alias definitions
+    alias:
+        production:
+            - host1
+            - host2
+        development:
+            - host3
+            - host4
+        all:
+            - production
+            - development
 
 transferring the public key
 ===========================
