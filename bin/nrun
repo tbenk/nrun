@@ -228,13 +228,17 @@ sub callback_action {
         }
     );
 
-    my $logger = NRun::Logger->new (
-        {
-            hostname  => $_host,
-            basedir   => $options->{log_directory},
-            semaphore => $options->{sem_logger},
-        }
-    );
+    my $logger = undef;
+    if (not defined($options->{no_logfile})) {
+
+        $logger = NRun::Logger->new (
+            {
+                hostname  => $_host,
+                basedir   => $options->{log_directory},
+                semaphore => $options->{sem_logger},
+            }
+        );
+    }
 
     $worker->init (
         {

@@ -147,10 +147,10 @@ sub do {
     $pid = open(CMD, "$_cmd 2>&1 2>&1|");
     if (not defined($pid)) {
 
-        $_self->{dumper}->push("$_cmd: $!\n");
-        $_self->{logger}->push("$_cmd: $!\n");
-        $_self->{dumper}->code($NRun::Constants::EXECUTION_FAILED);
-        $_self->{logger}->code($NRun::Constants::EXECUTION_FAILED);
+        $_self->{dumper}->push("$_cmd: $!\n") if (defined($_self->{dumper}));
+        $_self->{logger}->push("$_cmd: $!\n") if (defined($_self->{logger}));
+        $_self->{dumper}->code($NRun::Constants::EXECUTION_FAILED) if (defined($_self->{dumper}));
+        $_self->{logger}->code($NRun::Constants::EXECUTION_FAILED) if (defined($_self->{logger}));
 
         NRun::Signal::deregister('ALRM', $handler_alrm);
         NRun::Signal::deregister('INT',  $handler_int);
@@ -159,20 +159,20 @@ sub do {
         return ( "$_cmd: $!\n", $NRun::Constants::EXECUTION_FAILED );
     }
     
-    $_self->{dumper}->command("($pid) $_cmd");
-    $_self->{logger}->command("($pid) $_cmd");
+    $_self->{dumper}->command("($pid) $_cmd") if (defined($_self->{dumper}));
+    $_self->{logger}->command("($pid) $_cmd") if (defined($_self->{logger}));
     while (my $line = <CMD>) {
     
-        $_self->{dumper}->push($line);
-        $_self->{logger}->push($line);
+        $_self->{dumper}->push($line) if (defined($_self->{dumper}));
+        $_self->{logger}->push($line) if (defined($_self->{logger}));
         push(@out, $line);
     }
     close(CMD);
-    $_self->{dumper}->command();
-    $_self->{logger}->command();
+    $_self->{dumper}->command() if (defined($_self->{dumper}));
+    $_self->{logger}->command() if (defined($_self->{logger}));
 
-    $_self->{dumper}->code($? >> 8);
-    $_self->{logger}->code($? >> 8);
+    $_self->{dumper}->code($? >> 8) if (defined($_self->{dumper}));
+    $_self->{logger}->code($? >> 8) if (defined($_self->{logger}));
 
     NRun::Signal::deregister('ALRM', $handler_alrm);
     NRun::Signal::deregister('INT',  $handler_int);
@@ -190,8 +190,8 @@ sub destroy {
 
     my $_self = shift;
 
-    $_self->{dumper}->destroy();
-    $_self->{logger}->destroy();
+    $_self->{dumper}->destroy() if (defined($_self->{dumper}));
+    $_self->{logger}->destroy() if (defined($_self->{logger}));
 }
 
 ###
@@ -207,20 +207,20 @@ sub pre_check {
 
     if (not (defined($_self->{skip_ns_check}) or gethostbyname($_self->{hostname}))) {
 
-        $_self->{dumper}->push("dns entry is missing");
-        $_self->{logger}->push("dns entry is missing");
-        $_self->{dumper}->code($NRun::Constants::MISSING_DNS_ENTRY);
-        $_self->{logger}->code($NRun::Constants::MISSING_DNS_ENTRY);
+        $_self->{dumper}->push("dns entry is missing") if (defined($_self->{dumper}));
+        $_self->{logger}->push("dns entry is missing") if (defined($_self->{logger}));
+        $_self->{dumper}->code($NRun::Constants::MISSING_DNS_ENTRY) if (defined($_self->{dumper}));
+        $_self->{logger}->code($NRun::Constants::MISSING_DNS_ENTRY) if (defined($_self->{logger}));
 
         return 0;
     }
 
     if (not (defined($_self->{skip_ping_check}) or Net::Ping->new()->ping($_self->{hostname}))) {
 
-        $_self->{dumper}->push("not pinging");
-        $_self->{logger}->push("not pinging");
-        $_self->{dumper}->code($NRun::Constants::PING_FAILED);
-        $_self->{logger}->code($NRun::Constants::PING_FAILED);
+        $_self->{dumper}->push("not pinging") if (defined($_self->{dumper}));
+        $_self->{logger}->push("not pinging") if (defined($_self->{logger}));
+        $_self->{dumper}->code($NRun::Constants::PING_FAILED) if (defined($_self->{dumper}));
+        $_self->{logger}->code($NRun::Constants::PING_FAILED) if (defined($_self->{logger}));
 
         return 0;
     }
