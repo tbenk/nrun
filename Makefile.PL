@@ -16,9 +16,9 @@ WriteMakefile (
 sub MY::postamble {
 
     my $postamble =
-    "install :: etc/nrun.config\n" .
+    "install :: etc/nrunrc\n" .
     "\tmkdir -p \$(INSTALL_BASE)/etc\n" .
-    "\tcp etc/nrun.config \$(INSTALL_BASE)/etc/nrun.config\n";
+    "\tcp etc/nrunrc \$(INSTALL_BASE)/etc/nrunrc\n";
 
     return $postamble;
 }
