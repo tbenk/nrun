@@ -154,7 +154,7 @@ sub execute {
 ###
 # delete a file using nsh on $_self->{hostname}.
 #
-# $_file - the command that should be executed
+# $_file - the file that should be deleted
 # <- the return code (-128 indicates too many parallel connections)
 sub delete {
 

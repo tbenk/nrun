@@ -116,7 +116,7 @@ sub execute {
 ###
 # delete a file on $_self->{hostname}.
 #
-# $_file - the command that should be executed
+# $_file - the file that should be deleted
 # <- the return code
 sub delete {
 
