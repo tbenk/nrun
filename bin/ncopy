@@ -253,7 +253,6 @@ sub callback_action {
 # ensure exit on TERM, INT and ALRM
 sub handler {
 
-    wait();
     exit();
 }
 
