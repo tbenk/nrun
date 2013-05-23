@@ -182,7 +182,7 @@ sub run {
 
         $_self->dispatch(\@pool, \%pids, pop(@{$_self->{objects}}));
 
-        usleep(100000);
+        usleep(1000);
     }
 
     # hold level
@@ -204,7 +204,7 @@ sub run {
             unshift(@pool, $pid);
         }
 
-        usleep(100000);
+        usleep(1000);
     }
 
     # tear down
@@ -224,7 +224,7 @@ sub run {
             unshift(@pool, $pid);
         }
 
-        usleep(100000);
+        usleep(1000);
     }
 
     NRun::Signal::deregister('USR1', $handler_usr1);
