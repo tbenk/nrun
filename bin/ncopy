@@ -474,11 +474,11 @@ the following configuration options must be set in the configuration file:
 this is a special generic mode the can be used for arbitrary remote execution
 mechanisms.
 
-'cmdline_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'generic_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 
-'cmdline_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'generic_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
-'cmdline_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+'generic_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 an example that resembles the mode ssh would look the following way:
 

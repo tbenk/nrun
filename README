@@ -220,7 +220,7 @@ mode local
 execute the script locally for each host and set the environment variable
 TARGET_HOST on each execution.
 
-'local_exec'   - commandline for local execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'local_exec' - commandline for local execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 
 mode nsh
 ========
@@ -241,9 +241,9 @@ this is a special generic mode the can be used for arbitrary remote execution
 mechanism. it takes only two configuration options, one to specify a command
 for remote exection and one to specify a command for remote copying.
 
-'cmdline_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
-'cmdline_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
-'cmdline_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+'generic_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'generic_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'generic_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 an example that resembles the mode ssh would look the following way:
 
