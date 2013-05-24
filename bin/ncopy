@@ -69,9 +69,15 @@ sub usage {
     print "--version,-v             print the version string and exit.\n";
     print "--mode,-m MODE           remote execution mode:\n";
 
-    foreach my $object (values(%{NRun::Worker::workers()})) {
+    foreach my $object (values(%{NRun::Worker::workers()})) { 
 
-        print "                         " . $object->{MODE} . " - " . $object->{DESC} ."\n";
+        if (defined($options->{arg_mode}) and $options->{arg_mode} eq $object->{MODE}) {
+
+            print "                         " . $object->{MODE} . " - " . $object->{DESC} ." [default]\n";
+        } else {
+
+            print "                         " . $object->{MODE} . " - " . $object->{DESC} ."\n";
+        }
     }
 
     exit;

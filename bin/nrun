@@ -74,7 +74,13 @@ sub usage {
 
     foreach my $object (values(%{NRun::Worker::workers()})) { 
 
-        print "                         " . $object->{MODE} . " - " . $object->{DESC} ."\n";
+        if (defined($options->{arg_mode}) and $options->{arg_mode} eq $object->{MODE}) {
+
+            print "                         " . $object->{MODE} . " - " . $object->{DESC} ." [default]\n";
+        } else {
+
+            print "                         " . $object->{MODE} . " - " . $object->{DESC} ."\n";
+        }
     }
 
     exit;
