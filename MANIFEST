@@ -18,4 +18,5 @@ lib/NRun/Workers/WorkerLocal.pm
 lib/NRun/Workers/WorkerNsh.pm
 lib/NRun/Workers/WorkerRsh.pm
 lib/NRun/Workers/WorkerSsh.pm
+lib/NRun/Workers/WorkerGeneric.pm
 misc/put_pubkey

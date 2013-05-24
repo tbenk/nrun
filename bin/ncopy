@@ -342,39 +342,51 @@ does matter.
 
 - $HOME/.nrunrc
 
-      ---
-      # mode ssh options
-      ssh_binary: /usr/bin/ssh
-      scp_binary: /usr/bin/scp
-      ssh_args:   -o PreferredAuthentications=publickey
-      scp_args:   -o PreferredAuthentications=publickey
-      
-      # mode nsh options
-      agentinfo_binary: agentinfo
-      nexec_binary:     nexec
-      ncp_binary:       ncp
-      nexec_args:
-      agentinfo_args:
-      ncp_args:
-      
-      # mode rsh options
-      rsh_binary: /usr/bin/rsh
-      rcp_binary: /usr/bin/rcp
-      rsh_user:   root
-      rcp_user:   root
-      rsh_args:
-      rcp_args:
-      
-      # additional commandline options
-      arg_mode:     ssh
-      arg_parallel: 5
-      arg_timeout:  60
-      
-      # alias definitions
-      alias:
-          production:
-              - host1
-              - host2
+    ---
+    # mode ssh options
+    ssh_copy: >
+        /usr/bin/scp
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        SOURCE HOSTNAME:TARGET
+    
+    ssh_exec: >
+        /usr/bin/ssh
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME COMMAND ARGUMENTS
+    
+    ssh_delete: >
+        /usr/bin/ssh
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME rm -f "FILE"
+    
+    # additional commandline options
+    arg_mode: ssh
+    arg_parallel: 5
+    arg_timeout: 60
+    
+    # alias definitions
+    alias:
+        production:
+            - host1
+            - host2
+        development:
+            - host3
+            - host4
+        all:
+            - production
+            - development
 
 =head1 LOGGING
 
@@ -395,13 +407,11 @@ use ssh as the underlying remote access mechanism.
 
 the following configuration options must be set in the configuration file:
 
-'ssh_args'   - arguments supplied to the ssh binary
+'ssh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 
-'scp_args'   - arguments supplied to the scp binary
+'ssh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
-'ssh_binary' - ssh binary to be executed
-
-'scp_binary' - scp binary to be executed
+'ssh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 for passwordless login ssh-agent can be used:
 
@@ -420,10 +430,24 @@ suggested:
 	-o UserKnownHostsFile=/dev/null
 	-o LogLevel=FATAL
 
+=head2 mode rsh
+
+use rsh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'rsh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+
+'rsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
+'rsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+
 =head2 mode local
 
 execute the script locally for each host and set the environment variable
 TARGET_HOST on each execution.
+
+'local_exec' - commandline for local execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 
 =head2 mode nsh
 
@@ -431,35 +455,53 @@ use nsh as the underlying remote access mechanism.
 
 the following configuration options must be set in the configuration file:
 
-'agentinfo_args'   - arguments supplied to the agentinfo binary
+'nsh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 
-'nexec_args'       - arguments supplied to the nexec binary
+'nsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
-'ncp_args'         - arguments supplied to the ncp binary
+'nsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
-'agentinfo_binary' - agentinfo binary to be executed
+'nsh_check'  - commandline for the agentinfo check command (HOSTNAME will be replaced)
 
-'nexec_binary'     - nexec binary to be executed
+=head2 mode generic
 
-'ncp_binary'       - ncp binary to be executed
+this is a special generic mode the can be used for arbitrary remote execution
+mechanisms.
 
-=head2 mode rsh
+'cmdline_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 
-use rsh as the underlying remote access mechanism.
+'cmdline_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
-the following configuration options must be set in the configuration file:
+'cmdline_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
-'rsh_args'   - arguments supplied to the rsh binary
+an example that resembles the mode ssh would look the following way:
 
-'rcp_args'   - arguments supplied to the rcp binary
-
-'rsh_binary' - rsh binary to be executed
-
-'rcp_binary' - rcp binary to be executed
-
-'rsh_user'   - rsh login user
-
-'rcp_user'   - rcp login user
+    generic_copy: >
+        /usr/bin/scp
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        SOURCE HOSTNAME:TARGET
+    
+    generic_exec: >
+        /usr/bin/ssh
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME COMMAND ARGUMENTS
+    
+    generic_delete: >
+        /usr/bin/ssh
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME rm -f "FILE"
 
 =head1 OPTIONS
 

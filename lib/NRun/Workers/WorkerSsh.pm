@@ -69,10 +69,9 @@ sub new {
 #   'hostname'   - hostname this worker should act on
 #   'dumper'     - dumper object
 #   'logger'     - logger object
-#   'ssh_args'   - arguments supplied to the ssh binary
-#   'scp_args'   - arguments supplied to the scp binary
-#   'ssh_binary' - ssh binary to be executed
-#   'scp_binary' - scp binary to be executed
+#   'ssh_copy'   - commandline for the copy command (SOURCE, TARGET, HOSTNAME will be replaced)
+#   'ssh_exec'   - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+#   'ssh_delete' - commandline for the delete command (FILE, HOSTNAME will be replaced)
 # }
 sub init {
 
@@ -81,14 +80,13 @@ sub init {
 
     $_self->SUPER::init($_cfg);
 
-    $_self->{ssh_args}   = $_cfg->{ssh_args};
-    $_self->{scp_args}   = $_cfg->{scp_args};
-    $_self->{ssh_binary} = $_cfg->{ssh_binary};
-    $_self->{scp_binary} = $_cfg->{scp_binary};
+    $_self->{ssh_copy}   = $_cfg->{ssh_copy};
+    $_self->{ssh_exec}   = $_cfg->{ssh_exec};
+    $_self->{ssh_delete} = $_cfg->{ssh_delete};
 }
 
 ###
-# copy a file using ssh to $_self->{hostname}.
+# copy a file to $_self->{hostname}.
 #
 # $_source - source file to be copied
 # $_target - destination $_source should be copied to
@@ -99,12 +97,19 @@ sub copy {
     my $_source = shift;
     my $_target = shift;
 
-    my ( $out, $ret ) = $_self->do("$_self->{scp_binary} $_self->{scp_args} $_source $_self->{hostname}:$_target");
+    my $cmdline = $_self->{ssh_copy};
+
+    $cmdline =~ s/SOURCE/$_source/g;
+    $cmdline =~ s/TARGET/$_target/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    my ( $out, $ret ) = $_self->do($cmdline);
+
     return $ret;
 }
 
 ###
-# execute the command using ssh on $_self->{hostname}.
+# execute the command on $_self->{hostname}.
 #
 # $_command - the command that should be executed
 # $_args    - arguments that should be supplied to $_command
@@ -115,12 +120,19 @@ sub execute {
     my $_command = shift;
     my $_args    = shift;
 
-    my ( $out, $ret ) = $_self->do("$_self->{ssh_binary} $_self->{ssh_args} $_self->{hostname} $_command $_args");
+    my $cmdline = $_self->{ssh_exec};
+
+    $cmdline =~ s/COMMAND/$_command/g;
+    $cmdline =~ s/ARGUMENTS/$_args/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    my ( $out, $ret ) = $_self->do($cmdline);
+
     return $ret;
 }
 
 ###
-# delete a file using ssh on $_self->{hostname}.
+# delete a file on $_self->{hostname}.
 #
 # $_file - the file that should be deleted
 # <- the return code
@@ -129,7 +141,13 @@ sub delete {
     my $_self = shift;
     my $_file = shift;
 
-    my ( $out, $ret ) = $_self->do("$_self->{ssh_binary} $_self->{ssh_args} $_self->{hostname} rm -f \"$_file\"");
+    my $cmdline = $_self->{ssh_delete};
+
+    $cmdline =~ s/FILE/$_file/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    my ( $out, $ret ) = $_self->do($cmdline);
+
     return $ret;
 }
 

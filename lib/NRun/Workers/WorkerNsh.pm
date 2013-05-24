@@ -65,15 +65,13 @@ sub new {
 #
 # $_cfg - parameter hash where
 # {
-#   'hostname'         - hostname this worker should act on
-#   'dumper'           - dumper object
-#   'logger'           - logger object
-#   'agentinfo_args'   - arguments supplied to the agentinfo binary
-#   'agentinfo_binary' - agentinfo binary to be executed
-#   'ncp_args'         - arguments supplied to the ncp binary
-#   'ncp_binary'       - ncp binary to be executed
-#   'nexec_args'       - arguments supplied to the nexec binary
-#   'nexec_binary'     - nexec binary to be executed
+#   'hostname'   - hostname this worker should act on
+#   'dumper'     - dumper object
+#   'logger'     - logger object
+#   'nsh_copy'   - commandline for the copy command (SOURCE, TARGET, HOSTNAME will be replaced)
+#   'nsh_exec'   - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+#   'nsh_delete' - commandline for the delete command (FILE, HOSTNAME will be replaced)
+#   'nsh_check'  - commandline for the agentinfo check command (HOSTNAME will be replaced)
 # }
 sub init {
 
@@ -82,12 +80,10 @@ sub init {
 
     $_self->SUPER::init($_cfg);
 
-    $_self->{agentinfo_args}   = $_cfg->{agentinfo_args};
-    $_self->{agentinfo_binary} = $_cfg->{agentinfo_binary};
-    $_self->{nexec_args}       = $_cfg->{nexec_args};
-    $_self->{nexec_binary}     = $_cfg->{nexec_binary};
-    $_self->{ncp_args}         = $_cfg->{ncp_args};
-    $_self->{ncp_binary}       = $_cfg->{ncp_binary};
+    $_self->{nsh_copy}   = $_cfg->{nsh_copy};
+    $_self->{nsh_exec}   = $_cfg->{nsh_exec};
+    $_self->{nsh_delete} = $_cfg->{nsh_delete};
+    $_self->{nsh_check}  = $_cfg->{nsh_check};
 }
 
 ###
@@ -105,7 +101,11 @@ sub pre_check {
     close(STDIN);
     open(STDIN, "/dev/null");
 
-    my ($out, $ret) = $_self->do("$_self->{agentinfo_binary} $_self->{hostname}");
+    my $cmdline = $_self->{nsh_check};
+
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    my ( $out, $ret ) = $_self->do($cmdline);
     return 1 if ($ret != 0);
 
     return $_self->SUPER::pre_check();
@@ -127,7 +127,13 @@ sub copy {
     close(STDIN);
     open(STDIN, "/dev/null");
 
-    my ( $out, $ret ) = $_self->do("$_self->{ncp_binary} $_self->{ncp_args} $_source - //$_self->{hostname}/$_target");
+    my $cmdline = $_self->{nsh_copy};
+
+    $cmdline =~ s/SOURCE/$_source/g;
+    $cmdline =~ s/TARGET/$_target/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    my ( $out, $ret ) = $_self->do($cmdline);
     return $ret;
 }
 
@@ -147,7 +153,13 @@ sub execute {
     close(STDIN);
     open(STDIN, "/dev/null");
 
-    my ( $out, $ret ) = $_self->do("$_self->{nexec_binary} $_self->{nexec_args} -n $_self->{hostname} $_command $_args");
+    my $cmdline = $_self->{nsh_copy};
+
+    $cmdline =~ s/COMMAND/$_command/g;
+    $cmdline =~ s/ARGUMENTS/$_args/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    my ( $out, $ret ) = $_self->do($cmdline);
     return $ret;
 }
 
@@ -165,7 +177,12 @@ sub delete {
     close(STDIN);
     open(STDIN, "/dev/null");
 
-    my ( $out, $ret ) = $_self->do("$_self->{nexec_binary} $_self->{nexec_args} -n $_self->{hostname} rm -f \"$_file\"");
+    my $cmdline = $_self->{nsh_copy};
+
+    $cmdline =~ s/FILE/$_file/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    my ( $out, $ret ) = $_self->do($cmdline);
     return $ret;
 }
 

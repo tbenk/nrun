@@ -123,7 +123,7 @@ sub handler {
 
     my $_pid  = shift;
 
-    if (defined($$_pid) and $$_pid != -128) {
+    if ($$_pid != -128) {
 
         kill(KILL => $$_pid);
     }
@@ -135,12 +135,14 @@ sub handler {
 # $_cmd -  the command to be executed
 # <- (
 #      $out - command output
-#      $ret - the return code (-128 indicates too many parallel connections)
+#      $ret - the return code 
 #    )
 sub do {
 
     my $_self = shift;
     my $_cmd  = shift;
+
+    chomp($_cmd);
 
     my $pid = -128;
     my @out = ();
@@ -149,7 +151,7 @@ sub do {
     my $handler_int  = NRun::Signal::register('INT',  \&handler, [ \$pid ]);
     my $handler_term = NRun::Signal::register('TERM', \&handler, [ \$pid ]);
 
-    $pid = open(CMD, "$_cmd 2>&1 2>&1|");
+    $pid = open(CMD, "$_cmd 2>&1 |");
     if (not defined($pid)) {
 
         $_self->{dumper}->push("$_cmd: $!\n") if (defined($_self->{dumper}));

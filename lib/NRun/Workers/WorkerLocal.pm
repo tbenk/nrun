@@ -59,7 +59,6 @@ sub new {
     return $self;
 }
 
-###
 # initialize this worker module.
 #
 # $_cfg - parameter hash where
@@ -67,6 +66,7 @@ sub new {
 #   'hostname'   - hostname this worker should act on
 #   'dumper'     - dumper object
 #   'logger'     - logger object
+#   'local_exec' - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 # }
 sub init {
 
@@ -74,6 +74,8 @@ sub init {
     my $_cfg  = shift;
 
     $_self->SUPER::init($_cfg);
+
+    $_self->{local_exec}   = $_cfg->{local_exec};
 }
 
 ###
@@ -88,8 +90,8 @@ sub copy {
     my $_source = shift;
     my $_target = shift;
 
-    $_self->{logger}->push("not implemented");
-    $_self->{dumper}->push("not implemented");
+    $_self->{logger}->push("not implemented\n");
+    $_self->{dumper}->push("not implemented\n");
     $_self->{logger}->code(1);
     $_self->{dumper}->code(1);
 
@@ -109,7 +111,14 @@ sub execute {
     my $_command = shift;
     my $_args    = shift;
 
-    my ( $out, $ret ) = $_self->do("TARGET_HOST=$_self->{hostname} $_command $_args");
+    my $cmdline = $_self->{local_exec};
+
+    $cmdline =~ s/COMMAND/$_command/g;
+    $cmdline =~ s/ARGUMENTS/$_args/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    my ( $out, $ret ) = $_self->do($cmdline);
+
     return $ret;
 }
 
@@ -123,8 +132,8 @@ sub delete {
     my $_self = shift;
     my $_file = shift;
 
-    $_self->{logger}->push("not implemented");
-    $_self->{dumper}->push("not implemented");
+    $_self->{logger}->push("not implemented\n");
+    $_self->{dumper}->push("not implemented\n");
     $_self->{logger}->code(1);
     $_self->{dumper}->code(1);
 

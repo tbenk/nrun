@@ -49,10 +49,12 @@ usage: nrun -t HOST1[,HOST2,...] -- COMMAND
 --timeout SEC            timeout for each command execution (defaults to 60).
 --version,-v             print the version string and exit.
 --mode,-m MODE           remote execution mode:
+                         generic - generic mode
                          rsh - rsh based remote execution
                          nsh - nsh based remote execution
                          ssh - ssh based remote execution
-                         local - execute the script locally, set TARGET_HOST on each execution
+                         local - execute the script locally, set TARGET_HOST
+                         on each execution
 
 usage: ncopy -t HOST1[,HOST2,...] -- SRC DST
 --async,-a               asynchronous output mode.
@@ -67,10 +69,12 @@ usage: ncopy -t HOST1[,HOST2,...] -- SRC DST
 --timeout SEC            timeout for each command execution (defaults to 60).
 --version,-v             print the version string and exit.
 --mode,-m MODE           remote execution mode:
+                         generic - generic mode
                          rsh - rsh based remote execution
                          nsh - nsh based remote execution
                          ssh - ssh based remote execution
-                         local - execute the script locally, set TARGET_HOST on each execution
+                         local - execute the script locally, set TARGET_HOST
+                         on each execution
 
 examples
 ========
@@ -106,7 +110,7 @@ special configuration options for the different modes and additional all
 commandline options can be given in a configuration file. the following three
 places will be searched for configuration files (values in the last
 configuration file will overwrite values in the first configuration file).
-indentation does matter.
+indentation does matter (YAML syntax).
 
 - $FindBin::Bin/../etc/nrunrc
 - /etc/nrunrc
@@ -115,37 +119,49 @@ indentation does matter.
 --<snip>--
 ---
 # mode ssh options
-ssh_binary: /usr/bin/ssh
-scp_binary: /usr/bin/scp
-ssh_args:   -o PreferredAuthentications=publickey
-scp_args:   -o PreferredAuthentications=publickey
+ssh_copy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    SOURCE HOSTNAME:TARGET 
 
-# mode nsh options
-agentinfo_binary: agentinfo
-nexec_binary:     nexec
-ncp_binary:       ncp
-nexec_args:
-agentinfo_args:
-ncp_args:
+ssh_exec: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME COMMAND ARGUMENTS
 
-# mode rsh options
-rsh_binary: /usr/bin/rsh
-rcp_binary: /usr/bin/rcp
-rsh_user:   root
-rcp_user:   root
-rsh_args:
-rcp_args:
+ssh_delete: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME rm -f "FILE"
 
 # additional commandline options
-arg_mode:     ssh
+arg_mode: ssh
 arg_parallel: 5
-arg_timeout:  60
+arg_timeout: 60
 
 # alias definitions
 alias:
     production:
         - host1
         - host2
+    development:
+        - host3
+        - host4
+    all:
+        - production
+        - development
 --<snap>--
 
 logging
@@ -166,10 +182,9 @@ use ssh as the underlying remote access mechanism.
 
 the following configuration options must be set in the configuration file:
 
-'ssh_args'   - arguments supplied to the ssh binary
-'scp_args'   - arguments supplied to the scp binary
-'ssh_binary' - ssh binary to be executed
-'scp_binary' - scp binary to be executed
+'ssh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'ssh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'ssh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 for passwordless login ssh-agent can be used:
 
@@ -188,11 +203,24 @@ suggested:
 -o UserKnownHostsFile=/dev/null
 -o LogLevel=FATAL
 
+mode rsh
+========
+
+use rsh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'rsh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'rsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'rsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+
 mode local
 ==========
 
 execute the script locally for each host and set the environment variable
 TARGET_HOST on each execution.
+
+'local_exec'   - commandline for local execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 
 mode nsh
 ========
@@ -201,28 +229,56 @@ use nsh as the underlying remote access mechanism.
 
 the following configuration options must be set in the configuration file:
 
-'agentinfo_args'   - arguments supplied to the agentinfo binary
-'nexec_args'       - arguments supplied to the nexec binary
-'ncp_args'         - arguments supplied to the ncp binary
-'agentinfo_binary' - agentinfo binary to be executed
-'nexec_binary'     - nexec binary to be executed
-'ncp_binary'       - ncp binary to be executed
+'nsh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'nsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'nsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+'nsh_check'  - commandline for the agentinfo check command (HOSTNAME will be replaced)
 
-mode rsh
-========
+mode generic
+============
 
-use rsh as the underlying remote access mechanism.
+this is a special generic mode the can be used for arbitrary remote execution
+mechanism. it takes only two configuration options, one to specify a command
+for remote exection and one to specify a command for remote copying.
 
-the following configuration options must be set in the configuration file:
+'cmdline_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'cmdline_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'cmdline_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
-'rsh_args'   - arguments supplied to the rsh binary
-'rcp_args'   - arguments supplied to the rcp binary
-'rsh_binary' - rsh binary to be executed
-'rcp_binary' - rcp binary to be executed
-'rsh_user'   - rsh login user
-'rcp_user'   - rcp login user
+an example that resembles the mode ssh would look the following way:
+
+--<snip>--
+generic_copy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    -o SOURCE HOSTNAME:TARGET 
+
+generic_exec: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME COMMAND ARGUMENTS
+
+generic_delete: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME rm -f "FILE"
+
+--<snap>--
 
 inspecting long running processes
+=================================
 
 it is possible to signal nrun with USR1 and USR2 to dump, resp. save the currently
 running processes. if nrun is signaled with USR2, it will create a file in

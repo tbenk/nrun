@@ -25,7 +25,7 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
-package NRun::Worker::WorkerRsh;
+package NRun::Worker::WorkerGeneric;
 
 use strict;
 use warnings;
@@ -40,9 +40,9 @@ BEGIN {
 
     NRun::Worker::register ( {
 
-        'MODE' => "rsh",
-        'DESC' => "rsh based remote execution",
-        'NAME' => "NRun::Worker::WorkerRsh",
+        'MODE' => "generic",
+        'DESC' => "generic mode",
+        'NAME' => "NRun::Worker::WorkerGeneric",
     } );
 }
 
@@ -66,12 +66,12 @@ sub new {
 #
 # $_cfg - parameter hash where
 # {
-#   'hostname'   - hostname this worker should act on
-#   'dumper'     - dumper object
-#   'logger'     - logger object
-#   'rsh_copy'   - commandline for the copy command (SOURCE, TARGET, HOSTNAME will be replaced)
-#   'rsh_exec'   - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
-#   'rsh_delete' - commandline for the delete command (FILE, HOSTNAME will be replaced)
+#   'hostname'       - hostname this worker should act on
+#   'dumper'         - dumper object
+#   'logger'         - logger object
+#   'generic_copy'   - commandline for the copy command (SOURCE, TARGET, HOSTNAME will be replaced)
+#   'generic_exec'   - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+#   'generic_delete' - commandline for the delete command (FILE, HOSTNAME will be replaced)
 # }
 sub init {
 
@@ -80,9 +80,9 @@ sub init {
 
     $_self->SUPER::init($_cfg);
 
-    $_self->{rsh_copy}   = $_cfg->{rsh_copy};
-    $_self->{rsh_exec}   = $_cfg->{rsh_exec};
-    $_self->{rsh_delete} = $_cfg->{rsh_delete};
+    $_self->{generic_copy}   = $_cfg->{generic_copy};
+    $_self->{generic_exec}   = $_cfg->{generic_exec};
+    $_self->{generic_delete} = $_cfg->{generic_delete};
 }
 
 ###
@@ -97,7 +97,7 @@ sub copy {
     my $_source = shift;
     my $_target = shift;
 
-    my $cmdline = $_self->{rsh_copy};
+    my $cmdline = $_self->{generic_copy};
 
     $cmdline =~ s/SOURCE/$_source/g;
     $cmdline =~ s/TARGET/$_target/g;
@@ -120,7 +120,7 @@ sub execute {
     my $_command = shift;
     my $_args    = shift;
 
-    my $cmdline = $_self->{rsh_exec};
+    my $cmdline = $_self->{generic_exec};
 
     $cmdline =~ s/COMMAND/$_command/g;
     $cmdline =~ s/ARGUMENTS/$_args/g;
@@ -141,7 +141,7 @@ sub delete {
     my $_self = shift;
     my $_file = shift;
 
-    my $cmdline = $_self->{rsh_delete};
+    my $cmdline = $_self->{generic_delete};
 
     $cmdline =~ s/FILE/$_file/g;
     $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
