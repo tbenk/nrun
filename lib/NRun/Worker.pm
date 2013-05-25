@@ -185,7 +185,6 @@ sub do {
     NRun::Signal::deregister('INT',  $handler_int);
     NRun::Signal::deregister('TERM', $handler_term);
 
-
     return ( join("", @out), $? >> 8 );
 }
 
