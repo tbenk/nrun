@@ -203,8 +203,8 @@ sub destroy {
 ###
 # do some general checks.
 #
-# - ping check (will be checked if $_self->{skip_ns_check})
-# - dns check (will be checked if $_self->{skip_dns_check)
+# - ping check (will be skipped if $_self->{skip_ns_check})
+# - dns check (will be skipped if $_self->{skip_dns_check)
 #
 # <- 1 on success and 0 on error
 sub pre_check {
