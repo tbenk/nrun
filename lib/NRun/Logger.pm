@@ -42,12 +42,7 @@ use NRun::Signal;
 # {
 #   'hostname'  - the hostname this dumper is responsible for
 #   'semaphore' - the semaphore lock object
-#   'mode'      - one of ...
-#                 output_sync_hostname     - dump the command output incl hostname (synchronized)
-#                 output_sync_no_hostname  - dump the command output excl hostname (synchronized)
-#                 output_async_hostname    - dump the command output incl hostname (not synchronized)
-#                 output_async_no_hostname - dump the command output excl hostname (not synchronized)
-#                 result                   - dump the command result in csv format
+#   'basedir'   - the basedir the logfiles hsould be written to
 # }
 # <- the new object
 sub new {
@@ -61,7 +56,6 @@ sub new {
     $self->{basedir}       = $_cfg->{basedir};
     $self->{hostname}      = $_cfg->{hostname};
     $self->{semaphore}     = $_cfg->{semaphore};
-    $self->{semaphore_key} = $_cfg->{semaphore}->key();
 
     $self->{buffer} = [];
     $self->{code}   = 0;
