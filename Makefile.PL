@@ -10,6 +10,7 @@ WriteMakefile (
     ],
     'PREREQ_PM' => {
         "Date::Format" => 0,
+        "YAML"         => 0,
     },
 );
 
