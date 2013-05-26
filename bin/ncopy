@@ -145,6 +145,12 @@ sub parse_commandline {
         usage();
     }
 
+    if (not defined(NRun::Worker::workers()->{$arg_mode})) {
+
+        print "error: unknown mode given - $arg_mode.\n";
+        usage();
+    }
+
     my $date = time2str("%Y%m%d_%H_%M_%S", time);
 
     $options->{target}          = [ split(",", $arg_target) ];
