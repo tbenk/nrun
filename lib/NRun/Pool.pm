@@ -81,6 +81,7 @@ sub init {
 
             die("error: unable to fork");
         } elsif ($pid == 0) {
+
             $_self->{sink}->connect();
             foreach my $object (@$bunch) {
 
