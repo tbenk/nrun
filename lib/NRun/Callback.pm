@@ -30,6 +30,8 @@
 # will be executed in the child's context.
 package NRun::Callback;
 
+use File::Temp qw(tempfile);
+
 ###
 # ensure cleanup on TERM, INT and ALRM
 sub handler_cleanup {
