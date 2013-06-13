@@ -43,7 +43,7 @@ BEGIN {
 
         'CHECK' => "rscd",
         'DESC'  => "check if rscd agent answers",
-        'NAME'  => "NRun::Checks::CheckRscd",
+        'NAME'  => __PACKAGE__,
     } );
 }
 

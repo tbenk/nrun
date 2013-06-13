@@ -43,7 +43,7 @@ BEGIN {
 
         'CHECK' => "ns",
         'DESC'  => "check if hostname is resolvable",
-        'NAME'  => "NRun::Checks::CheckNs",
+        'NAME'  => __PACKAGE__,
     } );
 }
 

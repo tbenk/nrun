@@ -43,7 +43,7 @@ BEGIN {
 
         'FILTER' => "async",
         'DESC'   => "dump the command output asynchroniously",
-        'NAME'   => "NRun::Filters::FilterAsync",
+        'NAME'  => __PACKAGE__,
     } );
 }
 

@@ -43,7 +43,7 @@ BEGIN {
 
         'LOGGER' => "output",
         'DESC'   => "log the command output",
-        'NAME'   => "NRun::Loggers::LoggerOutput",
+        'NAME'   => __PACKAGE__,
     } );
 }
 

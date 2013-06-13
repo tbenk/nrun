@@ -44,7 +44,7 @@ BEGIN {
 
         'CHECK' => "ping",
         'DESC'  => "check if host answers to ping",
-        'NAME'  => "NRun::Checks::CheckPing",
+        'NAME'  => __PACKAGE__,
     } );
 }
 

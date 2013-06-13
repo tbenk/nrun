@@ -43,7 +43,7 @@ BEGIN {
 
         'FILTER' => "raw",
         'DESC'   => "dump the raw data received from the worker module",
-        'NAME'   => "NRun::Filters::FilterRaw",
+        'NAME'  => __PACKAGE__,
     } );
 }
 

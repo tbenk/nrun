@@ -44,7 +44,7 @@ BEGIN {
 
         'MODE' => "nsh",
         'DESC' => "nsh based remote execution",
-        'NAME' => "NRun::Worker::WorkerNsh",
+        'NAME'   => __PACKAGE__,
     } );
 }
 

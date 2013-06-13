@@ -45,7 +45,7 @@ BEGIN {
 
         'MODE' => "generic",
         'DESC' => "generic mode",
-        'NAME' => "NRun::Worker::WorkerGeneric",
+        'NAME'   => __PACKAGE__,
     } );
 }
 

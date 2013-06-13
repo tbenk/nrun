@@ -43,7 +43,7 @@ BEGIN {
 
         'FILTER' => "result",
         'DESC'   => "dump only the exit code",
-        'NAME'   => "NRun::Filters::FilterExitCode",
+        'NAME'  => __PACKAGE__,
     } );
 }
 

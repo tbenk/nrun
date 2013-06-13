@@ -43,7 +43,7 @@ BEGIN {
 
         'LOGGER' => "null",
         'DESC'   => "do nothing",
-        'NAME'   => "NRun::Loggers::LoggerNull",
+        'NAME'   => __PACKAGE__,
     } );
 }
 

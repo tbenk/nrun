@@ -43,7 +43,7 @@ BEGIN {
 
         'FILTER' => "sync",
         'DESC'   => "dump the command output synchroniously",
-        'NAME'   => "NRun::Filters::FilterSync",
+        'NAME'   => __PACKAGE__,
     } );
 }
 

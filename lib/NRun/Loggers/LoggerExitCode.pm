@@ -43,7 +43,7 @@ BEGIN {
 
         'LOGGER' => "result",
         'DESC'   => "log only the exit code",
-        'NAME'   => "NRun::Loggers::LoggerExitCode",
+        'NAME'   => __PACKAGE__,
     } );
 }
 

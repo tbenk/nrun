@@ -45,7 +45,7 @@ BEGIN {
 
         'MODE' => "local",
         'DESC' => "execute the script locally, set TARGET_HOST on each execution",
-        'NAME' => "NRun::Worker::WorkerLocal",
+        'NAME'   => __PACKAGE__,
     } );
 }
 

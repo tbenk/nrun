@@ -43,7 +43,7 @@ BEGIN {
 
         'FILTER' => "null",
         'DESC'   => "do nothing",
-        'NAME'   => "NRun::Filters::FilterNull",
+        'NAME'  => __PACKAGE__,
     } );
 }
 

@@ -43,7 +43,7 @@ BEGIN {
 
         'LOGGER' => "raw",
         'DESC'   => "log the raw data received from the worker module",
-        'NAME'   => "NRun::Loggers::LoggerRaw",
+        'NAME'   => __PACKAGE__,
     } );
 }
 

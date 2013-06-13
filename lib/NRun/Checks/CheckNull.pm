@@ -44,7 +44,7 @@ BEGIN {
 
         'CHECK' => "null",
         'DESC'  => "do nothing",
-        'NAME'  => "NRun::Checks::CheckNull",
+        'NAME'  => __PACKAGE__,
     } );
 }
 
