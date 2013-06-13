@@ -20,74 +20,79 @@
 # Author:  <AUTHORNAME> <<AUTHOREMAIL>>
 # Date:    <COMMITTERDATE>
 # Ident:   <COMMITHASH>
-# Branch:  <REFNAMES>
+# Branch:  <BRANCH>
 #
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
 ###
-# this is the base module for all "Logger" implementations and
-# is responsible for loading the available implementations
-# at runtime.
-#
-# a logger formats the ouput from the child processes and writes
-# this output into a logfile.
-package NRun::Logger;
+# this check does nothing.
+package NRun::Checks::CheckNull;
 
 use strict;
 use warnings;
 
 use File::Basename;
+use NRun::Check;
+use Net::Ping;
 
-###
-# automagically load all available modules
-INIT {
+our @ISA = qw(NRun::Check);
 
-    my $basedir = dirname($INC{"NRun/Logger.pm"}) . "/Loggers";
+BEGIN {
 
-    opendir(DIR, $basedir) or die("$basedir: $!");
-    while (my $module = readdir(DIR)) {
+    NRun::Check::register ( {
 
-        if ($module =~ /\.pm$/i) {
-
-            require "$basedir/$module";
-        }
-    }
-    close DIR;
+        'CHECK' => "null",
+        'DESC'  => "do nothing",
+        'NAME'  => "NRun::Checks::CheckNull",
+    } );
 }
 
 ###
-# all available logger will be registered here
-my $loggers = {};
+# create a new object.
+#
+# <- the new object
+sub new {
+
+    my $_pkg = shift;
+    my $_cfg = shift;
+
+    my $self = {};
+    bless $self, $_pkg;
+
+    return $self;
+}
 
 ###
-# will be called by the check modules on INIT.
+# initialize this check module.
 #
 # $_cfg - parameter hash where
 # {
-#   'LOGGER' - logger name
-#   'DESC'   - logger description
-#   'NAME'   - module name
+#   'hostname' - hostname this check should act on
 # }
-sub register {
-
-    my $_cfg = shift;
-
-    $loggers->{$_cfg->{LOGGER}} = $_cfg;
-}
-
-###
-# return all available logger modules
-sub loggers {
-
-    return $loggers;
-}
-
-###
-# initialize this logger module.
 sub init {
 
     my $_self = shift;
+    my $_cfg  = shift;
+
+    $_self->SUPER::init($_cfg);
+
+    $_self->{hostname} = $_cfg->{hostname};
+}
+
+###
+# execute the check on $_self->{hostname}.
+#
+# on error, the following string will be printed on stderr:
+#
+# HOSTNAME;stderr;PID;n/a;error;"OUTPUT"
+#
+# <- 1 on success and 0 on error
+sub execute {
+
+    my $_self = shift;
+
+    return 1;
 }
 
 1;

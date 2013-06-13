@@ -25,6 +25,8 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
+###
+# this package contains globally used constants.
 package NRun::Constants;
 
 our $CODE_SIGINT       = -255;
@@ -34,6 +36,9 @@ our $RSCD_NOT_ALIVE    = -251;
 our $EXECUTON_FAILED   = -250;
 our $MISSING_DNS_ENTRY = -249;
 our $PING_FAILED       = -248;
+our $CHECK_FAILED_PING = -247;
+our $CHECK_FAILED_NS   = -246;
+our $CHECK_FAILED_RSCD = -244;
 our $RSCD_ERROR        = -128;
 
 1;

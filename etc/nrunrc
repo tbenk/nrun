@@ -86,9 +86,21 @@ generic_delete: >
     HOSTNAME rm -f "FILE"
 
 # additional commandline options
-arg_mode: ssh
-arg_parallel: 5
-arg_timeout: 60
+nrun:
+    arg_mode: ssh
+    arg_check: ping,ns
+    arg_filter: sync
+    arg_logger: result,output,raw
+    arg_parallel: 5
+    arg_timeout: 60
+
+ncopy:
+    arg_mode: ssh
+    arg_check: ping,ns
+    arg_filter: result
+    arg_logger: result,output,raw
+    arg_parallel: 5
+    arg_timeout: 60
 
 # alias definitions
 alias:

@@ -26,13 +26,12 @@
 #
 
 ###
-# this is the base module for all "Logger" implementations and
+# this is the base module for all "Check" implementations and
 # is responsible for loading the available implementations
 # at runtime.
 #
-# a logger formats the ouput from the child processes and writes
-# this output into a logfile.
-package NRun::Logger;
+# a check checks for a specific condition, eg if th host is pinging
+package NRun::Check;
 
 use strict;
 use warnings;
@@ -43,7 +42,7 @@ use File::Basename;
 # automagically load all available modules
 INIT {
 
-    my $basedir = dirname($INC{"NRun/Logger.pm"}) . "/Loggers";
+    my $basedir = dirname($INC{"NRun/Check.pm"}) . "/Checks";
 
     opendir(DIR, $basedir) or die("$basedir: $!");
     while (my $module = readdir(DIR)) {
@@ -57,34 +56,48 @@ INIT {
 }
 
 ###
-# all available logger will be registered here
-my $loggers = {};
+# all available checks will be registered here
+my $checks = {};
 
 ###
 # will be called by the check modules on INIT.
 #
 # $_cfg - parameter hash where
 # {
-#   'LOGGER' - logger name
-#   'DESC'   - logger description
-#   'NAME'   - module name
+#   'CHECK' - check name
+#   'DESC'  - check description
+#   'NAME'  - module name
 # }
 sub register {
 
     my $_cfg = shift;
 
-    $loggers->{$_cfg->{LOGGER}} = $_cfg;
+    $checks->{$_cfg->{CHECK}} = $_cfg;
 }
 
 ###
-# return all available logger modules
-sub loggers {
+# return all available check modules
+sub checks {
 
-    return $loggers;
+    return $checks;
 }
 
 ###
-# initialize this logger module.
+# create a new object.
+#
+# <- the new object
+sub new {
+
+    my $_pkg = shift;
+
+    my $self = {};
+    bless $self, $_pkg;
+
+    return $self;
+}
+
+###
+# initialize this check module.
 sub init {
 
     my $_self = shift;

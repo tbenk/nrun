@@ -25,12 +25,16 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
+###
+# this worker executes the given script locally and sets the environment
+# variable TARGET_HOST on each execution
 package NRun::Worker::WorkerLocal;
 
 use strict;
 use warnings;
 
 use File::Basename;
+
 use NRun::Worker;
 
 our @ISA = qw(NRun::Worker);
@@ -64,8 +68,6 @@ sub new {
 # $_cfg - parameter hash where
 # {
 #   'hostname'   - hostname this worker should act on
-#   'dumper'     - dumper object
-#   'logger'     - logger object
 #   'local_exec' - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 # }
 sub init {
@@ -90,10 +92,7 @@ sub copy {
     my $_source = shift;
     my $_target = shift;
 
-    $_self->{logger}->push("not implemented\n");
-    $_self->{dumper}->push("not implemented\n");
-    $_self->{logger}->code(1);
-    $_self->{dumper}->code(1);
+    print STDERR "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"not implemented\"\n";
 
     return 1;
 }
@@ -117,9 +116,7 @@ sub execute {
     $cmdline =~ s/ARGUMENTS/$_args/g;
     $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
 
-    my ( $out, $ret ) = $_self->do($cmdline);
-
-    return $ret;
+    return $_self->do($cmdline);
 }
 
 ###
@@ -132,10 +129,7 @@ sub delete {
     my $_self = shift;
     my $_file = shift;
 
-    $_self->{logger}->push("not implemented\n");
-    $_self->{dumper}->push("not implemented\n");
-    $_self->{logger}->code(1);
-    $_self->{dumper}->code(1);
+    print STDOUT "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"not implemented\"\n";
 
     return 1;
 }

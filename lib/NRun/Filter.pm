@@ -26,13 +26,12 @@
 #
 
 ###
-# this is the base module for all "Logger" implementations and
+# this is the base module for all "Filter" implementations and
 # is responsible for loading the available implementations
 # at runtime.
 #
-# a logger formats the ouput from the child processes and writes
-# this output into a logfile.
-package NRun::Logger;
+# a filter formats the ouput from the child processes
+package NRun::Filter;
 
 use strict;
 use warnings;
@@ -43,7 +42,7 @@ use File::Basename;
 # automagically load all available modules
 INIT {
 
-    my $basedir = dirname($INC{"NRun/Logger.pm"}) . "/Loggers";
+    my $basedir = dirname($INC{"NRun/Filter.pm"}) . "/Filters";
 
     opendir(DIR, $basedir) or die("$basedir: $!");
     while (my $module = readdir(DIR)) {
@@ -57,34 +56,34 @@ INIT {
 }
 
 ###
-# all available logger will be registered here
-my $loggers = {};
+# all available filters will be registered here
+my $filters = {};
 
 ###
 # will be called by the check modules on INIT.
 #
 # $_cfg - parameter hash where
 # {
-#   'LOGGER' - logger name
-#   'DESC'   - logger description
+#   'FILTER' - filter name
+#   'DESC'   - filter description
 #   'NAME'   - module name
 # }
 sub register {
 
     my $_cfg = shift;
 
-    $loggers->{$_cfg->{LOGGER}} = $_cfg;
+    $filters->{$_cfg->{FILTER}} = $_cfg;
 }
 
 ###
-# return all available logger modules
-sub loggers {
+# return all available filter modules
+sub filters {
 
-    return $loggers;
+    return $filters;
 }
 
 ###
-# initialize this logger module.
+# initialize this filter module.
 sub init {
 
     my $_self = shift;

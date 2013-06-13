@@ -26,6 +26,8 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
+###
+# this package contains some utility functions.
 package NRun::Util;
 
 use strict;
@@ -146,9 +148,14 @@ sub read_config_files {
             my $options = { %{LoadFile($file)} };
             my $aliases = merge($config->{alias}, $options->{alias});
 
+            my $args_nrun  = merge($config->{nrun}, $options->{nrun});
+            my $args_ncopy = merge($config->{ncopy}, $options->{ncopy});
+
             $config = merge($config, $options);
 
             $config->{alias} = $aliases; 
+            $config->{nrun}  = $args_nrun; 
+            $config->{ncopy} = $args_ncopy; 
         }
     }
 
@@ -174,6 +181,32 @@ sub merge {
     } 
 
     return { %$_h1, %$_h2 };
+}
+
+###
+# take all entries from @$_objects and distribute each entry evenly into
+# $_num new arrays.
+#
+# $_objects - the array to be splitted
+# $_num     - the number of arrays to be returned
+# <- a list of array references
+sub bunches {
+
+    my $_objects = shift;
+    my $_num     = shift;
+
+    my @bunches;
+    foreach my $idx (0..($_num-1)) {
+
+        $bunches[$idx] = [];
+    }
+
+    for (my $idx = 0; $idx < scalar(@{$_objects}); $idx++) {
+
+        push(@{$bunches[$idx % $_num]}, $_objects->[$idx]);
+    }
+
+    return @bunches;
 }
 
 1;

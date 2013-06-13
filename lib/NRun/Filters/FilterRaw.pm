@@ -25,22 +25,31 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
-package NRun::Semaphore;
+###
+# this filter prints the raw data received by the worker modules.
+package NRun::Filters::FilterRaw;
 
 use strict;
 use warnings;
 
-use IPC::Semaphore;
-use IPC::SysV qw(IPC_CREAT);
-use Time::HiRes qw(usleep);
+use File::Basename;
+use NRun::Filter;
+
+our @ISA = qw(NRun::Filter);
+
+BEGIN {
+
+    NRun::Filter::register ( {
+
+        'FILTER' => "raw",
+        'DESC'   => "dump the raw data received from the worker module",
+        'NAME'   => "NRun::Filters::FilterRaw",
+    } );
+}
 
 ###
 # create a new object.
 #
-# $_obj - parameter hash where
-# {
-#   'key' => semaphore key or undef if a new unique semaphore should be created
-# }
 # <- the new object
 sub new {
 
@@ -50,68 +59,52 @@ sub new {
     my $self = {};
     bless $self, $_pkg;
 
-    if (not defined($_obj) or not defined($_obj->{key})) {
-
-        $self->{key} = int(rand(100000));
-        while (new IPC::Semaphore($self->{key}, 1, 0)) {
-
-            $self->{key} = int(rand(100000));
-        }
-    } else {
-
-        $self->{key} = $_obj->{key};
-    }
-
-    $self->{semaphore} = new IPC::Semaphore($self->{key}, 1, 0600 | IPC_CREAT);
-    $self->{semaphore}->op(0,1,0);
-
     return $self;
 }
 
 ###
-# set a global lock. will block until the global lock could be set.
-#
-# <- returns 0 on failure and 1 on success
-sub lock {
+# initialize this filter module.
+sub init {
 
     my $_self = shift;
+    my $_cfg  = shift;
 
-    return $_self->{semaphore}->op(0,-1,0);
+    $_self->SUPER::init($_cfg);
+}
+
+
+###
+# handle one line of data written on stdout.
+#
+# expected data format:
+#
+# HOSTNAME;[stdout|stderr];TSTAMP;PID;PID(CHILD);[debug|error|exit|output|end];"OUTPUT"
+#
+# $_data - the data to be handled
+sub stdout {
+
+    my $_self = shift;
+    my $_data = shift;
+
+    print STDOUT $_data;
 }
 
 ###
-# return the semaphore key of this instance.
+# handle one line of data written on stderr.
 #
-# <- the semaphore key of this instance
-sub key {
-
-    my $_self = shift;
-  
-    return $_self->{key};
-}
-
-###
-# unset a global lock.
+# expected data format:
 #
-# <- returns 0 on failure and 1 on success
-sub unlock {
+# HOSTNAME;[stdout|stderr];TSTAMP;PID;PID(CHILD);[debug|error|exit|output|end];"OUTPUT"
+#
+# $_data - the data to be handled
+sub stderr {
 
     my $_self = shift;
+    my $_data = shift;
 
-    return  $_self->{semaphore}->op(0,1,0);
-}
-
-###
-# remove the semaphore.
-sub delete {
-
-    my $_self = shift;
-
-    if (defined($_self->{semaphore})) {
-
-        $_self->{semaphore}->remove();
-    }
+    print STDERR $_data;
 }
 
 1;
+
 

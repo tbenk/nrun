@@ -25,11 +25,16 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
+###
+# this module is responsible for signal handling. multiple signal
+# handlers for the same signal may be registered which will be 
+# called sequential in the opposite order the handlers were registered.
 package NRun::Signal;
 
 ###
 # all handlers will be registered here
 my $HANDLERS = {};
+my $LOCK = 0;
 
 ###
 # local signal handlers.
@@ -41,6 +46,9 @@ sub _handler {
 
     my $_signal = shift;
 
+    return if ($LOCK == 1);
+
+    $LOCK = 1;
     foreach my $handler (reverse(@{$HANDLERS->{$_signal}})) {
 
         my $sub = $handler->{callback};
@@ -52,6 +60,7 @@ sub _handler {
             $sub->(@$arg);
         }
     }
+    $LOCK = 0;
 }
 
 ###
@@ -105,7 +114,7 @@ sub deregister {
 
         if (scalar(@$handlers) == 0) {
 
-            $ENV{$_signal} = 'DEFAULT';
+            $SIG{$_signal} = 'DEFAULT';
         }
     }
 }

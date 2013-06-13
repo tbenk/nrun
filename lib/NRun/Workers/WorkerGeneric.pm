@@ -25,6 +25,9 @@
 # <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
 #
 
+###
+# this is a generic worker implementation that can be used to add unimplemented
+# remote access mechanisms.
 package NRun::Worker::WorkerGeneric;
 
 use strict;
@@ -67,8 +70,6 @@ sub new {
 # $_cfg - parameter hash where
 # {
 #   'hostname'       - hostname this worker should act on
-#   'dumper'         - dumper object
-#   'logger'         - logger object
 #   'generic_copy'   - commandline for the copy command (SOURCE, TARGET, HOSTNAME will be replaced)
 #   'generic_exec'   - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 #   'generic_delete' - commandline for the delete command (FILE, HOSTNAME will be replaced)
@@ -103,9 +104,7 @@ sub copy {
     $cmdline =~ s/TARGET/$_target/g;
     $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
 
-    my ( $out, $ret ) = $_self->do($cmdline);
-
-    return $ret;
+    return $_self->do($cmdline);
 }
 
 ###
@@ -126,9 +125,7 @@ sub execute {
     $cmdline =~ s/ARGUMENTS/$_args/g;
     $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
 
-    my ( $out, $ret ) = $_self->do($cmdline);
-
-    return $ret;
+    return $_self->do($cmdline);
 }
 
 ###
@@ -146,9 +143,7 @@ sub delete {
     $cmdline =~ s/FILE/$_file/g;
     $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
 
-    my ( $out, $ret ) = $_self->do($cmdline);
-
-    return $ret;
+    return $_self->do($cmdline);
 }
 
 1;

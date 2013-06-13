@@ -35,21 +35,21 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../lib/perl5";
 
-use File::Path;
 use File::Basename;
 use Date::Format;
 use Getopt::Long;
-use Net::Ping;
-use POSIX qw(getuid);
-use File::Temp qw(tempfile);
 
 use NRun::Util;
 use NRun::Version;
-use NRun::Worker;
-use NRun::Dumper;
+use NRun::Check;
+use NRun::Filter;
 use NRun::Logger;
-use NRun::Dispatcher;
+use NRun::Callback;
+use NRun::Worker;
 use NRun::Signal;
+use NRun::Logger;
+use NRun::Pool;
+use NRun::Sink;
 
 our $options = {};
 
@@ -58,28 +58,66 @@ our $options = {};
 sub usage {
 
     print "usage: " . basename($0) . " -t HOST1[,HOST2,...] -- COMMAND\n";
-    print "--async,-a               asynchronous output mode.\n";
-    print "--copy,-c                copy command to target host before execution.\n";
-    print "--dump-results,-d        instead of dumping the command output, dump the exit status.\n";
-    print "--log-directory,-l DIR   base directory for the log files.\n";
-    print "--no-hostname            omit hostname prefix.\n";
-    print "--no-logfile             do not generate any log files.\n";
-    print "--parallel,-p MAX        number of parallel connections (defaults to 5).\n";
-    print "--skip-ns-check          skip checking if the hostname is resolvable.\n";
-    print "--skip-ping-check        skip checking if the host answers on ping.\n";
-    print "--target,-t HOST1,HOST2  comma separated list of target hosts.\n";
-    print "--timeout SEC            timeout for each command execution (defaults to 60).\n";
-    print "--version,-v             print the version string and exit.\n";
-    print "--mode,-m MODE           remote execution mode:\n";
+    print "--copy                      copy command to target host before execution.\n";
+    print "--log-directory DIR         base directory for the log files.\n";
+    print "--no-hostname               omit hostname prefix.\n";
+    print "--parallel,-p MAX           number of parallel connections (defaults to 5).\n";
+    print "--target,-t HOST1,HOST2     comma separated list of target hosts.\n";
+    print "--timeout SEC               timeout for each command execution (defaults to 60).\n";
+    print "--version,-v                print the version string and exit.\n";
+    print "--mode,-m MODE              remote execution mode:\n";
 
-    foreach my $object (values(%{NRun::Worker::workers()})) { 
+    my $workers = NRun::Worker::workers();
+    foreach my $name (sort(keys(%$workers))) {
 
-        if (defined($options->{arg_mode}) and $options->{arg_mode} eq $object->{MODE}) {
+        if (defined($options->{nrun}->{arg_mode}) and $options->{nrun}->{arg_mode} eq $name) {
 
-            print "                         " . $object->{MODE} . " - " . $object->{DESC} ." [default]\n";
+            print "                          * " . $name . " - " . $workers->{$name}->{DESC} . "\n";
         } else {
 
-            print "                         " . $object->{MODE} . " - " . $object->{DESC} ."\n";
+            print "                            " . $name . " - " . $workers->{$name}->{DESC} . "\n";
+        }
+    }
+
+    print "--filter,-f FILTER          output filter to be applied:\n";
+
+    my $filters = NRun::Filter::filters();
+    foreach my $name (sort(keys(%$filters))) {
+
+        if (defined($options->{nrun}->{arg_filter}) and $options->{nrun}->{arg_filter} eq $name) {
+
+            print "                          * " . $name . " - " . $filters->{$name}->{DESC} . "\n";
+        } else {
+
+            print "                            " . $name . " - " . $filters->{$name}->{DESC} . "\n";
+        }
+    }
+
+    print "--logger,-l LOGGER1,LOGGER2 logger to be used:\n";
+
+    my $loggers = NRun::Logger::loggers();
+    foreach my $name (sort(keys(%$loggers))) {
+
+        if (defined($options->{nrun}->{arg_logger}) and $options->{nrun}->{arg_logger} =~ /,*$name,*/) {
+
+            print "                          * " . $name . " - " . $loggers->{$name}->{DESC} . "\n";
+        } else {
+
+            print "                            " . $name . " - " . $loggers->{$name}->{DESC} . "\n";
+        }
+    }
+
+    print "--check,-c CHECK1,CHECK2    checks to be applied to each host:\n";
+
+    my $checks = NRun::Check::checks();
+    foreach my $name (sort(keys(%$checks))) {
+
+        if (defined($options->{nrun}->{arg_check}) and $options->{nrun}->{arg_check} =~ /,*$name,*/) {
+
+            print "                          * " . $name . " - " . $checks->{$name}->{DESC} . "\n";
+        } else {
+
+            print "                            " . $name . " - " . $checks->{$name}->{DESC} . "\n";
         }
     }
 
@@ -90,34 +128,30 @@ sub usage {
 # parse the commandline.
 sub parse_commandline {
 
-    my $arg_parallel        = $options->{arg_parallel};
-    my $arg_async           = $options->{arg_async };
-    my $arg_target          = $options->{arg_target};
-    my $arg_dump_results    = $options->{arg_dump_results};
-    my $arg_no_hostname     = $options->{arg_no_hostname};
-    my $arg_no_logfile      = $options->{arg_no_logfile};
-    my $arg_log_directory   = $options->{arg_log_directory};
-    my $arg_mode            = $options->{arg_mode};
-    my $arg_copy            = $options->{arg_copy};
-    my $arg_version         = $options->{arg_version};
-    my $arg_skip_ping_check = $options->{arg_skip_ping_check};
-    my $arg_skip_ns_check   = $options->{arg_skip_ns_check};
-    my $arg_timeout         = $options->{arg_timeout};
+    my $arg_parallel      = $options->{nrun}->{arg_parallel};
+    my $arg_target        = $options->{nrun}->{arg_target};
+    my $arg_no_hostname   = $options->{nrun}->{arg_no_hostname};
+    my $arg_log_directory = $options->{nrun}->{arg_log_directory};
+    my $arg_mode          = $options->{nrun}->{arg_mode};
+    my $arg_filter        = $options->{nrun}->{arg_filter};
+    my $arg_logger        = $options->{nrun}->{arg_logger};
+    my $arg_check         = $options->{nrun}->{arg_check};
+    my $arg_copy          = $options->{nrun}->{arg_copy};
+    my $arg_version       = $options->{nrun}->{arg_version};
+    my $arg_timeout       = $options->{nrun}->{arg_timeout};
 
     my $ret = GetOptions (
-        "async|a"           => \$arg_async,
-        "parallel|p=i"      => \$arg_parallel,
-        "target|t=s"        => \$arg_target,
-        "no-hostname"       => \$arg_no_hostname,
-        "dump-results|d"    => \$arg_dump_results,
-        "log-directory|l=s" => \$arg_log_directory,
-        "timeout=i"         => \$arg_timeout,
-        "no-logfile"        => \$arg_no_logfile,
-        "mode|m=s"          => \$arg_mode,
-        "skip-ping-check"   => \$arg_skip_ping_check,
-        "skip-ns-check"     => \$arg_skip_ns_check,
-        "copy|c"            => \$arg_copy,
-        "version|v"         => \$arg_version,
+        "parallel|p=i"    => \$arg_parallel,
+        "target|t=s"      => \$arg_target,
+        "no-hostname"     => \$arg_no_hostname,
+        "log-directory=s" => \$arg_log_directory,
+        "timeout=i"       => \$arg_timeout,
+        "mode|m=s"        => \$arg_mode,
+        "filter|f=s"      => \$arg_filter,
+        "logger|l=s"      => \$arg_logger,
+        "check|c=s"       => \$arg_check, 
+        "copy"            => \$arg_copy,
+        "version|v"       => \$arg_version,
     );
 
     usage() if (not $ret);
@@ -134,6 +168,18 @@ sub parse_commandline {
         usage();
     }
 
+    if (not defined($arg_filter)) {
+
+        print "error: parameter --filter is mandatory.\n";
+        usage();
+    }
+
+    if (not defined($arg_logger)) {
+
+        print "error: parameter --logger is mandatory.\n";
+        usage();
+    }
+
     if (not defined($arg_mode)) {
 
         print "error: parameter --mode is mandatory.\n";
@@ -146,54 +192,64 @@ sub parse_commandline {
         usage();
     }
 
+    $options->{target}      = [ split(",", $arg_target) ];
+    $options->{parallel}    = $arg_parallel ? $arg_parallel : 5;
+    $options->{command}     = shift(@ARGV);
+    $options->{arguments}   = join(" ", @ARGV);
+    $options->{timeout}     = $arg_timeout ? $arg_timeout : 60;
+    $options->{copy}        = $arg_copy;
+    $options->{no_hostname} = $arg_no_hostname;
+    $options->{mode}        = lc($arg_mode);
+    $options->{filter}      = lc($arg_filter);
+    $options->{logger}      = [ map { lc } split(",", $arg_logger) ];
+    $options->{check}       = [ map { lc } split(",", $arg_check) ];
+
     if (not defined(NRun::Worker::workers()->{$arg_mode})) {
 
         print "error: unknown mode given - $arg_mode.\n";
         usage();
     }
 
+    if (not defined(NRun::Filter::filters()->{$arg_filter})) {
+
+        print "error: unknown filter given - $arg_filter.\n";
+        usage();
+    }
+
+    foreach my $logger (@{$options->{logger}}) {
+
+        if (not defined(NRun::Logger::loggers()->{$logger})) {
+
+            print "error: unknown logger given - $logger.\n";
+            usage();
+        }
+    }
+
+    foreach my $check (@{$options->{check}}) {
+
+        if (not defined(NRun::Check::checks()->{$check})) {
+
+            print "error: unknown check given - $check.\n";
+            usage();
+        }
+    }
+
     my $date = time2str("%Y%m%d_%H_%M_%S", time);
 
-    $options->{target}          = [ split(",", $arg_target) ];
-    $options->{parallel}        = $arg_parallel ? $arg_parallel : 5;
-    $options->{command}         = shift(@ARGV);
-    $options->{arguments}       = join(" ", @ARGV);
-    $options->{timeout}         = $arg_timeout ? $arg_timeout : 60;
-    $options->{no_logfile}      = $arg_no_logfile;
-    $options->{copy}            = $arg_copy;
-    $options->{skip_ns_check}   = $arg_skip_ns_check;
-    $options->{skip_ping_check} = $arg_skip_ping_check;
-    $options->{mode}            = lc($arg_mode);
-
-    $options->{dumpmode} = "output";
-    if (defined($arg_dump_results)) {
-
-        $options->{dumpmode} = "result";
-    }
-
-    if (defined($arg_async)) {
-
-        $options->{dumpmode} .= "_async";
-    } else {
-
-        $options->{dumpmode} .= "_sync";
-    }
-
-    if (defined($arg_no_hostname)) {
-
-        $options->{dumpmode} .= "_no_hostname";
-    } else {
-
-        $options->{dumpmode} .= "_hostname";
-    }
-
-    $options->{log_directory} = basename($options->{command}) . "/" . $date;
+    $options->{log_directory} = NRun::Util::home() . "/.nrun/" . basename($options->{command});
     if (defined($arg_log_directory)) {
 
-        $options->{log_directory} = "$arg_log_directory/$options->{log_directory}";
-    } else {
+        $options->{log_directory} = $arg_log_directory;
+    }
 
-        $options->{log_directory} = NRun::Util::home() . "/.nrun/$options->{log_directory}";
+    $options->{log_directory} .= "/$date";
+
+    if (scalar(@{$options->{logger}}) > 1 or $options->{logger}->[0] ne "null") {
+
+        mkpath("$options->{log_directory}") or die("$options->{log_directory}: $!");
+
+        unlink("$options->{log_directory}/../latest");
+        symlink("$date", "$options->{log_directory}/../latest");
     }
 
     if ($options->{parallel} < 1) {
@@ -217,91 +273,79 @@ sub parse_commandline {
 }
 
 ###
-# ensure cleanup on TERM, INT and ALRM
-sub handler_cleanup {
-
-    my $_worker  = shift;
-    my $_command = shift;
-
-    $$_worker->delete($$_command);
-}
-
-###
 # callback function used by the dispatcher
-sub callback_action {
+sub callback {
     
     my $_host = shift;
 
-    my $command = $options->{command};
     my $worker = NRun::Worker::workers()->{$options->{mode}}->{NAME}->new();
-
-    my $dumper = NRun::Dumper->new (
-        {
-            hostname  => $_host,
-            mode      => $options->{dumpmode},
-            semaphore => $options->{sem_dumper},
-        }
-    );
-
-    my $logger = undef;
-    if (not defined($options->{no_logfile})) {
-
-        $logger = NRun::Logger->new (
-            {
-                hostname  => $_host,
-                basedir   => $options->{log_directory},
-                semaphore => $options->{sem_logger},
-            }
-        );
-    }
 
     $worker->init (
         {
             %$options,
             hostname => $_host,
-            dumper   => $dumper,
-            logger   => $logger,
         }
     );
 
-    if (not $worker->pre_check()) {
+    my @checks;
+    foreach my $check (@{$options->{check}}) {
 
-        $worker->destroy();
-        return;
+        my $c = NRun::Check::checks()->{$check}->{NAME}->new();
+
+        $c->init (
+            {
+                %$options,
+                hostname => $_host,
+            }
+        );
+
+        push(@checks, $c);
     }
 
-    if (defined($options->{copy})) {
-
-        my $source = $command;
-        $command = (tempfile(OPEN => 0, DIR => "/tmp"))[1] . "$$";
-
-        NRun::Signal::register('TERM', \&handler_cleanup, [ \$worker, \$command ]);
-        NRun::Signal::register('INT',  \&handler_cleanup, [ \$worker, \$command ]);
-        NRun::Signal::register('ALRM', \&handler_cleanup, [ \$worker, \$command ]);
-
-        my $ret = $worker->copy($source, $command);
-        if (not $ret == 0) {
-
-            $worker->destroy();
-            return;
-        }
-    }
-
-    $worker->execute($command, $options->{arguments});
-    $worker->destroy();
-
-    if (defined($options->{copy})) {
-
-        $worker->delete($command);
-    }
-
+    NRun::Callback::nrun (
+        $worker,
+        $options->{command},
+        $options->{arguments},
+        \@checks,
+        $options->{copy}
+    );
 }
 
 ###
-# ensure exit on TERM, INT and ALRM
+# ensure exit on SIGINT/SIGTERM
 sub handler {
 
-    exit();
+    if (not $options->{ppid} eq $$) {
+
+        exit();
+    }
+}
+
+###
+# initialize the sink object
+sub sink_init() {
+
+    my $_self = shift;
+
+    my @filters;
+
+    foreach my $logger (@{$options->{logger}}) {
+
+        my $l = NRun::Logger::loggers()->{$logger}->{NAME}->new();
+        $l->init($options);
+        push(@filters, $l);
+    };
+
+    my $filter = NRun::Filter::filters()->{$options->{filter}}->{NAME}->new();
+    $filter->init($options);
+    push(@filters, $filter);
+
+    $options->{sink} = NRun::Sink->new();
+    $options->{sink}->init ( 
+        {
+            filters => \@filters,
+        }
+    );
 }
 
 ###
@@ -310,7 +354,6 @@ sub main {
 
     NRun::Signal::register('TERM', \&handler);
     NRun::Signal::register('INT',  \&handler);
-    NRun::Signal::register('ALRM', \&handler);
 
     $options = NRun::Util::read_config_files (
         [
@@ -320,36 +363,28 @@ sub main {
         ]
     );
 
-    $options->{sem_logger} = NRun::Semaphore->new();
-    $options->{sem_dumper} = NRun::Semaphore->new();
-
-    $options->{sem_ppid} = $$;
+    $options->{ppid} = $$;
 
     parse_commandline();
 
-    my $dispatcher = NRun::Dispatcher->new (
+    sink_init();
+
+    $options->{pool} = NRun::Pool->new (
         {
             nmax    => $options->{parallel},
             timeout => $options->{timeout},
             objects => $options->{hosts},
-    
-            callback_action => \&callback_action,
+
+            sink => $options->{sink},
+
+            callback => \&callback,
         }
     );
 
-    $dispatcher->run();
+    $options->{sink}->process();
 }
 
 main();
-
-END {
-
-    if ($options->{sem_ppid} == $$) {
-
-        $options->{sem_logger}->delete();
-        $options->{sem_dumper}->delete();
-    }
-}
 
 __END__
 
@@ -362,11 +397,9 @@ synchronously.
 
 =head1 SYNOPSIS
 
-nrun -t HOST1[,HOST2,...] [-p MAX] [-l DIR] [-t SEC]
-[--mode MODE] [--dump-results] [--copy] [--no-hostname]
-[--no-logfile] [--skip-ping-check] [--skip-ns-check] [--version] 
-[--async] -- COMMAND
-
+nrun -t HOST1[,HOST2,...] [--copy] [--log-directory] [--no-hostname] 
+[-p MAX] [--timeout SEC] [-v] [-m MODE] [-f FILTER] [-l LOGGER1[,LOGGER2...]] 
+[-c CHECK1[,CHECK2]]  -- COMMAND
 
 =head1 DESCRIPTION
 
@@ -375,6 +408,30 @@ synchronously.
 
 the underlying remote access mechanism is exchangeable. as of now, ssh, nsh, rsh
 and local execution modes are implemented.
+
+=head1 OPTIONS
+
+B<--check,-c CHECK1[,CHECK2]>    checks to be applied to each host (see CHECKS)
+
+B<--copy,-c>                     copy command to target host before execution.
+
+B<--filter,-f FILTER1>           output filter to be applied (see FILTER).
+
+B<--logger,-l LOGGER1[,LOGGER2]> logger to be applied (see LOGGER).
+
+B<--log-directory,-l DIR>        base directory for the log files.
+
+B<--mode,-m MODE>                remote execution mode (see MODES).
+
+B<--no-hostname>                 omit hostname prefix.
+
+B<--parallel,-p MAX>             number of parallel connections (defaults to 5).
+
+B<--target,-t HOST1[,HOST2,...]> comma separated list of target hosts (see TARGETS).
+
+B<--timeout SEC>                 timeout for each command execution (defaults to 60).
+
+B<--version,-v>                  print the version string and exit.
 
 =head1 CONFIGURATION
 
@@ -421,9 +478,21 @@ does matter (YAML syntax).
         HOSTNAME rm -f "FILE"
     
     # additional commandline options
-    arg_mode: ssh
-    arg_parallel: 5
-    arg_timeout: 60
+    nrun:
+        arg_mode: ssh
+        arg_check: ping,ns
+        arg_filter: sync
+        arg_logger: result,output,raw
+        arg_parallel: 5
+        arg_timeout: 60
+    
+    ncopy:
+        arg_mode: ssh
+        arg_check: ping,ns
+        arg_filter: result
+        arg_logger: result,output,raw
+        arg_parallel: 5
+        arg_timeout: 60
     
     # alias definitions
     alias:
@@ -440,13 +509,14 @@ does matter (YAML syntax).
 =head1 LOGGING
 
 on each execution run, the command output and exit code will be saved inside the
-logging directory. the default logging directory is $HOME/.nrun.
+logging directory. the default logging directory is $HOME/.nrun. Logging is realized
+by so called loggers (see LOGGERS).
 
-- $LOGDIR/results.log - will contain the exit codes
+- $LOGDIR/result.log - will contain the exit codes
 
 - $LOGDIR/output.log - will contain the complete command output for all hosts
 
-- $LOGDIR/hosts/HOSTNAME.log - will contain the command output for a single host
+- $LOGDIR/raw.log - will contain the raw worker output for all hosts
 
 =head1 MODES
 
@@ -552,33 +622,85 @@ an example that resembles the mode ssh would look the following way:
         -o LogLevel=FATAL
         HOSTNAME rm -f "FILE"
 
-=head1 OPTIONS
+=head1 FILTERS
 
-B<--async,-a>                    asynchronous output mode.
+a filter reads the raw output generated by the worker processes and prints this
+output in a filter specific format. 
 
-B<--copy,-c>                     copy command to target host before execution.
+=head2 filter raw
 
-B<--dump-results,-d>             instead of dumping the command output, dump the exit status.
+this filter will just dump the output as it is provided by the worker process. no
+formatting will be done.
 
-B<--log-directory,-l DIR>        base directory for the log files.
+format:
 
-B<--mode,-m MODE>                remote execution mode (see MODES)
+	HOSTNAME;[stdout|stderr];TSTAMP;PID;PID(CHILD);[debug|error|exit|output|end];"OUTPUT"
 
-B<--no-hostname>                 omit hostname prefix.
+=head2 filter async
 
-B<--no-logfile>                  do not generate any log files.
+this filter dumps the worker process output unsynchronized in the following format. unsynchronised
+means, that output lines from the different worker processes are printed at the same time they are
+generated.
 
-B<--parallel,-p MAX>             number of parallel connections (defaults to 5).
+format:
 
-B<--skip-ping-check>             skip checking if the host answers on ping.
+	HOSTNAME: OUTPUT
 
-B<--skip-ns-check>               skip checking if the hostname is resolvable.
+=head2 filter sync
 
-B<--target,-t HOST1[,HOST2,...]> comma separated list of target hosts (see TARGETS).
+this filter dumps the worker process output synchronised in the following format. synchronized
+means, that the complete output for a single hosts will be dumped at once when the worker proces
+has finished execution.
 
-B<--timeout SEC>                 timeout for each command execution (defaults to 60).
+format:
 
-B<--version,-v>                  print the version string and exit.
+	HOSTNAME: OUTPUT
+
+=head2 filter result
+
+this filter will only print the exit codes for the worker processes.
+
+format:
+
+	HOSTNAME: exit code CODE
+
+=head1 LOGGERS
+
+a logger reads the raw output generated by the worker processes and logs this
+output in a specific format. 
+
+=head2 logger output
+
+this logger creates a logfile in the logging directory called output.log which contains the same
+data that the filter sync produces. 
+
+=head2 logger result
+
+this logger creates a logfile in the logging directory called result.log which contains the same
+data that the filter result produces.
+
+=head2 logger raw
+
+this logger creates a logfile in the logging directory called raw.log which contains the same
+data that the filter raw produces.
+
+=head1 checks
+
+a check does a specific check for each hostname. if the check fails, the hostname that failed will
+be removed from the target list and an error message will be printed. multiple checks may be given
+at the command line.
+
+=head2 check ping
+
+checks that the host is pingable.
+
+=head2 check ns
+
+checks that the hostname is resolvable to an ip address.
+
+=head2 check rscd
+
+checks that the rscd agent is alive.
 
 =head1 TARGETS
 
@@ -629,24 +751,6 @@ indentation does matter.
 
 
 =head1 NOTES
-
-=head2 inspecting long running processes
-
-it is possible to signal nrun with USR1 and USR2 to dump, resp. save the currently
-running processes. if nrun is signaled with USR2, it will create a file in
-the log directory trace_<%Y%m%d_%H_%M_%S>.log.
-
-the integer in square brackets is the pid of the perl process.
-
-	$ kill -USR1 1234
-	host1[14760]: (31800) /usr/bin/ssh -o User=root localhost sleep 120
-	host1[14760]: 1
-	host1[14760]: 2
-	host1[14760]: SIGUSR1 received
-	host1[14756]: (31801) /usr/bin/ssh -o User=root localhost sleep 120
-	host2[14756]: 1
-	host2[14756]: 2
-	host2[14756]: SIGUSR1 received
 
 =head2 transferring the public key
 

@@ -36,45 +36,65 @@ usage
 =====
 
 usage: nrun -t HOST1[,HOST2,...] -- COMMAND
---async,-a               asynchronous output mode.
---copy,-c                copy command to target host before execution.
---dump-results,-d        instead of dumping the command output, dump the exit status.
---log-directory,-l DIR   base directory for the log files.
---no-hostname            omit hostname prefix.
---no-logfile             do not generate any log files.
---parallel,-p MAX        number of parallel connections (defaults to 5).
---skip-ns-check          skip checking if the hostname is resolvable.
---skip-ping-check        skip checking if the host answers on ping.
---target,-t HOST1,HOST2  comma separated list of target hosts.
---timeout SEC            timeout for each command execution (defaults to 60).
---version,-v             print the version string and exit.
---mode,-m MODE           remote execution mode:
-                         generic - generic mode
-                         rsh - rsh based remote execution
-                         nsh - nsh based remote execution
-                         ssh - ssh based remote execution
-                         local - execute the script locally, set TARGET_HOST
-                         on each execution
+--copy                      copy command to target host before execution.
+--log-directory DIR         base directory for the log files.
+--no-hostname               omit hostname prefix.
+--parallel,-p MAX           number of parallel connections (defaults to 5).
+--target,-t HOST1,HOST2     comma separated list of target hosts.
+--timeout SEC               timeout for each command execution (defaults to 60).
+--version,-v                print the version string and exit.
+--mode,-m MODE              remote execution mode:
+                            generic - generic mode
+                            local - execute the script locally, set TARGET_HOST on each execution
+                            nsh - nsh based remote execution
+                            rsh - rsh based remote execution
+                          * ssh - ssh based remote execution
+--filter,-f FILTER          output filter to be applied:
+                            async - dump the command output asynchroniously
+                            null - do nothing
+                            raw - dump the raw data received from the worker module
+                            result - dump only the exit code
+                          * sync - dump the command output synchroniously
+--logger,-l LOGGER1,LOGGER2 logger to be used:
+                            null - do nothing
+                          * output - log the command output
+                          * raw - log the raw data received from the worker module
+                          * result - log only the exit code
+--check,-c CHECK1,CHECK2    checks to be applied to each host:
+                          * ns - check if hostname is resolvable
+                            null - do nothing
+                          * ping - check if host answers to ping
+                            rscd - check if rscd agent answers
 
-usage: ncopy -t HOST1[,HOST2,...] -- SRC DST
---async,-a               asynchronous output mode.
---dump-output,-d         instead of dumping the exit status, dump the command output.
---log-directory,-l DIR   base directory for the log files.
---no-hostname            omit hostname prefix.
---no-logfile             do not generate any log files.
---parallel,-p MAX        number of parallel connections (defaults to 5).
---skip-ping-check        skip checking if the host answers on ping.
---skip-ns-check          skip checking if the hostname is resolvable.
---target,-t HOST1,HOST2  comma separated list of target hosts.
---timeout SEC            timeout for each command execution (defaults to 60).
---version,-v             print the version string and exit.
---mode,-m MODE           remote execution mode:
-                         generic - generic mode
-                         rsh - rsh based remote execution
-                         nsh - nsh based remote execution
-                         ssh - ssh based remote execution
-                         local - execute the script locally, set TARGET_HOST
-                         on each execution
+usage: ncopy -t HOST1[,HOST2,...] -- SOURCE TARGET
+--log-directory DIR         base directory for the log files.
+--no-hostname               omit hostname prefix.
+--parallel,-p MAX           number of parallel connections (defaults to 5).
+--target,-t HOST1,HOST2     comma separated list of target hosts.
+--timeout SEC               timeout for each command execution (defaults to 60).
+--version,-v                print the version string and exit.
+--mode,-m MODE              remote execution mode:
+                            generic - generic mode
+                            local - execute the script locally, set TARGET_HOST on each execution
+                            nsh - nsh based remote execution
+                            rsh - rsh based remote execution
+                          * ssh - ssh based remote execution
+--filter,-f FILTER          output filter to be applied:
+                            async - dump the command output asynchroniously
+                            null - do nothing
+                            raw - dump the raw data received from the worker module
+                          * result - dump only the exit code
+                            sync - dump the command output synchroniously
+--logger,-l LOGGER1,LOGGER2 logger to be used:
+                            null - do nothing
+                          * output - log the command output
+                          * raw - log the raw data received from the worker module
+                          * result - log only the exit code
+--check,-c CHECK1,CHECK2    checks to be applied to each host:
+                          * ns - check if hostname is resolvable
+                            null - do nothing
+                          * ping - check if host answers to ping
+                            rscd - check if rscd agent answers
 
 examples
 ========
@@ -122,11 +142,11 @@ indentation does matter (YAML syntax).
 ssh_copy: >
     /usr/bin/scp
     -o User=root
-    -o PreferredAuthentications=hostbased,publickey 
-    -o StrictHostKeyChecking=no 
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
     -o UserKnownHostsFile=/dev/null
-    -o LogLevel=FATAL 
-    SOURCE HOSTNAME:TARGET 
+    -o LogLevel=FATAL
+    SOURCE HOSTNAME:TARGET
 
 ssh_exec: >
     /usr/bin/ssh
@@ -147,9 +167,21 @@ ssh_delete: >
     HOSTNAME rm -f "FILE"
 
 # additional commandline options
-arg_mode: ssh
-arg_parallel: 5
-arg_timeout: 60
+nrun:
+    arg_mode: ssh
+    arg_check: ping,ns
+    arg_filter: sync
+    arg_logger: result,output,raw
+    arg_parallel: 5
+    arg_timeout: 60
+
+ncopy:
+    arg_mode: ssh
+    arg_check: ping,ns
+    arg_filter: result
+    arg_logger: result,output,raw
+    arg_parallel: 5
+    arg_timeout: 60
 
 # alias definitions
 alias:
@@ -168,12 +200,12 @@ logging
 =======
 
 on each execution run, the command output and exit code will be saved inside the
-logging directory. the default logging directory is $HOME/.nrun.
+logging directory. the default logging directory is $HOME/.nrun. Logging is realized by
+so called filters (see FILTERS).
 
-- $LOGDIR/results.log - will contain the exit codes
+- $LOGDIR/result.log - will contain the exit codes
 - $LOGDIR/output.log - will contain the complete command output for all hosts
-- $LOGDIR/hosts/<HOSTNAME>.log - will contain the command output for a single
-  host
+- $LOGDIR/raw.log - will contain the raw worker output for all hosts
 
 mode ssh
 ========
@@ -277,24 +309,99 @@ generic_delete: >
 
 --<snap>--
 
-inspecting long running processes
-=================================
+filters
+=======
 
-it is possible to signal nrun with USR1 and USR2 to dump, resp. save the currently
-running processes. if nrun is signaled with USR2, it will create a file in
-the log directory trace_<%Y%m%d_%H_%M_%S>.log.
+a filter reads the raw output generated by the worker processes and prints this
+output in a specific format.
 
-the integer in square brackets is the pid of the perl process.
+filter raw
+==========
 
-$ kill -USR1 1234
-host1[14760]: (31800) /usr/bin/ssh -o User=root localhost sleep 120
-host1[14760]: 1
-host1[14760]: 2
-host1[14760]: SIGUSR1 received
-host1[14756]: (31801) /usr/bin/ssh -o User=root localhost sleep 120
-host2[14756]: 1
-host2[14756]: 2
-host2[14756]: SIGUSR1 received
+this filter will just dump the output as it is provided by the worker process. no
+formatting will be done.
+
+format:
+
+        HOSTNAME;[stdout|stderr];TSTAMP;PID;PID(CHILD);[debug|error|exit|output|end];"OUTPUT"
+
+filter async
+============
+
+this filter dumps the worker process output unsynchronized in the following format. unsynchronised
+means, that output lines from the different worker processes are printed at the same time they are
+generated.
+
+format:
+
+        HOSTNAME: OUTPUT
+
+filter sync
+============
+
+this filter dumps the worker process output synchronised in the following format. synchronized
+means, that the complete output for a single hosts will be dumped at once when the worker proces
+has finished execution.
+
+format:
+
+        HOSTNAME: OUTPUT
+
+filter result
+=============
+
+this filter will only print the exit codes for the worker processes.
+
+format:
+
+        HOSTNAME: exit code CODE
+
+
+LOGGERS
+=======
+
+a logger reads the raw output generated by the worker processes and logs this
+output in a specific format.
+
+logger output
+=============
+
+this logger creates a logfile in the logging directory called output.log which
+contains the same data that the filter sync produces.
+
+logger result
+=============
+
+this logger creates a logfile in the logging directory called result.log which
+contains the same data that the filter result produces.
+
+logger raw
+==========
+
+this logger creates a logfile in the logging directory called raw.log which contains the same
+data that the filter raw produces.
+
+checks
+======
+
+a check does a specific check for each hostname. if the check fails, the hostname
+that failed will be removed from the target list and an error message will be
+printed. multiple checks may be given at the command line.
+
+check ping
+==========
+
+checks that the host is pingable.
+
+check ns
+========
+
+checks that the hostname is resolvable to an ip address.
+
+check rscd
+==========
+
+checks that the rscd agent is alive.
 
 targets
 =======
