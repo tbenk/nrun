@@ -72,6 +72,24 @@ sub new {
 }
 
 ###
+# deliver signal to all child processes
+sub handler_int {
+
+    my $_pids = shift;
+
+    kill(INT => @$_pids);
+}
+
+###
+# deliver signal to all child processes
+sub handler_term {
+
+    my $_pids = shift;
+
+    kill(TERM => @$_pids);
+}
+
+###
 # dispatch the worker processes.
 sub init {
 
@@ -79,6 +97,9 @@ sub init {
 
     my @pids;
 
+    my $handler_int  = NRun::Signal::register('INT',  \&handler_int,  [ \@pids ], $$);
+    my $handler_term = NRun::Signal::register('TERM', \&handler_term, [ \@pids ], $$);
+    
     foreach my $bunch (NRun::Util::bunches($_self->{objects}, $_self->{nmax})) {
  
         $_self->{sink}->pipe();
