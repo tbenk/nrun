@@ -66,20 +66,9 @@ sub new {
 
 ###
 # initialize this filter module.
-#
-# $_cfg - parameter hash where
-# {
-#   'no_hostname' - if defined omit hostname prefix
-# }
 sub init {
 
     my $_self = shift;
-    my $_cfg  = shift;
-
-    $_self->SUPER::init($_cfg);
-
-    $_self->{no_hostname} = $_cfg->{no_hostname};
-
 }
 
 ###
@@ -101,13 +90,7 @@ sub stdout {
 
     if ($data[5] =~ /output|error|info/) {
 
-        if (defined($_self->{no_hostname})) {
-
-            print STDOUT "$message\n";
-        } else {
-
-            print STDOUT "$data[0]: $message\n";
-        }
+        print STDOUT "$data[0]: $message\n";
     }
 }
 

@@ -99,11 +99,4 @@ sub filters {
     return $filters;
 }
 
-###
-# initialize this filter module.
-sub init {
-
-    my $_self = shift;
-}
-
 1;

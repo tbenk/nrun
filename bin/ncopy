@@ -60,7 +60,6 @@ sub usage {
 
     print "usage: " . basename($0) . " -t HOST1[,HOST2,...] -- SOURCE TARGET\n";
     print "--log-directory DIR         base directory for the log files.\n";
-    print "--no-hostname               omit hostname prefix.\n";
     print "--parallel,-p MAX           number of parallel connections (defaults to 5).\n";
     print "--target,-t HOST1,HOST2     comma separated list of target hosts.\n";
     print "--timeout SEC               timeout for each command execution (defaults to 60).\n";
@@ -130,7 +129,6 @@ sub parse_commandline {
 
     my $arg_target        = $options->{ncopy}->{arg_target};
     my $arg_parallel      = $options->{ncopy}->{arg_parallel};
-    my $arg_no_hostname   = $options->{ncopy}->{arg_no_hostname};
     my $arg_log_directory = $options->{ncopy}->{arg_log_directory};
     my $arg_mode          = $options->{ncopy}->{arg_mode};
     my $arg_filter        = $options->{ncopy}->{arg_filter};
@@ -142,7 +140,6 @@ sub parse_commandline {
     my $ret = GetOptions (
         "parallel|p=i"    => \$arg_parallel,
         "target|t=s"      => \$arg_target,
-        "no-hostname"     => \$arg_no_hostname,
         "log-directory=s" => \$arg_log_directory,
         "timeout=i"       => \$arg_timeout,
         "mode|m=s"        => \$arg_mode,
@@ -199,7 +196,6 @@ sub parse_commandline {
     $options->{source}      = $ARGV[0];
     $options->{destination} = $ARGV[1];
     $options->{timeout}     = $arg_timeout ? $arg_timeout : 60;
-    $options->{no_hostname} = $arg_no_hostname;
     $options->{mode}        = lc($arg_mode);
     $options->{filter}      = lc($arg_filter);
     $options->{logger}      = [ map { lc } split(",", $arg_logger) ];
@@ -396,7 +392,7 @@ ncopy - copy a file or directory to multiple target servers.
 
 =head1 SYNOPSIS
 
-ncopy -t HOST1[,HOST2,...] [--log-directory] [--no-hostname] 
+ncopy -t HOST1[,HOST2,...] [--log-directory]
 [-p MAX] [--timeout SEC] [-v] [-m MODE] [-f FILTER] [-l LOGGER1[,LOGGER2...]] 
 [-c CHECK1[,CHECK2]]  -- SOURCE TARGET
 
@@ -418,8 +414,6 @@ B<--logger,-l LOGGER1[,LOGGER2]> logger to be applied (see LOGGER).
 B<--log-directory,-l DIR>        base directory for the log files.
 
 B<--mode,-m MODE>                remote execution mode (see MODES).
-
-B<--no-hostname>                 omit hostname prefix.
 
 B<--parallel,-p MAX>             number of parallel connections (defaults to 5).
 

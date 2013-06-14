@@ -100,11 +100,4 @@ sub loggers {
     return $loggers;
 }
 
-###
-# initialize this logger module.
-sub init {
-
-    my $_self = shift;
-}
-
 1;

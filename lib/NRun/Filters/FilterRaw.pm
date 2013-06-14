@@ -69,9 +69,6 @@ sub new {
 sub init {
 
     my $_self = shift;
-    my $_cfg  = shift;
-
-    $_self->SUPER::init($_cfg);
 }
 
 

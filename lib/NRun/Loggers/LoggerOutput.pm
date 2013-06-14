@@ -83,8 +83,6 @@ sub init {
     open(LOG, ">>$_self->{logfile}") or die("$_self->{logfile}: $!");
 
     $_self->{LOG} = \*LOG;
-
-    $_self->SUPER::init($_self);
 }
 
 ###

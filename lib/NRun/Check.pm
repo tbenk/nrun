@@ -114,11 +114,4 @@ sub new {
     return $self;
 }
 
-###
-# initialize this check module.
-sub init {
-
-    my $_self = shift;
-}
-
 1;

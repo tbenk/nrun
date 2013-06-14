@@ -66,19 +66,9 @@ sub new {
 
 ###
 # initialize this filter module.
-#
-# $_cfg - parameter hash where
-# {
-#   'no_hostname' - if defined omit hostname prefix
-# }
 sub init {
 
     my $_self = shift;
-    my $_cfg  = shift;
-
-    $_self->SUPER::init($_cfg);
-
-    $_self->{no_hostname} = $_cfg->{no_hostname};
 }
 
 ###
@@ -155,21 +145,12 @@ sub end {
 
     my $output = delete($_self->{data}->{$_host});
 
-    if (defined($_self->{no_hostname})) {
+    if (defined($output)) {
 
-        if (defined($output)) {
+        print STDOUT "$_host: " . join("\n$_host: ", @$output) . "\n";
+    } else { 
 
-            print STDOUT join("\n", @$output) . "\n";
-        }
-    } else {
-
-        if (defined($output)) {
-
-            print STDOUT "$_host: " . join("\n$_host: ", @$output) . "\n";
-        } else { 
-
-            print STDOUT "$_host:\n";
-        }
+        print STDOUT "$_host:\n";
     }
 }
 
