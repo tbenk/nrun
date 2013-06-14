@@ -27,6 +27,8 @@
 
 ###
 # this filter prints the raw data received by the worker modules.
+###
+
 package NRun::Filters::FilterRaw;
 
 use strict;
@@ -106,5 +108,3 @@ sub stderr {
 }
 
 1;
-
-

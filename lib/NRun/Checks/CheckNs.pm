@@ -27,6 +27,8 @@
 
 ###
 # this check checks whether the provided hostname is resolveable.
+###
+
 package NRun::Checks::CheckNs;
 
 use strict;
@@ -101,4 +103,3 @@ sub execute {
 }
 
 1;
-

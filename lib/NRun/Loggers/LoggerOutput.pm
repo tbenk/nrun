@@ -27,6 +27,8 @@
 
 ###
 # this logger logs the command output.
+###
+
 package NRun::Loggers::LoggerOutput;
 
 use strict;
@@ -148,7 +150,7 @@ sub stderr {
 }
 
 ###
-# when both stderr and stdend have signaled end for $_host, dump
+# when both stderr and stdout have signaled end for $_host, save
 # the collected data for this host.
 #
 # $_host - the host that has finished execution

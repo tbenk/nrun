@@ -27,6 +27,12 @@
 
 ###
 # this module is responsible for the creation of the process pool.
+#
+# each dispatched process will be connected to the sink object which
+# is responsible for passing the output from the worker modules to the
+# filter/logger modules.
+##
+
 package NRun::Pool;
 
 use strict;
@@ -42,6 +48,7 @@ use warnings;
 #   'nmax'     => maximum number of parallel login processes
 #   'callback' => callback function to be executed in parallel
 #                 signature: sub callback ($object)
+#   'sink'     => the sink object
 # }
 # <- the new object
 sub new {
@@ -100,4 +107,3 @@ sub init {
 }
 
 1;
-

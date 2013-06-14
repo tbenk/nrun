@@ -26,9 +26,12 @@
 #
 
 ###
-# this module is responsible for signal handling. multiple signal
-# handlers for the same signal may be registered which will be 
+# this module is responsible for signal handling.
+#
+# multiple signal handlers for the same signal may be registered which will be 
 # called sequential in the opposite order the handlers were registered.
+###
+
 package NRun::Signal;
 
 ###
@@ -37,7 +40,7 @@ my $HANDLERS = {};
 my $LOCK = 0;
 
 ###
-# local signal handlers.
+# local signal handler.
 #
 # calls all registered handlers in $HANDLERS.
 #

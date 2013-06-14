@@ -26,7 +26,9 @@
 #
 
 ###
-# this package contains the package version.
+# this package contains the nrun version string.
+###
+
 package NRun::Version;
 
 use version;

@@ -28,6 +28,8 @@
 ###
 # this is a generic worker implementation that can be used to add unimplemented
 # remote access mechanisms.
+###
+
 package NRun::Worker::WorkerGeneric;
 
 use strict;
@@ -147,4 +149,3 @@ sub delete {
 }
 
 1;
-

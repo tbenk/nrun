@@ -27,6 +27,8 @@
 
 ###
 # this filter will only print the exit codes.
+###
+
 package NRun::Filters::FilterExitCode;
 
 use strict;
@@ -122,4 +124,3 @@ sub stderr {
 }
 
 1;
-

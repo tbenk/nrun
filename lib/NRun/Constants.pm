@@ -27,6 +27,8 @@
 
 ###
 # this package contains globally used constants.
+###
+
 package NRun::Constants;
 
 our $CODE_SIGINT       = -255;

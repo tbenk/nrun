@@ -27,6 +27,8 @@
 
 ###
 # this filter provides asynchronious command output.
+###
+
 package NRun::Filters::FilterAsync;
 
 use strict;
@@ -133,4 +135,3 @@ sub stderr {
 }
 
 1;
-

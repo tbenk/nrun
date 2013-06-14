@@ -26,11 +26,35 @@
 #
 
 ###
-# this is the base module for all "Worker" implementations and
-# is responsible for loading the available implementations
+# this is the base module for all worker implementations and
+# it is responsible for loading the available implementations
 # at runtime.
 #
-# a worker implements a a single remote access mechanism like ssh.
+# a worker implements a a single remote access mechanism like ssh
+# which will be used to execute commands on the remote host,
+# delete files on the remote host and to copy files to the remote host.
+#
+# derived modules must implement the following subs's
+#
+# - init($cfg)
+# - execute($cmd, $args)
+# - delete($file)
+# - copy($source, $target)
+#
+# a derived module must call register() in BEGIN{}, otherwise it will not
+# be available.
+#
+# a derived module must always write to $_self->{E} (STDERR) and
+# $_self->{O} (STDOUT).
+#
+# all output produced by the derived worker modules must match the
+# following format:
+#
+# HOSTNAME;[stdout|stderr];TSTAMP;PID;PID(CHILD);[debug|error|exit|output|end];"OUTPUT"
+#
+# this is the string which will be passed to the logger/filter implementations.
+###
+
 package NRun::Worker;
 
 use strict;
@@ -278,4 +302,3 @@ sub end {
 }
 
 1;
-

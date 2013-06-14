@@ -27,7 +27,9 @@
 #
 
 ###
-# this package contains some utility functions.
+# this package provides some utility functions.
+###
+
 package NRun::Util;
 
 use strict;
@@ -37,7 +39,7 @@ use YAML qw(LoadFile);
 use POSIX qw(getuid);
 
 ###
-# remove all duplicate entries from array
+# remove all duplicate entries from array.
 #
 # my @_arr - the array the duplicates should be removed from
 # <- the array with all duplicates removed from
@@ -95,7 +97,7 @@ sub resolve_target {
 }
 
 ###
-# return users home directory
+# return the users home directory.
 #
 # <- the current users home directory
 sub home {
@@ -104,7 +106,7 @@ sub home {
 }
 
 ###
-# read the hosts file.
+# read a file containing hostnames.
 #
 # $_file - the file containing the hostnames, one per line
 # <- an array containing all hostnames
@@ -123,7 +125,6 @@ sub read_hosts {
 
         if (not $host =~ /^ *$/) {
 
-            # filter out duplicate entries
             $hosts->{$host} = 1;
         }
     }
@@ -132,7 +133,7 @@ sub read_hosts {
 }
 
 ##
-# read configuration files
+# read the configuration files.
 #
 # $_files - the files to be read (values in last file will overwrite values in first file)
 sub read_config_files {

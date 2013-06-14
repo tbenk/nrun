@@ -27,6 +27,8 @@
 
 ###
 # this filter logs the raw data received by the worker modules.
+###
+
 package NRun::Loggers::LoggerRaw;
 
 use strict;
@@ -129,4 +131,3 @@ DESTROY {
 };
 
 1;
-

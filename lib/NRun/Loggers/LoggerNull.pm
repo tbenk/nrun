@@ -27,6 +27,8 @@
 
 ###
 # this logger does nothing
+###
+
 package NRun::Loggers::LoggerNull;
 
 use strict;
@@ -101,4 +103,3 @@ sub stderr {
 }
 
 1;
-

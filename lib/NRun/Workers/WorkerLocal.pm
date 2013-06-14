@@ -28,6 +28,8 @@
 ###
 # this worker executes the given script locally and sets the environment
 # variable TARGET_HOST on each execution
+###
+
 package NRun::Worker::WorkerLocal;
 
 use strict;
@@ -135,4 +137,3 @@ sub delete {
 }
 
 1;
-

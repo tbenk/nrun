@@ -27,6 +27,8 @@
 
 ###
 # this check does nothing.
+###
+
 package NRun::Checks::CheckNull;
 
 use strict;
@@ -96,4 +98,3 @@ sub execute {
 }
 
 1;
-

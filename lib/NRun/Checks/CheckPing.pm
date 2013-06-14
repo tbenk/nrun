@@ -26,7 +26,9 @@
 #
 
 ###
-# this check checks whether the provide hostname pings.
+# this check checks whether the provide hostname is pinging.
+###
+
 package NRun::Checks::CheckPing;
 
 use strict;
@@ -104,4 +106,3 @@ sub execute {
 }
 
 1;
-

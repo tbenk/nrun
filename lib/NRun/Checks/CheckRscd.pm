@@ -27,6 +27,8 @@
 
 ###
 # this check checks whether the rscd agent is running on the provided hostname.
+###
+
 package NRun::Checks::CheckRscd;
 
 use strict;

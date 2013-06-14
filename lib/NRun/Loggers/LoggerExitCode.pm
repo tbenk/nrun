@@ -27,6 +27,8 @@
 
 ###
 # this logger logs the exit codes.
+###
+
 package NRun::Loggers::LoggerExitCode;
 
 use strict;
@@ -135,4 +137,3 @@ DESTROY {
 };
 
 1;
-

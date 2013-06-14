@@ -27,6 +27,8 @@
 
 ###
 # this filter does nothing.
+###
+
 package NRun::Filters::FilterNull;
 
 use strict;
@@ -102,4 +104,3 @@ sub stderr {
 }
 
 1;
-

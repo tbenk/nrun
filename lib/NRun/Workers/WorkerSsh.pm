@@ -27,6 +27,8 @@
 
 ###
 # this worker implements ssh based remote execution
+###
+
 package NRun::Worker::WorkerSsh;
 
 use strict;
@@ -146,4 +148,3 @@ sub delete {
 }
 
 1;
-
