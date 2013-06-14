@@ -92,7 +92,7 @@ sub copy {
     my $_source = shift;
     my $_target = shift;
 
-    print STDERR "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"not implemented\"\n";
+    print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"not implemented\"\n";
 
     return 1;
 }
@@ -129,7 +129,7 @@ sub delete {
     my $_self = shift;
     my $_file = shift;
 
-    print STDOUT "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"not implemented\"\n";
+    print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"not implemented\"\n";
 
     return 1;
 }
