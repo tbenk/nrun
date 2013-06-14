@@ -38,7 +38,6 @@ usage
 usage: nrun -t HOST1[,HOST2,...] -- COMMAND
 --copy                      copy command to target host before execution.
 --log-directory DIR         base directory for the log files.
---no-hostname               omit hostname prefix.
 --parallel,-p MAX           number of parallel connections (defaults to 5).
 --target,-t HOST1,HOST2     comma separated list of target hosts.
 --timeout SEC               timeout for each command execution (defaults to 60).
@@ -68,7 +67,6 @@ usage: nrun -t HOST1[,HOST2,...] -- COMMAND
 
 usage: ncopy -t HOST1[,HOST2,...] -- SOURCE TARGET
 --log-directory DIR         base directory for the log files.
---no-hostname               omit hostname prefix.
 --parallel,-p MAX           number of parallel connections (defaults to 5).
 --target,-t HOST1,HOST2     comma separated list of target hosts.
 --timeout SEC               timeout for each command execution (defaults to 60).
