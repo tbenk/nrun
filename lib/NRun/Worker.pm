@@ -195,15 +195,18 @@ sub do {
     my $handler_int  = NRun::Signal::register('INT',  \&handler_int,  [ \$_self, \$pid ], $$);
     my $handler_term = NRun::Signal::register('TERM', \&handler_term, [ \$_self, \$pid ], $$);
 
-    $pid = open3(\*CMDIN, \*CMDOUT, \*CMDERR, "$_cmd");
-    if (not defined($pid)) {
+    eval{
+
+        $pid = open3(\*CMDIN, \*CMDOUT, \*CMDERR, "$_cmd");
+    };
+    if ($@) {
 
         NRun::Signal::deregister('ALRM', $handler_alrm);
         NRun::Signal::deregister('INT',  $handler_int);
         NRun::Signal::deregister('TERM', $handler_term);
 
         print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;n/a;debug;\"exec $_cmd\"\n";
-        print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"$!\"\n";
+        print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"$@\"\n";
         print {$_self->{O}} "$_self->{hostname};stdout;" . time() . ";$$;n/a;exit;\"exit code $NRun::Constants::EXECUTION_FAILED\"\n";
 
         return $NRun::Constants::EXECUTION_FAILED;
