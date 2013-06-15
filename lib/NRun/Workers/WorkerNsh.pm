@@ -73,7 +73,6 @@ sub new {
 #   'nsh_copy'   - commandline for the copy command (SOURCE, TARGET, HOSTNAME will be replaced)
 #   'nsh_exec'   - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 #   'nsh_delete' - commandline for the delete command (FILE, HOSTNAME will be replaced)
-#   'nsh_check'  - commandline for the agentinfo check command (HOSTNAME will be replaced)
 # }
 sub init {
 
@@ -85,7 +84,6 @@ sub init {
     $_self->{nsh_copy}   = $_cfg->{nsh_copy};
     $_self->{nsh_exec}   = $_cfg->{nsh_exec};
     $_self->{nsh_delete} = $_cfg->{nsh_delete};
-    $_self->{nsh_check}  = $_cfg->{nsh_check};
 }
 
 ###
@@ -129,7 +127,7 @@ sub execute {
     close(STDIN);
     open(STDIN, "/dev/null");
 
-    my $cmdline = $_self->{nsh_copy};
+    my $cmdline = $_self->{nsh_exec};
 
     $cmdline =~ s/COMMAND/$_command/g;
     $cmdline =~ s/ARGUMENTS/$_args/g;
@@ -152,7 +150,7 @@ sub delete {
     close(STDIN);
     open(STDIN, "/dev/null");
 
-    my $cmdline = $_self->{nsh_copy};
+    my $cmdline = $_self->{nsh_delete};
 
     $cmdline =~ s/FILE/$_file/g;
     $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
