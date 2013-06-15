@@ -93,8 +93,8 @@ sub execute {
 
     if (not gethostbyname($_self->{hostname})) {
     
-        print STDOUT "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"dns entry is missing for $_self->{hostname}\"\n";
-        print STDERR "$_self->{hostname};stdout;" . time() . ";$$;n/a;exit;\"exit code $NRun::Constants::CHECK_FAILED_NS\"\n";
+        print STDERR "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"dns entry is missing for $_self->{hostname}\"\n";
+        print STDOUT "$_self->{hostname};stdout;" . time() . ";$$;n/a;exit;\"exit code $NRun::Constants::CHECK_FAILED_NS\"\n";
 
         return 0;
     }

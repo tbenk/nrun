@@ -94,8 +94,8 @@ sub execute {
 
     if (not Net::Ping->new()->ping($_self->{hostname})) {
 
-        print STDOUT "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"no ping reply from $_self->{hostname}\"\n";
-        print STDERR "$_self->{hostname};stdout;" . time() . ";$$;n/a;exit;\"exit code $NRun::Constants::CHECK_FAILED_PING\"\n";
+        print STDERR "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"no ping reply from $_self->{hostname}\"\n";
+        print STDOUT "$_self->{hostname};stdout;" . time() . ";$$;n/a;exit;\"exit code $NRun::Constants::CHECK_FAILED_PING\"\n";
 
         return 0;
     }
