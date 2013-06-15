@@ -233,7 +233,7 @@ sub parse_commandline {
 
     my $date = time2str("%Y%m%d_%H_%M_%S", time);
 
-    $options->{log_directory} = NRun::Util::home() . "/.nrun/" . basename($options->{command});
+    $options->{log_directory} = NRun::Util::home() . "/.nrun/ncopy";
     if (defined($arg_log_directory)) {
 
         $options->{log_directory} = $arg_log_directory;
@@ -365,7 +365,7 @@ sub main {
 
     sink_init();
 
-    $options->{pool} = NRun::Dispatcher->new (
+    $options->{pool} = NRun::Pool->new (
         {
             nmax    => $options->{parallel},
             timeout => $options->{timeout},
