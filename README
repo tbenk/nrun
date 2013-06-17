@@ -28,9 +28,9 @@ installation is straight forward:
 # make install
 
 if desired it is possible to change the installation prefix using the
-parameter INSTALLATION_BASE:
+parameter DESTDIR:
 
-# perl Makefile.PL INSTALLATION_BASE=~/applications
+# make install DESTDIR=~/applications
 
 usage
 =====
