@@ -291,9 +291,16 @@ sub callback {
     
     my $_host = shift;
 
-    # initialize the worker object
     my $worker = NRun::Worker::workers()->{$options->{mode}}->{NAME}->new();
 
+    # register signal handlers
+    my $command = $options->{command};
+
+    my $handler_term = NRun::Signal::register('TERM', \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
+    my $handler_int  = NRun::Signal::register('INT',  \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
+    my $handler_alrm = NRun::Signal::register('ALRM', \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
+
+    # initialize the worker object
     $worker->init (
         {
             %$options,
@@ -316,13 +323,6 @@ sub callback {
 
         push(@checks, $c);
     }
-
-    # register signal handlers
-    my $command = $options->{command};
-
-    my $handler_term = NRun::Signal::register('TERM', \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
-    my $handler_int  = NRun::Signal::register('INT',  \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
-    my $handler_alrm = NRun::Signal::register('ALRM', \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
 
     # execute all check objects
     foreach my $check (@checks) {

@@ -135,6 +135,12 @@ sub init {
 
     $_self->{hostname} = $_cfg->{hostname};
 
+    $_self->{pid} = "n/a";
+
+    $_self->{handler_alrm} = NRun::Signal::register('ALRM', \&handler_alrm, [ \$_self ], $$);
+    $_self->{handler_int}  = NRun::Signal::register('INT',  \&handler_int,  [ \$_self ], $$);
+    $_self->{handler_term} = NRun::Signal::register('TERM', \&handler_term, [ \$_self ], $$);
+
     $_self->{O} = \*STDOUT;
     $_self->{E} = \*STDERR;
 }
@@ -144,18 +150,14 @@ sub init {
 sub handler_term {
 
     my $_self = shift;
-    my $_pid  = shift;
 
-    if ($$_pid != -128) {
+    if ($$_self->{pid} ne "n/a") {
 
-        kill(KILL => $$_pid);
-    } else {
-  
-        $$_pid = "n/a";
+        kill(KILL => $$_self->{pid});
     }
 
-    print {$$_self->{O}} "$$_self->{hostname};stdout;" . time() . ";$$;$$_pid;exit;\"exit code $NRun::Constants::CODE_SIGTERM;\"\n";
-    print {$$_self->{E}} "$$_self->{hostname};stderr;" . time() . ";$$;$$_pid;error;\"SIGTERM received\"\n";
+    print {$$_self->{O}} "$$_self->{hostname};stdout;" . time() . ";$$;$$_self->{pid};exit;\"exit code $NRun::Constants::CODE_SIGTERM;\"\n";
+    print {$$_self->{E}} "$$_self->{hostname};stderr;" . time() . ";$$;$$_self->{pid};error;\"SIGTERM received\"\n";
 }
 
 ###
@@ -163,18 +165,14 @@ sub handler_term {
 sub handler_int {
 
     my $_self = shift;
-    my $_pid  = shift;
 
-    if ($$_pid != -128) {
+    if ($$_self->{pid} ne "n/a") {
 
-        kill(KILL => $$_pid);
-    } else {
-  
-        $$_pid = "n/a";
-    }
+        kill(KILL => $$_self->{pid});
+    } 
 
-    print {$$_self->{O}} "$$_self->{hostname};stdout;" . time() . ";$$;$$_pid;exit;\"exit code $NRun::Constants::CODE_SIGINT;\"\n";
-    print {$$_self->{E}} "$$_self->{hostname};stderr;" . time() . ";$$;$$_pid;error;\"SIGINT received\"\n";
+    print {$$_self->{O}} "$$_self->{hostname};stdout;" . time() . ";$$;$$_self->{pid};exit;\"exit code $NRun::Constants::CODE_SIGINT;\"\n";
+    print {$$_self->{E}} "$$_self->{hostname};stderr;" . time() . ";$$;$$_self->{pid};error;\"SIGINT received\"\n";
 }
 
 
@@ -183,18 +181,14 @@ sub handler_int {
 sub handler_alrm {
 
     my $_self = shift;
-    my $_pid  = shift;
 
-    if ($$_pid != -128) {
+    if ($$_self->{pid} ne "n/a") {
 
-        kill(KILL => $$_pid);
-    } else {
-  
-        $$_pid = "n/a";
+        kill(KILL => $$_self->{pid});
     }
 
-    print {$$_self->{O}} "$$_self->{hostname};stdout;" . time() . ";$$;$$_pid;exit;\"exit code $NRun::Constants::CODE_SIGALRM;\"\n";
-    print {$$_self->{E}} "$$_self->{hostname};stderr;" . time() . ";$$;$$_pid;error;\"SIGALRM received\"\n";
+    print {$$_self->{O}} "$$_self->{hostname};stdout;" . time() . ";$$;$$_self->{pid};exit;\"exit code $NRun::Constants::CODE_SIGALRM;\"\n";
+    print {$$_self->{E}} "$$_self->{hostname};stderr;" . time() . ";$$;$$_self->{pid};error;\"SIGALRM received\"\n";
 }
 
 ###
@@ -213,21 +207,11 @@ sub do {
 
     chomp($_cmd);
 
-    my $pid = -128;
-
-    my $handler_alrm = NRun::Signal::register('ALRM', \&handler_alrm, [ \$_self, \$pid ], $$);
-    my $handler_int  = NRun::Signal::register('INT',  \&handler_int,  [ \$_self, \$pid ], $$);
-    my $handler_term = NRun::Signal::register('TERM', \&handler_term, [ \$_self, \$pid ], $$);
-
     eval{
 
-        $pid = open3(\*CMDIN, \*CMDOUT, \*CMDERR, "$_cmd");
+        $_self->{pid} = open3(\*CMDIN, \*CMDOUT, \*CMDERR, "$_cmd");
     };
     if ($@) {
-
-        NRun::Signal::deregister('ALRM', $handler_alrm);
-        NRun::Signal::deregister('INT',  $handler_int);
-        NRun::Signal::deregister('TERM', $handler_term);
 
         print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;n/a;debug;\"exec $_cmd\"\n";
         print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"$@\"\n";
@@ -236,7 +220,7 @@ sub do {
         return $NRun::Constants::EXECUTION_FAILED;
     }
     
-    print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;$pid;debug;\"exec $_cmd\"\n";
+    print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;$_self->{pid};debug;\"exec $_cmd\"\n";
 
     my $selector = IO::Select->new();
     $selector->add(\*CMDOUT, \*CMDERR);
@@ -250,14 +234,14 @@ sub do {
                 while (my $line = <$fh>) {
 
                     chomp($line);
-                    print {$_self->{O}} "$_self->{hostname};stdout;" . time() . ";$$;$pid;output;\"$line\"\n";
+                    print {$_self->{O}} "$_self->{hostname};stdout;" . time() . ";$$;$_self->{pid};output;\"$line\"\n";
                 }
             } elsif (fileno($fh) == fileno(CMDERR)) {
 
                 while (my $line = <$fh>) {
 
                     chomp($line);
-                    print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;$pid;output;\"$line\"\n";
+                    print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;$_self->{pid};output;\"$line\"\n";
                 }
             }
 
@@ -268,13 +252,11 @@ sub do {
     close(CMDOUT);
     close(CMDERR);
 
-    waitpid($pid, 0);
+    waitpid($_self->{pid}, 0);
 
-    print {$_self->{O}} "$_self->{hostname};stdout;" . time() . ";$$;$pid;exit;\"exit code " . ($? >> 8) . "\"\n";
+    print {$_self->{O}} "$_self->{hostname};stdout;" . time() . ";$$;$_self->{pid};exit;\"exit code " . ($? >> 8) . "\"\n";
 
-    NRun::Signal::deregister('ALRM', $handler_alrm);
-    NRun::Signal::deregister('INT',  $handler_int);
-    NRun::Signal::deregister('TERM', $handler_term);
+    $_self->{pid} = "n/a";
 
     return ($? >> 8);
 }
@@ -295,6 +277,10 @@ sub end {
     print {$_self->{O}} "$_self->{hostname};stdout;" . time() . ";$$;n/a;end;\n";
     print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;n/a;end;\n";
 
+    NRun::Signal::deregister('ALRM', $_self->{handler_alrm});
+    NRun::Signal::deregister('INT',  $_self->{handler_int});
+    NRun::Signal::deregister('TERM', $_self->{handler_term});
+    
     open(NULL, ">/dev/null");
 
     $_self->{O} = \*NULL;
