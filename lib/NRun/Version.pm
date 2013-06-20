@@ -33,5 +33,5 @@ package NRun::Version;
 
 use version;
 
-our $VERSION = qv(1.0.0);
+our $VERSION = qv(1.0.1);
 
