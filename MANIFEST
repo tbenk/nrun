@@ -31,7 +31,6 @@ lib/NRun/Signal.pm
 lib/NRun/Check.pm
 lib/NRun/Sink.pm
 lib/NRun/Version.pm
-lib/NRun/Callback.pm
 lib/NRun/Pool.pm
 lib/NRun/Worker.pm
 misc/put_pubkey

@@ -45,7 +45,6 @@ use NRun::Version;
 use NRun::Check;
 use NRun::Filter;
 use NRun::Logger;
-use NRun::Callback;
 use NRun::Worker;
 use NRun::Signal;
 use NRun::Logger;
@@ -270,11 +269,12 @@ sub parse_commandline {
 }
 
 ###
-# callback function used by the dispatcher
+# callback function used by the dispatcher (child context)
 sub callback {
     
     my $_host = shift;
 
+    # initialize the worker object
     my $worker = NRun::Worker::workers()->{$options->{mode}}->{NAME}->new();
 
     $worker->init (
@@ -284,6 +284,7 @@ sub callback {
         }
     );
 
+    # initialize the check objects
     my @checks;
     foreach my $check (@{$options->{check}}) {
 
@@ -299,14 +300,20 @@ sub callback {
         push(@checks, $c);
     }
 
-    $options->{sink}->connect();
+    # execute all check objects
+    foreach my $check (@checks) {
 
-    NRun::Callback::ncopy (
-        $worker,
-        $options->{source},
-        $options->{destination},
-        \@checks
-    );
+        if (not $check->execute()) {
+
+            $worker->end();
+            return;
+        }
+    }
+
+    # finally copy the file
+    $worker->copy($options->{source}, $options->{destination});
+
+    $worker->end();
 }
 
 ###

@@ -45,7 +45,6 @@ use NRun::Version;
 use NRun::Check;
 use NRun::Filter;
 use NRun::Logger;
-use NRun::Callback;
 use NRun::Worker;
 use NRun::Signal;
 use NRun::Logger;
@@ -270,11 +269,12 @@ sub parse_commandline {
 }
 
 ###
-# callback function used by the dispatcher
+# callback function used by the dispatcher (child context)
 sub callback {
     
     my $_host = shift;
 
+    # initialize the worker object
     my $worker = NRun::Worker::workers()->{$options->{mode}}->{NAME}->new();
 
     $worker->init (
@@ -284,6 +284,7 @@ sub callback {
         }
     );
 
+    # initialize the check objects
     my @checks;
     foreach my $check (@{$options->{check}}) {
 
@@ -299,13 +300,50 @@ sub callback {
         push(@checks, $c);
     }
 
-    NRun::Callback::nrun (
-        $worker,
-        $options->{command},
-        $options->{arguments},
-        \@checks,
-        $options->{copy}
-    );
+    # register signal handlers
+    my $command = $options->{command};
+
+    my $handler_term = NRun::Signal::register('TERM', \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
+    my $handler_int  = NRun::Signal::register('INT',  \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
+    my $handler_alrm = NRun::Signal::register('ALRM', \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
+
+    # execute all check objects
+    foreach my $check (@checks) {
+
+        if (not $check->execute()) {
+
+            $worker->end();
+            return;
+        }
+    }
+
+    # start the actual execution sequence
+    if (defined($options->{copy})) {
+
+        my $source = $command;
+
+        $command = (tempfile(OPEN => 0, DIR => "/tmp"))[1] . "$$";
+
+        if ($worker->copy($source, $command) != 0) {
+
+            $worker->end();
+            return;
+        }
+    }
+
+    $worker->execute($command, $options->{arguments});
+
+    $worker->end();
+
+    if (defined($options->{copy})) {
+
+        $worker->delete($command);
+    }
+
+    # deregister signal handlers
+    NRun::Signal::deregister('TERM', $handler_term);
+    NRun::Signal::deregister('INT',  $handler_int);
+    NRun::Signal::deregister('ALRM', $handler_alrm);
 }
 
 ###
