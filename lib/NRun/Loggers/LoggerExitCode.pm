@@ -80,6 +80,10 @@ sub init {
     $_self->{log_directory} = $_cfg->{log_directory};
     $_self->{logfile} = "$_self->{log_directory}/result.log";
 
+    select(LOG);
+    $| = 1;
+    select(STDOUT);
+
     open(LOG, ">>$_self->{logfile}") or die("$_self->{logfile}: $!");
 
     $_self->{LOG} = \*LOG;
