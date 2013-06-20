@@ -30,7 +30,7 @@ installation is straight forward:
 if desired it is possible to change the installation prefix using the
 parameter DESTDIR:
 
-# make install DESTDIR=~/applications
+# perl Makefile.PL DESTDIR=~/applications
 
 usage
 =====
