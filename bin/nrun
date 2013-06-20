@@ -270,6 +270,22 @@ sub parse_commandline {
 }
 
 ###
+# ensure cleanup on TERM, INT and ALRM
+sub handler_cleanup {
+
+    my $_worker  = shift;
+    my $_command = shift;
+    my $_copy    = shift;
+
+    $$_worker->end();
+
+    if (defined($$_copy)) {
+
+        $$_worker->delete($$_command) if (defined($$_copy));
+    }
+}
+
+###
 # callback function used by the dispatcher (child context)
 sub callback {
     
