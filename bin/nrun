@@ -407,6 +407,8 @@ sub sink_init() {
 # main
 sub main {
 
+    $options->{ppid} = $$;
+
     NRun::Signal::register('TERM', \&handler);
     NRun::Signal::register('INT',  \&handler);
 
@@ -417,8 +419,6 @@ sub main {
             NRun::Util::home() . "/.nrunrc" 
         ]
     );
-
-    $options->{ppid} = $$;
 
     parse_commandline();
 
