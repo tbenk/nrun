@@ -80,17 +80,17 @@ sub resolve_target {
 
         foreach my $tgt (@{$_alias->{$_tgt}}) {
 
-            @targets = ( @targets, resolve_target($tgt, $_alias, $_seen) );
+            push(@targets, resolve_target($tgt, $_alias, $_seen));
         }
     } elsif (-e $_tgt) {
 
         foreach my $tgt (read_hosts($_tgt)) {
 
-            @targets = ( @targets, resolve_target($tgt, $_alias, $_seen) );
+            push(@targets, resolve_target($tgt, $_alias, $_seen));
         }
     } else {
 
-        @targets = ( $_tgt );
+        push(@targets, $_tgt);
     }
 
     return @targets;
