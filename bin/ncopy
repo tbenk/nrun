@@ -40,6 +40,7 @@ use File::Basename;
 use File::Temp qw(tempfile);
 use Date::Format;
 use Getopt::Long;
+use POSIX qw(:sys_wait_h);
 
 use NRun::Util;
 use NRun::Version;
@@ -336,6 +337,8 @@ sub callback {
 ###
 # ensure exit on SIGINT/SIGTERM
 sub handler {
+
+    while (waitpid(-1, WNOHANG) != -1) { };
 
     if (not $options->{ppid} eq $$) {
 
