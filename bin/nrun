@@ -370,12 +370,12 @@ sub handler {
 
     my $_options = shift;
 
-    if ($$_options->{ppid} eq $$) {
+    if (not $$_options->{ppid} eq $$) {
 
-        while (waitpid(-1, WNOHANG) != -1) { };
+        exit();
     }
 
-    exit();
+    while (waitpid(-1, WNOHANG) != -1) { };
 }
 
 ###
