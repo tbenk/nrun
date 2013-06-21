@@ -83,6 +83,23 @@ sub init {
 }
 
 ###
+# copy a file from $_self->{hostname}.
+#
+# $_source - source file to be copied
+# $_target - destination $_source should be copied to
+# <- the return code
+sub rcopy {
+
+    my $_self   = shift;
+    my $_source = shift;
+    my $_target = shift;
+
+    print {$_self->{E}} "$_self->{hostname};stderr;" . time() . ";$$;n/a;error;\"not implemented\"\n";
+
+    return 1;
+}
+
+###
 # copy a file to $_self->{hostname}.
 #
 # $_source - source file to be copied

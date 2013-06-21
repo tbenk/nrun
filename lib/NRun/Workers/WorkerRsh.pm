@@ -71,6 +71,7 @@ sub new {
 # $_cfg - parameter hash where
 # {
 #   'hostname'   - hostname this worker should act on
+#   'rsh_rcopy'  - commandline for the rcopy command (SOURCE, TARGET, HOSTNAME will be replaced)
 #   'rsh_copy'   - commandline for the copy command (SOURCE, TARGET, HOSTNAME will be replaced)
 #   'rsh_exec'   - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 #   'rsh_delete' - commandline for the delete command (FILE, HOSTNAME will be replaced)
@@ -82,13 +83,14 @@ sub init {
 
     $_self->SUPER::init($_cfg);
 
+    $_self->{rsh_rcopy}  = $_cfg->{rsh_rcopy};
     $_self->{rsh_copy}   = $_cfg->{rsh_copy};
     $_self->{rsh_exec}   = $_cfg->{rsh_exec};
     $_self->{rsh_delete} = $_cfg->{rsh_delete};
 }
 
 ###
-# copy a file to $_self->{hostname}.
+# copy a file from $_self->{hostname}.
 #
 # $_source - source file to be copied
 # $_target - destination $_source should be copied to
@@ -100,6 +102,27 @@ sub copy {
     my $_target = shift;
 
     my $cmdline = $_self->{rsh_copy};
+
+    $cmdline =~ s/SOURCE/$_source/g;
+    $cmdline =~ s/TARGET/$_target/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    return $_self->do($cmdline);
+}
+
+###
+# rcopy a file from $_self->{hostname}.
+#
+# $_source - source file to be copied
+# $_target - destination $_source should be copied to
+# <- the return code
+sub rcopy {
+
+    my $_self   = shift;
+    my $_source = shift;
+    my $_target = shift;
+
+    my $cmdline = $_self->{rsh_rcopy};
 
     $cmdline =~ s/SOURCE/$_source/g;
     $cmdline =~ s/TARGET/$_target/g;

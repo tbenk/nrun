@@ -71,6 +71,7 @@ sub new {
 # $_cfg - parameter hash where
 # {
 #   'hostname'   - hostname this worker should act on
+#   'ssh_rcopy'  - commandline for the rcopy command (SOURCE, TARGET, HOSTNAME will be replaced)
 #   'ssh_copy'   - commandline for the copy command (SOURCE, TARGET, HOSTNAME will be replaced)
 #   'ssh_exec'   - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 #   'ssh_delete' - commandline for the delete command (FILE, HOSTNAME will be replaced)
@@ -82,6 +83,7 @@ sub init {
 
     $_self->SUPER::init($_cfg);
 
+    $_self->{ssh_rcopy}  = $_cfg->{ssh_rcopy};
     $_self->{ssh_copy}   = $_cfg->{ssh_copy};
     $_self->{ssh_exec}   = $_cfg->{ssh_exec};
     $_self->{ssh_delete} = $_cfg->{ssh_delete};
@@ -100,6 +102,27 @@ sub copy {
     my $_target = shift;
 
     my $cmdline = $_self->{ssh_copy};
+
+    $cmdline =~ s/SOURCE/$_source/g;
+    $cmdline =~ s/TARGET/$_target/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    return $_self->do($cmdline);
+}
+
+###
+# copy a file from $_self->{hostname}.
+#
+# $_source - source file to be copied
+# $_target - destination $_source should be copied to
+# <- the return code
+sub rcopy {
+
+    my $_self   = shift;
+    my $_source = shift;
+    my $_target = shift;
+
+    my $cmdline = $_self->{ssh_rcopy};
 
     $cmdline =~ s/SOURCE/$_source/g;
     $cmdline =~ s/TARGET/$_target/g;

@@ -70,6 +70,7 @@ sub new {
 # $_cfg - parameter hash where
 # {
 #   'hostname'   - hostname this worker should act on
+#   'nsh_rcopy'  - commandline for the rcopy command (SOURCE, TARGET, HOSTNAME will be replaced)
 #   'nsh_copy'   - commandline for the copy command (SOURCE, TARGET, HOSTNAME will be replaced)
 #   'nsh_exec'   - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 #   'nsh_delete' - commandline for the delete command (FILE, HOSTNAME will be replaced)
@@ -81,9 +82,35 @@ sub init {
 
     $_self->SUPER::init($_cfg);
 
+    $_self->{nsh_rcopy}  = $_cfg->{nsh_rcopy};
     $_self->{nsh_copy}   = $_cfg->{nsh_copy};
     $_self->{nsh_exec}   = $_cfg->{nsh_exec};
     $_self->{nsh_delete} = $_cfg->{nsh_delete};
+}
+
+###
+# copy a file from $_self->{hostname}.
+#
+# $_source - source file to be copied
+# $_target - destination $_source should be copied to
+# <- the return code
+sub rcopy {
+
+    my $_self   = shift;
+    my $_source = shift;
+    my $_target = shift;
+
+    # nexec "steals" STDIN otherwise - no CTRL+C possible
+    close(STDIN);
+    open(STDIN, "/dev/null");
+
+    my $cmdline = $_self->{nsh_rcopy};
+
+    $cmdline =~ s/SOURCE/$_source/g;
+    $cmdline =~ s/TARGET/$_target/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    return $_self->do($cmdline);
 }
 
 ###

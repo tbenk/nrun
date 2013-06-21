@@ -72,6 +72,7 @@ sub new {
 # $_cfg - parameter hash where
 # {
 #   'hostname'       - hostname this worker should act on
+#   'generic_rcopy'  - commandline for the rcopy command (SOURCE, TARGET, HOSTNAME will be replaced)
 #   'generic_copy'   - commandline for the copy command (SOURCE, TARGET, HOSTNAME will be replaced)
 #   'generic_exec'   - commandline for the exec command (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 #   'generic_delete' - commandline for the delete command (FILE, HOSTNAME will be replaced)
@@ -83,6 +84,7 @@ sub init {
 
     $_self->SUPER::init($_cfg);
 
+    $_self->{generic_rcopy}  = $_cfg->{generic_rcopy};
     $_self->{generic_copy}   = $_cfg->{generic_copy};
     $_self->{generic_exec}   = $_cfg->{generic_exec};
     $_self->{generic_delete} = $_cfg->{generic_delete};
@@ -104,6 +106,27 @@ sub copy {
 
     $cmdline =~ s/SOURCE/$_source/g;
     $cmdline =~ s/TARGET/$_target/g;
+    $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
+
+    return $_self->do($cmdline);
+}
+
+###
+# copy a file from $_self->{hostname}.
+#
+# $_source - source file to be copied
+# $_target - destination $_source should be copied to
+# <- the return code
+sub rcopy {
+
+    my $_self   = shift;
+    my $_source = shift;
+    my $_target = shift;
+
+    my $cmdline = $_self->{generic_rcopy};
+
+    $cmdline =~ s/SOURCE/$_source/g;
+    $cmdline =~ s/TARGET/$_target.$_self->{hostname}/g;
     $cmdline =~ s/HOSTNAME/$_self->{hostname}/g;
 
     return $_self->do($cmdline);

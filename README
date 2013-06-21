@@ -39,6 +39,7 @@ usage: nrun -t HOST1[,HOST2,...] -- COMMAND
 --copy                      copy command to target host before execution.
 --log-directory DIR         base directory for the log files.
 --parallel,-p MAX           number of parallel connections (defaults to 5).
+--reverse,-r                reverse copy the source file from all target hosts.
 --target,-t HOST1,HOST2     comma separated list of target hosts.
 --timeout SEC               timeout for each command execution (defaults to 60).
 --version,-v                print the version string and exit.
@@ -117,9 +118,13 @@ $ nrun --target HOSTS.LST --copy -- bin/script.sh
 
 $ nrun --target HOSTS.LST --mode local -- ./test.sh
 
-6. copy file test.tar to host1, host2 and all hosts in the file HOSTS.LST
+6. copy file test.tar to all hosts in the file HOSTS.LST
 
 $ ncopy --target HOSTS.LST -- test.tar /tmp 
+
+7. reverse copy file /etc/passwd from all hosts in the file HOSTS.LST
+
+$ ncopy --target HOSTS.LST --reverse -- /etc/passwd /tmp 
 
 configuration
 =============
@@ -145,6 +150,15 @@ ssh_copy: >
     -o UserKnownHostsFile=/dev/null
     -o LogLevel=FATAL
     SOURCE HOSTNAME:TARGET
+
+ssh_rcopy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME:SOURCE TARGET
 
 ssh_exec: >
     /usr/bin/ssh
@@ -214,6 +228,7 @@ the following configuration options must be set in the configuration file:
 
 'ssh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 'ssh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'ssh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 'ssh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 for passwordless login ssh-agent can be used:
@@ -242,6 +257,7 @@ the following configuration options must be set in the configuration file:
 
 'rsh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 'rsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'rsh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 'rsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 mode local
@@ -261,6 +277,7 @@ the following configuration options must be set in the configuration file:
 
 'nsh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 'nsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'nsh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 'nsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 'nsh_check'  - commandline for the agentinfo check command (HOSTNAME will be replaced)
 
@@ -273,6 +290,7 @@ for remote exection and one to specify a command for remote copying.
 
 'generic_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
 'generic_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'generic_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 'generic_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 an example that resembles the mode ssh would look the following way:
@@ -285,7 +303,16 @@ generic_copy: >
     -o StrictHostKeyChecking=no 
     -o UserKnownHostsFile=/dev/null
     -o LogLevel=FATAL 
-    -o SOURCE HOSTNAME:TARGET 
+    SOURCE HOSTNAME:TARGET 
+
+generic_rcopy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    HOSTNAME:SOURCE TARGET 
 
 generic_exec: >
     /usr/bin/ssh

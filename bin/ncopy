@@ -61,6 +61,7 @@ sub usage {
     print "usage: " . basename($0) . " -t HOST1[,HOST2,...] -- SOURCE TARGET\n";
     print "--log-directory DIR         base directory for the log files.\n";
     print "--parallel,-p MAX           number of parallel connections (defaults to 5).\n";
+    print "--reverse,-r                reverse copy the source file from all target hosts.\n";
     print "--target,-t HOST1,HOST2     comma separated list of target hosts.\n";
     print "--timeout SEC               timeout for each command execution (defaults to 60).\n";
     print "--version,-v                print the version string and exit.\n";
@@ -135,6 +136,7 @@ sub parse_commandline {
     my $arg_logger        = $options->{ncopy}->{arg_logger};
     my $arg_check         = $options->{ncopy}->{arg_check};
     my $arg_version       = $options->{ncopy}->{arg_version};
+    my $arg_rcopy         = $options->{ncopy}->{arg_rcopy};
     my $arg_timeout       = $options->{ncopy}->{arg_timeout};
 
     my $ret = GetOptions (
@@ -144,6 +146,7 @@ sub parse_commandline {
         "timeout=i"       => \$arg_timeout,
         "mode|m=s"        => \$arg_mode,
         "filter|f=s"      => \$arg_filter,
+        "reverse|r"       => \$arg_rcopy,
         "logger|l=s"      => \$arg_logger,
         "check|c=s"       => \$arg_check, 
         "version|v"       => \$arg_version,
@@ -196,6 +199,7 @@ sub parse_commandline {
     $options->{source}      = $ARGV[0];
     $options->{destination} = $ARGV[1];
     $options->{timeout}     = $arg_timeout ? $arg_timeout : 60;
+    $options->{rcopy}       = $arg_rcopy;
     $options->{mode}        = lc($arg_mode);
     $options->{filter}      = lc($arg_filter);
     $options->{logger}      = [ map { lc } split(",", $arg_logger) ];
@@ -312,7 +316,19 @@ sub callback {
     }
 
     # finally copy the file
-    $worker->copy($options->{source}, $options->{destination});
+    if (defined($options->{rcopy})) {
+
+        my $dst = "$options->{destination}.$_host";
+        if (-e $options->{destination} and -d $options->{destination}) {
+   
+            $dst = "$options->{destination}/" . basename($options->{source}) . ".$_host";
+        }
+
+        $worker->rcopy($options->{source}, $dst);
+    } else {
+
+        $worker->copy($options->{source}, $options->{destination});
+    }
 
     $worker->end();
 }
@@ -425,6 +441,8 @@ B<--mode,-m MODE>                remote execution mode (see MODES).
 
 B<--parallel,-p MAX>             number of parallel connections (defaults to 5).
 
+B<--reverse,-r>                  reverse copy the source file from all target hosts.
+
 B<--target,-t HOST1[,HOST2,...]> comma separated list of target hosts (see TARGETS).
 
 B<--timeout SEC>                 timeout for each command execution (defaults to 60).
@@ -456,6 +474,15 @@ does matter (YAML syntax).
         -o UserKnownHostsFile=/dev/null
         -o LogLevel=FATAL
         SOURCE HOSTNAME:TARGET
+    
+    ssh_rcopy: >
+        /usr/bin/scp
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME:SOURCE TARGET
     
     ssh_exec: >
         /usr/bin/ssh
@@ -528,6 +555,8 @@ the following configuration options must be set in the configuration file:
 
 'ssh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
+'ssh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
 'ssh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 for passwordless login ssh-agent can be used:
@@ -557,6 +586,8 @@ the following configuration options must be set in the configuration file:
 
 'rsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
+'rsh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
 'rsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 =head2 mode local
@@ -576,6 +607,8 @@ the following configuration options must be set in the configuration file:
 
 'nsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
+'nsh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
 'nsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 'nsh_check'  - commandline for the agentinfo check command (HOSTNAME will be replaced)
@@ -589,6 +622,8 @@ mechanisms.
 
 'generic_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
+'generic_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
 'generic_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 an example that resembles the mode ssh would look the following way:
@@ -601,6 +636,15 @@ an example that resembles the mode ssh would look the following way:
         -o UserKnownHostsFile=/dev/null
         -o LogLevel=FATAL
         SOURCE HOSTNAME:TARGET
+    
+    generic_rcopy: >
+        /usr/bin/scp
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME:SOURCE TARGET
     
     generic_exec: >
         /usr/bin/ssh
@@ -727,9 +771,13 @@ indentation does matter.
 
 =head1 EXAMPLES
 
-1. copy file test.tar to host1, host2 and all hosts in the file HOSTS.LST
+1. copy file test.tar to all hosts in the file HOSTS.LST
 
 	$ ncopy --target HOSTS.LST -- test.tar /tmp 
+
+2. reverse copy file /etc/passwd from all hosts in the file HOSTS.LST
+
+	$ ncopy --target HOSTS.LST --reverse -- /etc/passwd /tmp 
 
 =head1 NOTES
 

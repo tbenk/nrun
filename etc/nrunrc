@@ -12,6 +12,15 @@ ssh_copy: >
     -o LogLevel=FATAL 
     SOURCE HOSTNAME:TARGET 
 
+ssh_rcopy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    HOSTNAME:SOURCE TARGET 
+
 ssh_exec: >
     /usr/bin/ssh
     -o User=root
@@ -34,6 +43,9 @@ ssh_delete: >
 rsh_copy: >
     /usr/bin/rcp SOURCE root@HOSTNAME:TARGET
 
+rsh_rcopy: >
+    /usr/bin/rcp root@HOSTNAME:SOURCE TARGET 
+
 rsh_exec: >
     /usr/bin/rsh -l root HOSTNAME COMMAND ARGUMENTS
 
@@ -43,6 +55,9 @@ rsh_delete: >
 # mode nsh options
 nsh_copy: >
     ncp SOURCE - //HOSTNAME/TARGET
+
+nsh_rcopy: >
+    ncp //HOSTNAME/SOURCE - TARGET
 
 nsh_exec: >
     nexec -n HOSTNAME COMMAND ARGUMENTS
@@ -66,6 +81,15 @@ generic_copy: >
     -o UserKnownHostsFile=/dev/null
     -o LogLevel=FATAL 
     SOURCE HOSTNAME:TARGET 
+
+generic_rcopy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    HOSTNAME:SOURCE TARGET 
 
 generic_exec: >
     /usr/bin/ssh

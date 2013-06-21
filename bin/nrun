@@ -509,6 +509,15 @@ does matter (YAML syntax).
         -o LogLevel=FATAL
         SOURCE HOSTNAME:TARGET
     
+    ssh_rcopy: >
+        /usr/bin/scp
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME:SOURCE TARGET
+    
     ssh_exec: >
         /usr/bin/ssh
         -o User=root
@@ -580,6 +589,8 @@ the following configuration options must be set in the configuration file:
 
 'ssh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
+'ssh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
 'ssh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 for passwordless login ssh-agent can be used:
@@ -609,6 +620,8 @@ the following configuration options must be set in the configuration file:
 
 'rsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
+'rsh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
 'rsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 =head2 mode local
@@ -628,6 +641,8 @@ the following configuration options must be set in the configuration file:
 
 'nsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
+'nsh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
 'nsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 'nsh_check'  - commandline for the agentinfo check command (HOSTNAME will be replaced)
@@ -641,6 +656,8 @@ mechanisms.
 
 'generic_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
 
+'generic_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
 'generic_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
 
 an example that resembles the mode ssh would look the following way:
@@ -653,6 +670,15 @@ an example that resembles the mode ssh would look the following way:
         -o UserKnownHostsFile=/dev/null
         -o LogLevel=FATAL
         SOURCE HOSTNAME:TARGET
+    
+    generic_rcopy: >
+        /usr/bin/scp
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME:SOURCE TARGET
     
     generic_exec: >
         /usr/bin/ssh
