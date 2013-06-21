@@ -368,12 +368,14 @@ sub callback {
 # ensure exit on SIGINT/SIGTERM
 sub handler {
 
-    while (waitpid(-1, WNOHANG) != -1) { };
+    my $_options = shift;
 
-    if (not $options->{ppid} eq $$) {
+    if ($$_options->{ppid} eq $$) {
 
-        exit();
+        while (waitpid(-1, WNOHANG) != -1) { };
     }
+
+    exit();
 }
 
 ###
@@ -407,11 +409,6 @@ sub sink_init() {
 # main
 sub main {
 
-    $options->{ppid} = $$;
-
-    NRun::Signal::register('TERM', \&handler);
-    NRun::Signal::register('INT',  \&handler);
-
     $options = NRun::Util::read_config_files (
         [
             "$FindBin::Bin/../etc/nrunrc",
@@ -419,6 +416,11 @@ sub main {
             NRun::Util::home() . "/.nrunrc" 
         ]
     );
+
+    $options->{ppid} = $$;
+
+    NRun::Signal::register('TERM', \&handler, [ \$options ]);
+    NRun::Signal::register('INT',  \&handler, [ \$options ]);
 
     parse_commandline();
 
