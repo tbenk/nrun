@@ -40,6 +40,7 @@
 # - execute($cmd, $args)
 # - delete($file)
 # - copy($source, $target)
+# - rcopy($source, $target)
 #
 # a derived module must call register() in BEGIN{}, otherwise it will not
 # be available.
