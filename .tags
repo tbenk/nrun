@@ -5,6 +5,7 @@ eg: "tags: relevant restructuring"
 
 available tags: 
 
-relevant      - code relevant commits
+relevant      - relevant code commits
 documentation - comment/documentation changes
 restructuring - file/directory renaming
+insignificant - insignificant code commits
