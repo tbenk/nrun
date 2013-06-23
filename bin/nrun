@@ -282,7 +282,7 @@ sub handler_cleanup {
 
     if (defined($$_copy)) {
 
-        $$_worker->delete($$_command) if (defined($$_copy));
+        $$_worker->delete($$_command);
     }
 }
 
