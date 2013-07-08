@@ -90,6 +90,13 @@ sub handler_term {
 }
 
 ###
+# break out of callback()
+sub handler_alrm {
+
+    die();
+}
+
+###
 # dispatch the worker processes.
 sub init {
 
@@ -110,12 +117,17 @@ sub init {
             die("error: unable to fork");
         } elsif ($pid == 0) {
 
+            my $handler_alrm = NRun::Signal::register('ALRM', \&handler_alrm, [ ], $$);
+
             $_self->{sink}->connect();
             foreach my $object (@$bunch) {
 
                 alarm($_self->{timeout});
 
-                $_self->{callback}->($object);
+                eval {
+
+                    $_self->{callback}->($object);
+                };
             };
             $_self->{sink}->disconnect();
 

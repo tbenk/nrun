@@ -52,18 +52,26 @@ sub _handler {
     return if ($LOCK == 1);
 
     $LOCK = 1;
-    foreach my $handler (reverse(@{$HANDLERS->{$_signal}})) {
+    eval {
 
-        my $sub = $handler->{callback};
-        my $arg = $handler->{arguments};
-        my $pid = $handler->{pid};
+        foreach my $handler (reverse(@{$HANDLERS->{$_signal}})) {
 
-        if (not defined($pid) or $pid == $$ ) {
+            my $sub = $handler->{callback};
+            my $arg = $handler->{arguments};
+            my $pid = $handler->{pid};
 
-            $sub->(@$arg);
+            if (not defined($pid) or $pid == $$ ) {
+
+                $sub->(@$arg);
+            }
         }
-    }
-    $LOCK = 0;
+     };
+     if ($@) {
+
+         $LOCK = 0;
+         die ($@);
+     }
+     $LOCK = 0;
 }
 
 ###
