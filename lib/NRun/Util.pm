@@ -76,21 +76,24 @@ sub resolve_target {
 
     my @targets;
 
-    if (defined($_alias) and defined($_alias->{$_tgt})) {
+    foreach my $token (split(/[ ,]/, $_tgt)) {
 
-        foreach my $tgt (@{$_alias->{$_tgt}}) {
-
-            push(@targets, resolve_target($tgt, $_alias, $_seen));
+        if (defined($_alias) and defined($_alias->{$token})) {
+    
+            foreach my $tgt (@{$_alias->{$token}}) {
+    
+                push(@targets, resolve_target($tgt, $_alias, $_seen));
+            }
+        } elsif (-e $token or $token eq "-") {
+    
+            foreach my $tgt (read_hosts($token)) {
+    
+                push(@targets, resolve_target($tgt, $_alias, $_seen));
+            }
+        } else {
+    
+            push(@targets, $token);
         }
-    } elsif (-e $_tgt) {
-
-        foreach my $tgt (read_hosts($_tgt)) {
-
-            push(@targets, resolve_target($tgt, $_alias, $_seen));
-        }
-    } else {
-
-        push(@targets, $_tgt);
     }
 
     return @targets;

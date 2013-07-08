@@ -195,7 +195,7 @@ sub parse_commandline {
         usage();
     }
 
-    $options->{target}      = [ split(",", $arg_target) ];
+    $options->{target}      = $arg_target;
     $options->{parallel}    = $arg_parallel ? $arg_parallel : 5;
     $options->{source}      = $ARGV[0];
     $options->{destination} = $ARGV[1];
@@ -260,11 +260,7 @@ sub parse_commandline {
         usage();
     }
 
-    $options->{hosts} = [];
-    foreach my $target (@{$options->{target}}) {
-
-        $options->{hosts} = [ @{$options->{hosts}}, NRun::Util::resolve_target($target, $options->{alias}) ];
-    }
+    $options->{hosts} = [ NRun::Util::resolve_target($options->{target}, $options->{alias}) ];
     $options->{hosts} = [ NRun::Util::uniq(@{$options->{hosts}}) ];
 
     if (scalar(@{$options->{hosts}}) == 0) {
