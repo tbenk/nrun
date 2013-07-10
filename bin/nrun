@@ -295,7 +295,7 @@ sub callback {
 
     my $handler_term = NRun::Signal::register('TERM', \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
     my $handler_int  = NRun::Signal::register('INT',  \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
-    my $handler_alrm = NRun::Signal::register('ALRM', \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
+    my $handler_alrm = NRun::Signal::register('ALRM', \&handler_cleanup, [ \$worker, \$command ]);
 
     # initialize the worker object
     $worker->init (
