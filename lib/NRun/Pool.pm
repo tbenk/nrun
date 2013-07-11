@@ -93,7 +93,7 @@ sub handler_term {
 # break out of callback()
 sub handler_alrm {
 
-    die();
+    die("alarm\n");
 }
 
 ###
@@ -122,12 +122,16 @@ sub init {
             $_self->{sink}->connect();
             foreach my $object (@$bunch) {
 
-                alarm($_self->{timeout});
-
                 eval {
 
+                    alarm($_self->{timeout});
                     $_self->{callback}->($object);
+                    alarm(0);
                 };
+                if ($@) {
+
+                    die($@) unless ($@ eq "alarm\n");
+                }
             };
             $_self->{sink}->disconnect();
 

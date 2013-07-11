@@ -147,15 +147,24 @@ sub init {
 }
 
 ###
+# kill the currently running command
+sub kill {
+
+    my $_self = shift;
+
+    if ($_self->{pid} ne "n/a") {
+
+        kill(KILL => $_self->{pid});
+    }
+}
+
+###
 # SIGTERM signal handler.
 sub handler_term {
 
     my $_self = shift;
 
-    if ($$_self->{pid} ne "n/a") {
-
-        kill(KILL => $$_self->{pid});
-    }
+    $$_self->kill();
 
     print {$$_self->{O}} "$$_self->{hostname};stdout;" . time() . ";$$;$$_self->{pid};exit;\"exit code $NRun::Constants::CODE_SIGTERM;\"\n";
     print {$$_self->{E}} "$$_self->{hostname};stderr;" . time() . ";$$;$$_self->{pid};error;\"SIGTERM received\"\n";
@@ -167,10 +176,7 @@ sub handler_int {
 
     my $_self = shift;
 
-    if ($$_self->{pid} ne "n/a") {
-
-        kill(KILL => $$_self->{pid});
-    } 
+    $$_self->kill();
 
     print {$$_self->{O}} "$$_self->{hostname};stdout;" . time() . ";$$;$$_self->{pid};exit;\"exit code $NRun::Constants::CODE_SIGINT;\"\n";
     print {$$_self->{E}} "$$_self->{hostname};stderr;" . time() . ";$$;$$_self->{pid};error;\"SIGINT received\"\n";
@@ -183,10 +189,7 @@ sub handler_alrm {
 
     my $_self = shift;
 
-    if ($$_self->{pid} ne "n/a") {
-
-        kill(KILL => $$_self->{pid});
-    }
+    $$_self->kill();
 
     print {$$_self->{O}} "$$_self->{hostname};stdout;" . time() . ";$$;$$_self->{pid};exit;\"exit code $NRun::Constants::CODE_SIGALRM;\"\n";
     print {$$_self->{E}} "$$_self->{hostname};stderr;" . time() . ";$$;$$_self->{pid};error;\"SIGALRM received\"\n";

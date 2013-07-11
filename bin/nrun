@@ -270,15 +270,31 @@ sub parse_commandline {
 # ensure cleanup on TERM, INT and ALRM
 sub handler_cleanup {
 
-    my $_worker  = shift;
-    my $_command = shift;
-    my $_copy    = shift;
+    my $_worker = shift;
+    my $_file   = shift;
 
     $$_worker->end();
 
-    if (defined($$_copy)) {
+    if (defined($$_file)) {
 
-        $$_worker->delete($$_command);
+        eval {
+
+            local $SIG{ALRM} = sub { die("alarm\n"); };
+
+            alarm($options->{timeout});
+            $$_worker->delete($$_file);
+            alarm(0);
+        };
+        if ($@) {
+
+            if ($@ eq "alarm\n") {
+
+                $$_worker->kill();
+            } else {
+
+                die($@);
+            }
+        }
     }
 }
 
@@ -288,14 +304,13 @@ sub callback {
     
     my $_host = shift;
 
+    my $file   = undef;
     my $worker = NRun::Worker::workers()->{$options->{mode}}->{NAME}->new();
 
     # register signal handlers
-    my $command = $options->{command};
-
-    my $handler_term = NRun::Signal::register('TERM', \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
-    my $handler_int  = NRun::Signal::register('INT',  \&handler_cleanup, [ \$worker, \$command, \$options->{copy} ]);
-    my $handler_alrm = NRun::Signal::register('ALRM', \&handler_cleanup, [ \$worker, \$command ]);
+    my $handler_term = NRun::Signal::register('TERM', \&handler_cleanup, [ \$worker, \$file ]);
+    my $handler_int  = NRun::Signal::register('INT',  \&handler_cleanup, [ \$worker, \$file ]);
+    my $handler_alrm = NRun::Signal::register('ALRM', \&handler_cleanup, [ \$worker, \$file ]);
 
     # initialize the worker object
     $worker->init (
@@ -332,6 +347,8 @@ sub callback {
     }
 
     # start the actual execution sequence
+    my $command = $options->{command};
+
     if (defined($options->{copy})) {
 
         my $source = $command;
@@ -343,6 +360,8 @@ sub callback {
             $worker->end();
             return;
         }
+
+        $file = $command;
     }
 
     $worker->execute($command, $options->{arguments});
