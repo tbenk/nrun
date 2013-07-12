@@ -83,13 +83,12 @@ sub init {
 }
 
 ###
-# create two additional pipes connected to this sink
-# object. each child process needs it's own pipes.
+# connect the currently running process to this sink.
 #
-# - must be called before each fork() 
-# - must be called before connect() or disconnect().
+# - must be called once before each fork() 
+# - must be called before process(), open() and close()
 # - must be called in the parent's context
-sub pipe() {
+sub connect() {
 
     my $_self = shift;
 
@@ -119,42 +118,40 @@ sub process {
     while (my @ready = $selector->can_read()) {
         
         foreach my $fh (@ready) {
-    
-            my $line = <$fh>;
 
-            foreach my $RDR1 (@{$_self->{RDR1}}) {
+            if (my $line = <$fh>) {
 
-                last if (not defined($line));
-                next if (not defined(fileno($RDR1)));
+                foreach my $RDR1 (@{$_self->{RDR1}}) {
 
-                if (fileno($fh) == fileno($RDR1)) {
+                    next if (not defined(fileno($RDR1)));
+
+                    if (fileno($fh) == fileno($RDR1)) {
         
-                    foreach my $filter (@{$_self->{filters}}) {
+                        foreach my $filter (@{$_self->{filters}}) {
     
-                        $filter->stdout($line);
+                            $filter->stdout($line);
+                        }
                     }
                 }
-            }
 
-            foreach my $RDR2 (@{$_self->{RDR2}}) {
+                foreach my $RDR2 (@{$_self->{RDR2}}) {
 
-                last if (not defined($line));
-                next if(not defined(fileno($RDR2)));
+                    next if(not defined(fileno($RDR2)));
 
-                if (fileno($fh) == fileno($RDR2)) {
+                    if (fileno($fh) == fileno($RDR2)) {
         
-                    foreach my $filter (@{$_self->{filters}}) {
+                        foreach my $filter (@{$_self->{filters}}) {
     
-                        $filter->stderr($line);
+                            $filter->stderr($line);
+                        }
                     }
                 }
-            }
+            } else {
 
-            if (eof($fh)) {
-            
                 $selector->remove($fh);
                 close($fh);
             }
+
         }
     }
 }
@@ -164,7 +161,7 @@ sub process {
 # this sink.
 #
 # - must be called in the child's context
-sub connect() {
+sub open() {
 
     my $_self = shift;
 
@@ -192,14 +189,14 @@ sub connect() {
 # this sink.
 #
 # - must be called in the child's context
-sub disconnect() {
+sub close() {
 
     my $_self = shift;
 
     return if (not defined($_self->{OLDOUT}));
 
-    open(STDOUT, ">&" . fileno($_self->{OLDOUT})) or die ("unable to restore stdout: $!");
-    open(STDERR, ">&" . fileno($_self->{OLDERR})) or die ("unable to restore stderr: $!");
+    CORE::open(STDOUT, ">&" . fileno($_self->{OLDOUT})) or die ("unable to restore stdout: $!");
+    CORE::open(STDERR, ">&" . fileno($_self->{OLDERR})) or die ("unable to restore stderr: $!");
 
     delete($_self->{OLDOUT});
     delete($_self->{OLDERR});

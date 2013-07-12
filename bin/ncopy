@@ -52,6 +52,7 @@ use NRun::Signal;
 use NRun::Logger;
 use NRun::Pool;
 use NRun::Sink;
+use NRun::Queue;
 
 our $options = {};
 
@@ -371,6 +372,21 @@ sub sink_init() {
     );
 }
 
+
+###
+# initialize the queue object
+sub queue_init {
+
+    my $_self = shift;
+
+    $options->{queue} = NRun::Queue->new();
+    $options->{queue}->init (
+        {
+            objects => $options->{hosts},
+        }
+    );
+}
+
 ###
 # main
 sub main {
@@ -391,14 +407,15 @@ sub main {
     parse_commandline();
 
     sink_init();
+    queue_init();
 
     $options->{pool} = NRun::Pool->new (
         {
             nmax    => $options->{parallel},
             timeout => $options->{timeout},
-            objects => $options->{hosts},
 
             sink => $options->{sink},
+            queue => $options->{queue},
 
             callback => \&callback,
         }

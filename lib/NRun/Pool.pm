@@ -44,7 +44,7 @@ use warnings;
 # $_obj - parameter hash where
 # {
 #   'timeout'  => timeout in seconds
-#   'objects'  => the target objects
+#   'queue'    => the queue object
 #   'nmax'     => maximum number of parallel login processes
 #   'callback' => callback function to be executed in parallel
 #                 signature: sub callback ($object)
@@ -61,7 +61,7 @@ sub new {
 
     $self->{timeout} = $_obj->{timeout};
     $self->{nmax}    = $_obj->{nmax};
-    $self->{objects} = $_obj->{objects};
+    $self->{queue}   = $_obj->{queue};
     $self->{sink}    = $_obj->{sink};
 
     $self->{callback} = $_obj->{callback};
@@ -107,40 +107,60 @@ sub init {
     my $handler_int  = NRun::Signal::register('INT',  \&handler_int,  [ \@pids ], $$);
     my $handler_term = NRun::Signal::register('TERM', \&handler_term, [ \@pids ], $$);
     
-    foreach my $bunch (NRun::Util::bunches($_self->{objects}, $_self->{nmax})) {
- 
-        $_self->{sink}->pipe();
+    foreach my $process (1..$_self->{nmax}) {
 
-        my $pid = fork();
-        if (not defined $pid) {
+        $_self->{sink}->connect();
+        $_self->{queue}->connect();
 
-            die("error: unable to fork");
-        } elsif ($pid == 0) {
-
-            my $handler_alrm = NRun::Signal::register('ALRM', \&handler_alrm, [ ], $$);
-
-            $_self->{sink}->connect();
-            foreach my $object (@$bunch) {
-
-                eval {
-
-                    alarm($_self->{timeout});
-                    $_self->{callback}->($object);
-                    alarm(0);
-                };
-                if ($@) {
-
-                    die($@) unless ($@ eq "alarm\n");
-                }
-            };
-            $_self->{sink}->disconnect();
-
-            exit(0);
-        } else {
-
-            push (@pids, $pid);
-        }
+        push(@pids, $_self->dispatch());
     }
+
+    $_self->{queue}->start();
+}
+
+###
+# dispatch a single worker process
+sub dispatch {
+
+    my $_self = shift;
+
+    my $pid = fork();
+    if (not defined $pid) {
+
+        die("error: unable to fork");
+    } elsif ($pid == 0) {
+
+        $_self->work();
+
+        exit(0);
+    }
+
+    return $pid;
+}
+
+###
+# do the actual work
+sub work {
+
+    my $_self = shift;
+
+    my $handler_alrm = NRun::Signal::register('ALRM', \&handler_alrm, [ ], $$);
+
+    $_self->{sink}->open();
+    while (my $object = $_self->{queue}->next()) {
+
+        eval {
+
+            alarm($_self->{timeout});
+            $_self->{callback}->($object);
+            alarm(0);
+        };
+        if ($@) {
+
+            die($@) unless ($@ eq "alarm\n");
+        }
+    };
+    $_self->{sink}->close();
 }
 
 1;
