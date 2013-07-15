@@ -151,7 +151,6 @@ sub process {
                 $selector->remove($fh);
                 close($fh);
             }
-
         }
     }
 }
