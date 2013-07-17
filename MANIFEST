@@ -33,4 +33,5 @@ lib/NRun/Sink.pm
 lib/NRun/Version.pm
 lib/NRun/Pool.pm
 lib/NRun/Worker.pm
+lib/NRun/Queue.pm
 misc/put_pubkey
